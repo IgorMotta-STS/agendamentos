@@ -87,7 +87,7 @@
       btn.textContent = 'Buscando...';
 
       try {
-        const res = await fetch(`http://localhost:3000/api/rastreio/${codigo}`);
+        const res = await fetch(`https://se7-backend.onrender.com/api/rastreio/${codigo}`);
         const dados = await res.json();
 
         if (res.ok) {
