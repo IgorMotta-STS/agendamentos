@@ -141,5 +141,55 @@
           // Código para colocar o nome na tela...
       }
   </script>
+  <script>
+    // URL da sua API
+    const API = 'https://se7-backend.onrender.com/api';
+
+    document.getElementById('formRastreio').addEventListener('submit', async function(e) {
+      e.preventDefault(); // Impede a página de recarregar
+
+      const inputBusca = document.getElementById('inputBusca').value.trim();
+      const btnSubmit = this.querySelector('button[type="submit"]');
+      const textoOriginalBtn = btnSubmit.innerHTML;
+
+      // Se o campo estiver vazio, não faz nada
+      if (!inputBusca) return;
+
+      // 1. UX: Altera o botão para o estado de "Carregando"
+      btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Buscando...';
+      btnSubmit.disabled = true;
+
+      try {
+        // 2. Faz a requisição para o seu backend
+        // (Ajuste a rota se o seu backend usar um caminho diferente para o rastreio público)
+        const response = await fetch(`${API}/agendamentos/${inputBusca}`);
+
+        // Se o backend retornar erro (como 404 Not Found)
+        if (!response.ok) {
+          throw new Error('Carga não encontrada');
+        }
+
+        const dados = await response.json();
+
+        // Se a carga for encontrada, você pode redirecionar ou exibir os dados aqui
+        console.log("Carga encontrada:", dados);
+        // Exemplo: window.location.href = `resultado.html?id=${dados.id}`;
+
+      } catch (error) {
+        // 3. UX: Exibe o alerta bonito de erro
+        Swal.fire({
+          icon: 'error',
+          title: 'Não encontrado',
+          text: 'Não localizamos nenhuma carga com esta identificação. Verifique os números e tente novamente.',
+          confirmButtonColor: '#0083CB' // Usa a cor azul da sua marca no botão do alerta!
+        });
+      } finally {
+        // 4. Devolve o botão ao estado normal
+        btnSubmit.innerHTML = textoOriginalBtn;
+        btnSubmit.disabled = false;
+        document.getElementById('inputBusca').value = ''; // Limpa o campo
+      }
+    });
+  </script>
 </body>
 </html>

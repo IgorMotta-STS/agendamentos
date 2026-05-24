@@ -311,13 +311,24 @@
 
     function obterDadosFormulario() {
       return {
-        tipoCarga: valor('tipoCarga'), di: valor('di'), pedido: valor('pedido'), dataHora: valor('dataHora'),
-        cnpjCliente: valor('cnpjCliente'), cliente: valor('cliente'), endereco: valor('endereco'),
-        cnpjTransportadora: valor('cnpjTransportadora'), transportadora: valor('transportadora'),
-        cpfMotorista: valor('cpfMotorista'), motorista: valor('motorista'),
-        placaCavalo: valor('placaCavalo'), placaCarreta1: valor('placaCarreta1'),
-        placaCarreta2: valor('placaCarreta2'), placaCarreta3: valor('placaCarreta3'),
-        produto: valor('produto'), quantidade: valor('quantidade'), status: valor('status'),
+        tipocarga: valor('tipoCarga'), 
+        di: valor('di'), 
+        pedido: valor('pedido'), 
+        datahora: valor('dataHora'), // Assumindo que no banco está datahora
+        cnpjcliente: valor('cnpjCliente'), 
+        cliente: valor('cliente'), 
+        endereco: valor('endereco'),
+        cnpjtransportadora: valor('cnpjTransportadora'), 
+        transportadora: valor('transportadora'),
+        cpfmotorista: valor('cpfMotorista'), 
+        motorista: valor('motorista'),
+        placacavalo: valor('placaCavalo'), 
+        placacarreta1: valor('placaCarreta1'),
+        placacarreta2: valor('placaCarreta2'), 
+        placacarreta3: valor('placaCarreta3'),
+        produto: valor('produto'), 
+        quantidade: valor('quantidade'), 
+        status: valor('status'),
         observacao: valor('observacao')
       };
     }
