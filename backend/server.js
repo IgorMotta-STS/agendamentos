@@ -202,29 +202,39 @@ app.put('/api/perfil', autenticarToken, async (req, res) => {
   }
 });
 
-// ROTA PÚBLICA DE RASTREIO (Não usa autenticarToken)
+// =============================
+// ROTA PÚBLICA DE RASTREIO (CORRIGIDA)
+// =============================
 app.get('/api/rastreio/:codigo', async (req, res) => {
   try {
-    // 1. Decodifica a URL (Transforma %2F de volta em barra '/')
-    const codigo = decodeURIComponent(req.params.codigo);
+    // 1. Recebe o código da URL e tira os espaços em branco das pontas
+    const codigoDigitado = decodeURIComponent(req.params.codigo).trim();
     
-    // 2. CORREÇÃO: datahora e atualizadoem tudo minúsculo!
+    // 2. Limpa o texto: Remove "#" ou palavras como "ID " caso o motorista tenha digitado
+    const codigoLimpo = codigoDigitado.replace(/^id\s*/i, '').replace(/^#/, '').trim();
+    
     let query = supabase.from('agendamentos').select('id, cliente, transportadora, produto, status, datahora, atualizadoem');
     
-    if (!isNaN(codigo)) {
-      query = query.or(`id.eq.${codigo},di.eq.${codigo}`);
+    // 3. O SEGREDO: Se só sobrarem números, é uma pesquisa por ID puro.
+    if (/^\d+$/.test(codigoLimpo)) {
+      query = query.eq('id', parseInt(codigoLimpo, 10));
     } else {
-      query = query.eq('di', codigo);
+      // 4. Se tiver barras ou outros caracteres, é uma pesquisa por DI exata.
+      query = query.eq('di', codigoDigitado);
     }
 
     const { data, error } = await query.maybeSingle();
 
-    if (error) throw error;
+    if (error) {
+        console.error("Erro interno do Supabase:", error);
+        throw error;
+    }
+    
     if (!data) return res.status(404).json({ erro: 'Carga não encontrada.' });
 
     res.json(data);
   } catch (error) {
-    console.error('Erro no rastreio:', error);
+    console.error("Erro na Rota de Rastreio:", error);
     res.status(500).json({ erro: 'Erro interno ao buscar rastreio.' });
   }
 });
