@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro - SE7 Terminais</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css" rel="stylesheet">
+  <style>
+    body { background-color: #f8f9fa; display: flex; align-items: center; min-height: 100vh; }
+    .card-cadastro { max-width: 500px; width: 100%; margin: auto; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: none; }
+    .logo-icon { font-size: 3rem; color: #0d6efd; }
+  </style>
+</head>
+<body>
+
+  <div class="container px-4">
+    <div class="card card-cadastro overflow-hidden">
+      <div class="card-body p-4 p-md-5">
+        
+        <div class="text-center mb-4">
+          <i class="bi bi-box-seam logo-icon"></i>
+          <h3 class="fw-bold text-secondary mt-2">Criar Conta</h3>
+          <p class="text-muted">Preencha os dados para acessar o SE7 Terminais</p>
+        </div>
+
+        <form id="formCadastro">
+          <div class="mb-3">
+            <label class="form-label fw-semibold text-muted small">Nome Completo</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
+              <input type="text" id="nome" class="form-control" placeholder="Digite seu nome" required>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold text-muted small">E-mail</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light"><i class="bi bi-envelope"></i></span>
+              <input type="email" id="email" class="form-control" placeholder="seuemail@empresa.com" required>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-semibold text-muted small">Senha de Acesso</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light"><i class="bi bi-lock"></i></span>
+              <input type="password" id="senha" class="form-control" placeholder="Mínimo de 6 caracteres" required minlength="6">
+            </div>
+            <div class="form-text mt-2"><i class="bi bi-info-circle me-1"></i>Sua conta será criada como Usuário Padrão.</div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold mb-3" id="btnCadastrar">
+            <span class="spinner-border spinner-border-sm d-none me-1" id="spinnerCadastro" role="status"></span>
+            <span id="textoCadastrar">Cadastrar</span>
+          </button>
+
+          <div class="text-center">
+            <p class="text-muted small mb-0">Já possui uma conta? <a href="login.html" class="text-primary fw-semibold text-decoration-none">Faça login aqui</a>.</p>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    const API = 'http://localhost:3000/api';
+
+    document.getElementById('formCadastro').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      
+      const btn = document.getElementById('btnCadastrar');
+      const spinner = document.getElementById('spinnerCadastro');
+      const texto = document.getElementById('textoCadastrar');
+      
+      btn.disabled = true;
+      spinner.classList.remove('d-none');
+      texto.textContent = 'Processando...';
+
+      // Note que a variável "perfil" foi totalmente removida daqui
+      const dados = {
+        nome: document.getElementById('nome').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        senha: document.getElementById('senha').value
+      };
+
+      try {
+        const res = await fetch(`${API}/cadastro`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(dados)
+        });
+
+        const resposta = await res.json();
+
+        if (res.ok) {
+          Swal.fire({
+            title: 'Conta Criada!',
+            text: 'Seu usuário foi cadastrado com sucesso.',
+            icon: 'success',
+            confirmButtonColor: '#0d6efd',
+            confirmButtonText: 'Ir para o Login',
+            allowOutsideClick: false
+          }).then(() => {
+            window.location.href = 'login.html';
+          });
+        } else {
+          Swal.fire('Atenção!', resposta.erro || 'Erro ao cadastrar.', 'warning');
+        }
+      } catch (erro) {
+        Swal.fire('Erro no Servidor', 'Não foi possível conectar ao banco de dados.', 'error');
+      } finally {
+        btn.disabled = false;
+        spinner.classList.add('d-none');
+        texto.textContent = 'Cadastrar';
+      }
+    });
+  </script>
+</body>
+</html>

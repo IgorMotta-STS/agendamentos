@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - SE7 Terminais</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <style>
+    .bg-login {
+      background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+                  url('https://www.portodesantos.com.br/wp-content/themes/Tema%20SPA/assets/img/foto_homepage_nova.jpg');
+      background-size: cover;
+      background-position: center;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="d-flex vh-100 bg-light">
+
+  <div class="col-md-6 d-none d-md-flex justify-content-center align-items-center bg-login text-white">
+    <div class="text-center p-4 bg-dark bg-opacity-50 rounded-3 shadow-lg">
+      <h1 class="display-5 fw-bold mb-0">SE7 TERMINAIS</h1>
+      <p class="fs-4 mt-2 mb-0">Gestão de Agendamentos</p>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-6 d-flex justify-content-center align-items-center">
+    <div class="card shadow-sm border-0 w-100 mx-3" style="max-width: 400px;">
+      <div class="card-body p-5">
+        <h2 class="text-center mb-4 fw-bold text-primary">Acesso ao Sistema</h2>
+
+        <div id="mensagemErro" class="alert alert-danger d-none" role="alert"></div>
+
+        <form id="loginForm">
+          <div class="mb-3">
+            <label for="usuario" class="form-label text-muted fw-semibold">Usuário ou E-mail</label>
+            <input type="text" class="form-control form-control-lg bg-light" id="usuario" placeholder="Digite seu acesso" required>
+          </div>
+          
+          <div class="mb-4">
+            <label for="senha" class="form-label text-muted fw-semibold">Senha</label>
+            <input type="password" class="form-control form-control-lg bg-light" id="senha" placeholder="********" required>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold">Entrar</button>
+          <div class="text-center mt-3 border-top pt-3">
+            <p class="text-muted small mb-1">É motorista ou cliente externo?</p>
+            <a href="rastreio.html" class="btn btn-outline-secondary btn-sm w-100 fw-semibold">
+              <i class="bi bi-geo-alt-fill me-1"></i>Rastrear Carga Sem Login
+            </a>
+          </div>
+        </form>
+
+        <div class="text-center mt-4">
+          <span class="text-muted">Não possui conta?</span> 
+          <a href="cadastro.html" class="text-decoration-none fw-semibold">Cadastrar usuário</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = 'http://localhost:3000/api';
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const dados = {
+        usuario: document.getElementById('usuario').value,
+        senha: document.getElementById('senha').value
+      };
+
+      try {
+        const res = await fetch(`${API}/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(dados)
+        });
+
+        const resposta = await res.json();
+
+        if (res.ok) {
+          localStorage.setItem('token', resposta.token);
+          localStorage.setItem('usuario', JSON.stringify(resposta.usuario));
+          
+          // Login com sucesso não precisa de alerta, redireciona direto para ficar fluido
+          window.location.href = resposta.usuario.perfil === 'admin' ? 'admin.html' : 'dashboard.html';
+        } else {
+          Swal.fire('Acesso Negado', resposta.erro || 'Login inválido', 'error');
+        }
+      } catch (erro) {
+        Swal.fire('Ops!', 'Erro ao conectar com o servidor.', 'error');
+      }
+    });
+  </script>
+</body>
+</html>

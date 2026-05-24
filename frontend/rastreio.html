@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rastreio de Carga - SE7 Terminais</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css" rel="stylesheet">
+  <style>
+    body { background-color: #f8f9fa; display: flex; flex-direction: column; min-height: 100vh; }
+    .tracking-box { max-width: 600px; margin: auto; padding: 2rem; background: white; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .step { display: flex; align-items: center; margin-bottom: 1.5rem; position: relative; }
+    .step::before { content: ''; position: absolute; left: 24px; top: 45px; bottom: -30px; width: 2px; background: #e9ecef; z-index: 1; }
+    .step:last-child::before { display: none; }
+    .step-icon { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; z-index: 2; border: 3px solid white; }
+    .step.active .step-icon { background-color: #0d6efd; color: white; }
+    .step.completed .step-icon { background-color: #198754; color: white; }
+    .step.pending .step-icon { background-color: #e9ecef; color: #6c757d; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar navbar-dark bg-primary shadow-sm py-3">
+    <div class="container d-flex justify-content-center">
+      <a class="navbar-brand fw-bold m-0" href="#"><i class="bi bi-box-seam me-2"></i>SE7 Terminais - Rastreamento Público</a>
+    </div>
+  </nav>
+
+  <div class="container flex-grow-1 d-flex align-items-center justify-content-center py-5">
+    <div class="tracking-box w-100 border">
+      <h4 class="text-center fw-bold text-secondary mb-4">Acompanhe sua Carga</h4>
+      
+      <form id="formRastreio" class="d-flex gap-2 mb-4">
+        <input type="text" id="codigoBusca" class="form-control form-control-lg" placeholder="Digite o ID do agendamento ou DI" required>
+        <button type="submit" class="btn btn-primary btn-lg fw-bold px-4" id="btnBuscar">Buscar</button>
+      </form>
+
+      <div id="resultadoRastreio" class="d-none">
+        <hr class="mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h5 class="fw-bold m-0 text-primary">Status do Pedido <span id="resId"></span></h5>
+          <span class="badge bg-secondary" id="resProduto"></span>
+        </div>
+        
+        <div class="bg-light p-3 rounded mb-4 border">
+          <p class="mb-1"><small class="text-muted">Cliente:</small> <strong id="resCliente"></strong></p>
+          <p class="mb-0"><small class="text-muted">Transportadora:</small> <strong id="resTransp"></strong></p>
+        </div>
+
+        <div class="timeline mt-4">
+          <div class="step" id="step1">
+            <div class="step-icon"><i class="bi bi-calendar-check"></i></div>
+            <div class="ms-3">
+              <h6 class="mb-0 fw-bold">Agendado</h6>
+              <small class="text-muted" id="dataAgendado">Aguardando início</small>
+            </div>
+          </div>
+          <div class="step" id="step2">
+            <div class="step-icon"><i class="bi bi-truck"></i></div>
+            <div class="ms-3">
+              <h6 class="mb-0 fw-bold">Em Andamento</h6>
+              <small class="text-muted">Carga em operação no terminal</small>
+            </div>
+          </div>
+          <div class="step" id="step3">
+            <div class="step-icon"><i class="bi bi-check2-circle"></i></div>
+            <div class="ms-3">
+              <h6 class="mb-0 fw-bold">Finalizado</h6>
+              <small class="text-muted">Operação concluída</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    document.getElementById('formRastreio').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const codigo = document.getElementById('codigoBusca').value.trim();
+      const btn = document.getElementById('btnBuscar');
+      
+      btn.disabled = true;
+      btn.textContent = 'Buscando...';
+
+      try {
+        const res = await fetch(`http://localhost:3000/api/rastreio/${codigo}`);
+        const dados = await res.json();
+
+        if (res.ok) {
+          preencherRastreio(dados);
+        } else {
+          document.getElementById('resultadoRastreio').classList.add('d-none');
+          Swal.fire('Não Encontrado', 'Não localizamos nenhuma carga com este código ou DI.', 'warning');
+        }
+      } catch (error) {
+        Swal.fire('Erro', 'Falha ao conectar com o sistema de rastreamento.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Buscar';
+      }
+    });
+
+    function preencherRastreio(dados) {
+      document.getElementById('resId').textContent = `#${dados.id}`;
+      document.getElementById('resProduto').textContent = dados.produto;
+      document.getElementById('resCliente').textContent = dados.cliente;
+      document.getElementById('resTransp').textContent = dados.transportadora;
+
+      const dataFormatada = dados.dataHora ? new Date(dados.dataHora).toLocaleString('pt-BR') : 'Data não informada';
+      document.getElementById('dataAgendado').textContent = `Previsto para: ${dataFormatada}`;
+
+      // Lógica das cores da linha do tempo
+      const s1 = document.getElementById('step1');
+      const s2 = document.getElementById('step2');
+      const s3 = document.getElementById('step3');
+
+      // Reseta tudo para pendente
+      [s1, s2, s3].forEach(el => el.className = 'step pending');
+
+      if (dados.status === 'Agendado') {
+        s1.classList.add('active');
+      } else if (dados.status === 'Em andamento') {
+        s1.classList.add('completed');
+        s2.classList.add('active');
+      } else if (dados.status === 'Finalizado') {
+        s1.classList.add('completed');
+        s2.classList.add('completed');
+        s3.classList.add('completed');
+      }
+
+      document.getElementById('resultadoRastreio').classList.remove('d-none');
+    }
+  </script>
+</body>
+</html>

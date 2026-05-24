@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meu Perfil - SE7 Terminais</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand fw-bold" href="dashboard.html"><i class="bi bi-box-seam me-2"></i>SE7 Terminais</a>
+      <div class="d-flex align-items-center gap-3">
+        <a href="dashboard.html" class="btn btn-outline-light btn-sm"><i class="bi bi-arrow-left me-1"></i>Voltar ao Dashboard</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-6">
+        
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+          <div class="bg-primary text-white text-center py-4">
+            <i class="bi bi-person-circle" style="font-size: 4rem;"></i>
+            <h4 class="mt-2 fw-bold mb-0" id="infoNome">Carregando...</h4>
+            <p class="mb-0 text-white-50" id="infoPerfil">Perfil de Usuário</p>
+          </div>
+          
+          <div class="card-body p-4 p-md-5">
+            <h5 class="fw-bold text-secondary border-bottom pb-2 mb-4">Dados da Conta</h5>
+            
+            <div class="mb-3">
+              <label class="form-label text-muted fw-semibold small">Endereço de E-mail</label>
+              <input type="email" class="form-control bg-light" id="infoEmail" readonly disabled>
+            </div>
+
+            <h5 class="fw-bold text-secondary border-bottom pb-2 mb-4 mt-5">Segurança</h5>
+            
+            <form id="formSenha">
+              <div class="mb-3">
+                <label class="form-label text-muted fw-semibold small">Nova Senha</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-transparent"><i class="bi bi-lock"></i></span>
+                  <input type="password" id="senhaNova" class="form-control" placeholder="Mínimo de 6 caracteres" required minlength="6">
+                </div>
+              </div>
+              <div class="mb-4">
+                <label class="form-label text-muted fw-semibold small">Confirmar Nova Senha</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-transparent"><i class="bi bi-lock-fill"></i></span>
+                  <input type="password" id="senhaConfirma" class="form-control" placeholder="Repita a nova senha" required minlength="6">
+                </div>
+              </div>
+              
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg fw-bold" id="btnSalvar">
+                  <span class="spinner-border spinner-border-sm d-none me-1" id="spinnerSalvar" role="status"></span>
+                  <span id="textoSalvar">Atualizar Senha</span>
+                </button>
+              </div>
+            </form>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    const API = 'http://localhost:3000/api';
+    const token = localStorage.getItem('token');
+    const usuarioInfo = JSON.parse(localStorage.getItem('usuario') || '{}');
+
+    if (!token) window.location.href = 'login.html';
+
+    window.onload = function() {
+      // Preenche os dados estáticos da conta
+      document.getElementById('infoNome').textContent = usuarioInfo.nome;
+      document.getElementById('infoEmail').value = usuarioInfo.email;
+      
+      const tipoPerfil = usuarioInfo.perfil === 'admin' ? 'Administrador do Sistema' : 'Usuário Padrão';
+      document.getElementById('infoPerfil').textContent = tipoPerfil;
+    };
+
+    document.getElementById('formSenha').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const senhaNova = document.getElementById('senhaNova').value;
+      const senhaConfirma = document.getElementById('senhaConfirma').value;
+
+      if (senhaNova !== senhaConfirma) {
+        return Swal.fire('Atenção', 'As senhas não coincidem. Digite novamente.', 'warning');
+      }
+
+      const btnSalvar = document.getElementById('btnSalvar');
+      const spinner = document.getElementById('spinnerSalvar');
+      const texto = document.getElementById('textoSalvar');
+      
+      btnSalvar.disabled = true;
+      spinner.classList.remove('d-none');
+      texto.textContent = 'Atualizando...';
+
+      try {
+        const res = await fetch(`${API}/perfil`, {
+          method: 'PUT',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+          },
+          body: JSON.stringify({ senhaNova })
+        });
+
+        const resposta = await res.json();
+
+        if (res.ok) {
+          document.getElementById('formSenha').reset();
+          Swal.fire('Sucesso!', 'Sua senha foi atualizada. Você a usará no próximo login.', 'success');
+        } else {
+          Swal.fire('Erro', resposta.erro || 'Não foi possível atualizar a senha.', 'error');
+        }
+      } catch (error) {
+        Swal.fire('Ops!', 'Falha ao conectar com o servidor.', 'error');
+      } finally {
+        btnSalvar.disabled = false;
+        spinner.classList.add('d-none');
+        texto.textContent = 'Atualizar Senha';
+      }
+    });
+  </script>
+</body>
+</html>
