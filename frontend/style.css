@@ -1,0 +1,33 @@
+:root {
+  --bs-primary: #0083CB;
+  --bs-primary-rgb: 0, 131, 203; /* O mesmo azul, mas em formato RGB */
+}
+
+.bg-primary {
+  background-color: #0083CB !important;
+}
+
+.text-primary {
+  color: #0083CB !important;
+}
+
+.btn-primary {
+  background-color: #0083CB !important;
+  border-color: #0083CB !important;
+  color: white !important;
+}
+
+.btn-primary:hover {
+  background-color: #006DA8 !important; /* Um tom levemente mais escuro para o hover */
+  border-color: #006DA8 !important;
+}
+
+.btn-outline-primary {
+  color: #0083CB !important;
+  border-color: #0083CB !important;
+}
+
+.btn-outline-primary:hover {
+  background-color: #0083CB !important;
+  color: white !important;
+}
