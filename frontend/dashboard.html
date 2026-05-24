@@ -9,6 +9,8 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css" rel="stylesheet">
   <link href="style.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.6.0/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body class="bg-light">
 
@@ -40,6 +42,7 @@
         </div>
         
         <button class="btn btn-outline-secondary" onclick="carregarAgendamentos()"><i class="bi bi-arrow-clockwise"></i></button>
+        <button class="btn btn-outline-danger fw-semibold" onclick="exportarPDF()"><i class="bi bi-file-earmark-pdf me-1"></i>Exportar PDF</button>
         <button class="btn btn-primary fw-bold" onclick="abrirFormulario()"><i class="bi bi-plus-lg me-1"></i>Novo</button>
       </div>
     </div>
@@ -187,6 +190,63 @@
     </div>
   </div>
 
+  <div class="modal fade" id="modalVisualizar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-light border-bottom-0 pb-3">
+          <h5 class="modal-title fw-bold text-dark d-flex align-items-center">
+            <i class="bi bi-file-earmark-text text-primary me-2 fs-4"></i>
+            Detalhes da Carga <span id="visId" class="text-muted ms-2 fs-6 fw-normal"></span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4 bg-white">
+          
+          <div class="row g-4">
+            <div class="col-md-6">
+              <h6 class="fw-bold text-primary mb-3 border-bottom pb-2">Informações da Carga</h6>
+              <div class="mb-2"><small class="text-muted d-block">Status Atual</small> <span id="visStatus"></span></div>
+              <div class="mb-2"><small class="text-muted d-block">Produto & Quantidade</small> <span class="fw-semibold" id="visProduto"></span> - <span class="fw-semibold" id="visQtd"></span> Ton</div>
+              <div class="mb-2"><small class="text-muted d-block">Tipo / DI / Pedido</small> <span class="fw-semibold" id="visTipo"></span> | <span class="fw-semibold" id="visDi"></span> | <span class="fw-semibold" id="visPedido"></span></div>
+              <div class="mb-2"><small class="text-muted d-block">Data/Hora Prevista</small> <span class="fw-semibold" id="visData"></span></div>
+            </div>
+
+            <div class="col-md-6">
+              <h6 class="fw-bold text-primary mb-3 border-bottom pb-2">Cliente</h6>
+              <div class="mb-2"><small class="text-muted d-block">Razão Social</small> <span class="fw-semibold" id="visClienteNome"></span></div>
+              <div class="mb-2"><small class="text-muted d-block">CNPJ</small> <span class="fw-semibold" id="visClienteCnpj"></span></div>
+              <div class="mb-2"><small class="text-muted d-block">Endereço</small> <span class="fw-semibold" id="visClienteEnd"></span></div>
+            </div>
+
+            <div class="col-12">
+              <h6 class="fw-bold text-primary mb-3 border-bottom pb-2">Logística & Transporte</h6>
+              <div class="row">
+                <div class="col-md-6 mb-2"><small class="text-muted d-block">Transportadora (CNPJ)</small> <span class="fw-semibold" id="visTranspNome"></span> (<span id="visTranspCnpj"></span>)</div>
+                <div class="col-md-6 mb-2"><small class="text-muted d-block">Motorista (CPF)</small> <span class="fw-semibold" id="visMotNome"></span> (<span id="visMotCpf"></span>)</div>
+                <div class="col-12 mb-2"><small class="text-muted d-block">Placas (Cavalo / Carretas)</small> <span class="fw-semibold text-uppercase" id="visPlacas"></span></div>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="p-3 bg-light rounded border">
+                <small class="text-muted d-block mb-1"><i class="bi bi-info-circle me-1"></i>Observações</small>
+                <span class="fw-semibold fst-italic" id="visObs"></span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        
+        <div class="modal-footer border-top-0 bg-light justify-content-between">
+          <button type="button" class="btn btn-outline-danger fw-bold px-4" onclick="exportarDetalhesPDF()">
+            <i class="bi bi-file-earmark-pdf me-1"></i>Salvar PDF
+          </button>
+          <button type="button" class="btn btn-secondary fw-bold px-4" data-bs-dismiss="modal">Fechar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -200,18 +260,13 @@
     if (!token) window.location.href = 'login.html';
 
     window.onload = function () {
-      // Força a remoção do tema escuro caso o navegador tenha salvo no localStorage
       localStorage.removeItem('tema_se7');
-      
       modalInstance = new bootstrap.Modal(document.getElementById('modalAgendamento'));
       carregarUsuario();
       carregarAgendamentos();
       aplicarEventos();
     };
 
-    // ==========================================
-    // MELHORIA: BARRA DE PESQUISA INTELIGENTE
-    // ==========================================
     document.getElementById('pesquisa').addEventListener('keyup', function(e) {
       const termo = e.target.value.toLowerCase();
       const linhas = document.querySelectorAll('.linha-dado');
@@ -257,6 +312,8 @@
         let dados;
         try {
             dados = await res.json();
+            // SALVANDO NA MEMÓRIA PARA O PDF
+            window.agendamentosCarregados = dados;
         } catch(e) {
             dados = null;
         }
@@ -293,9 +350,11 @@
               <td>${item.produto || '-'}</td>
               <td>${item.quantidade || '-'}</td>
               <td><span class="badge ${corBadge}">${item.status || 'Agendado'}</span></td>
-              <td class="text-end pe-4">
-                <button class="btn btn-sm btn-outline-primary" onclick='editarAgendamento(${JSON.stringify(item)})'><i class="bi bi-pencil"></i></button>
-                <button class="btn btn-sm btn-outline-danger" onclick='excluirAgendamento("${item.id}")'><i class="bi bi-trash"></i></button>
+              
+              <td class="text-end pe-4 text-nowrap">
+                <button class="btn btn-sm btn-outline-info me-1" onclick='visualizarAgendamento(${JSON.stringify(item)})' title="Visualizar Detalhes"><i class="bi bi-eye"></i></button>
+                <button class="btn btn-sm btn-outline-primary me-1" onclick='editarAgendamento(${JSON.stringify(item)})' title="Editar"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-sm btn-outline-danger" onclick='excluirAgendamento("${item.id}")' title="Excluir"><i class="bi bi-trash"></i></button>
               </td>
             </tr>
           `;
@@ -313,7 +372,7 @@
         tipocarga: valor('tipoCarga'), 
         di: valor('di'), 
         pedido: valor('pedido'), 
-        datahora: valor('dataHora'), // Assumindo que no banco está datahora
+        datahora: valor('dataHora'),
         cnpjcliente: valor('cnpjCliente'), 
         cliente: valor('cliente'), 
         endereco: valor('endereco'),
@@ -375,6 +434,46 @@
       }
     }
 
+    function visualizarAgendamento(item) {
+      // SALVA O ITEM NA MEMÓRIA PARA O PDF
+      window.itemVisualizacaoAtual = item;
+      
+      let corBadge = 'bg-info text-dark';
+      if (item.status === 'Finalizado') corBadge = 'bg-success';
+      if (item.status === 'Em andamento') corBadge = 'bg-warning text-dark';
+      
+      let dataFormatada = '-';
+      if (item.datahora) {
+        dataFormatada = new Date(item.datahora).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+      }
+
+      document.getElementById('visId').textContent = `#${item.id}`;
+      document.getElementById('visStatus').innerHTML = `<span class="badge ${corBadge} fs-6">${item.status || 'Agendado'}</span>`;
+      document.getElementById('visProduto').textContent = item.produto || '-';
+      document.getElementById('visQtd').textContent = item.quantidade || '-';
+      document.getElementById('visTipo').textContent = item.tipocarga || '-';
+      document.getElementById('visDi').textContent = item.di || '-';
+      document.getElementById('visPedido').textContent = item.pedido || '-';
+      document.getElementById('visData').textContent = dataFormatada;
+
+      document.getElementById('visClienteNome').textContent = item.cliente || '-';
+      document.getElementById('visClienteCnpj').textContent = item.cnpjcliente || '-';
+      document.getElementById('visClienteEnd').textContent = item.endereco || '-';
+
+      document.getElementById('visTranspNome').textContent = item.transportadora || '-';
+      document.getElementById('visTranspCnpj').textContent = item.cnpjtransportadora || '-';
+      document.getElementById('visMotNome').textContent = item.motorista || '-';
+      document.getElementById('visMotCpf').textContent = item.cpfmotorista || '-';
+
+      const placas = [item.placacavalo, item.placacarreta1, item.placacarreta2, item.placacarreta3].filter(Boolean);
+      document.getElementById('visPlacas').textContent = placas.length > 0 ? placas.join(' / ') : '-';
+
+      document.getElementById('visObs').textContent = item.observacao || 'Nenhuma observação registrada.';
+
+      const modalVis = new bootstrap.Modal(document.getElementById('modalVisualizar'));
+      modalVis.show();
+    }
+
     function editarAgendamento(item) {
       abrirFormulario();
 
@@ -408,7 +507,6 @@
       document.getElementById('status').value = item.status || 'Agendado';
       document.getElementById('observacao').value = item.observacao || '';
 
-      // Configurações ocultas e título do modal
       document.getElementById('agendamentoId').value = item.id;
       document.getElementById('tituloFormulario').textContent = 'Editar Agendamento';
     }
@@ -434,6 +532,160 @@
           Swal.fire('Erro!', 'Não foi possível excluir.', 'error');
         }
       }
+    }
+
+    async function exportarPDF() {
+      const agendamentos = window.agendamentosCarregados || [];
+
+      if (agendamentos.length === 0) {
+        Swal.fire('Atenção', 'Não há dados disponíveis para exportar no momento.', 'warning');
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF('l', 'mm', 'a4');
+
+      doc.setFillColor(0, 131, 203);
+      doc.rect(0, 0, 297, 24, 'F');
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(18);
+      doc.setTextColor(255, 255, 255);
+      doc.text("SE7 Terminais", 15, 16);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(12);
+      doc.text(" - Relatório de Agendamentos Operacionais", 60, 16);
+
+      const dataEmissao = new Date().toLocaleString('pt-BR');
+      doc.setFontSize(10);
+      doc.text(`Emitido em: ${dataEmissao}`, 230, 16);
+
+      const cabecalho = [['ID', 'Cliente / Razão Social', 'Transportadora', 'Placa Cavalo', 'Produto', 'Qtd', 'Status']];
+      
+      const linhas = agendamentos.map(item => [
+        `#${item.id}`,
+        item.cliente || '-',
+        item.transportadora || '-',
+        (item.placacavalo || '-').toUpperCase(),
+        item.produto || '-',
+        `${item.quantidade || '0'} Ton`,
+        item.status || 'Agendado'
+      ]);
+
+      doc.autoTable({
+        head: cabecalho,
+        body: linhas,
+        startY: 32,
+        theme: 'striped',
+        headStyles: { fillColor: [0, 131, 203], fontStyle: 'bold', halign: 'left' }, 
+        styles: { font: 'helvetica', fontSize: 9, cellPadding: 3.5 },
+        alternateRowStyles: { fillColor: [245, 247, 250] },
+        columnStyles: {
+          0: { cellWidth: 15 },  
+          1: { cellWidth: 65 },  
+          2: { cellWidth: 60 },  
+          3: { cellWidth: 30 },  
+          4: { cellWidth: 55 },  
+          5: { cellWidth: 20 },  
+          6: { cellWidth: 25 }   
+        }
+      });
+
+      const dataArquivo = new Date().toISOString().slice(0, 10);
+      doc.save(`SE7-Relatorio-Agendamentos-${dataArquivo}.pdf`);
+    }
+
+    // ==========================================
+    // NOVA FUNÇÃO: EXPORTAR TICKET INDIVIDUAL
+    // ==========================================
+    function exportarDetalhesPDF() {
+      const item = window.itemVisualizacaoAtual;
+      if (!item) return;
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF('p', 'mm', 'a4'); 
+
+      // 1. Cabeçalho (Azul SE7)
+      doc.setFillColor(0, 131, 203);
+      doc.rect(0, 0, 210, 24, 'F');
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(18);
+      doc.setTextColor(255, 255, 255);
+      doc.text("SE7 Terminais", 15, 16);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(12);
+      doc.text(` - Ticket de Agendamento #${item.id}`, 60, 16);
+
+      let y = 35;
+      const addSectionTitle = (title) => {
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(12);
+        doc.setTextColor(0, 131, 203);
+        doc.text(title, 15, y);
+        doc.setDrawColor(200, 200, 200);
+        doc.line(15, y + 2, 195, y + 2); 
+        y += 8;
+        doc.setTextColor(40, 40, 40);
+        doc.setFontSize(10);
+      };
+
+      const addLine = (label, value, label2, value2) => {
+        doc.setFont("helvetica", "bold");
+        doc.text(`${label}:`, 15, y);
+        doc.setFont("helvetica", "normal");
+        doc.text(String(value || '-'), 45, y);
+        
+        if (label2) {
+          doc.setFont("helvetica", "bold");
+          doc.text(`${label2}:`, 110, y);
+          doc.setFont("helvetica", "normal");
+          doc.text(String(value2 || '-'), 140, y);
+        }
+        y += 7;
+      };
+
+      // 2. Informações da Carga
+      addSectionTitle("Informações da Carga");
+      let dataFormatada = '-';
+      if (item.datahora) {
+        dataFormatada = new Date(item.datahora).toLocaleString('pt-BR');
+      }
+      addLine("Status", item.status || 'Agendado', "Data Prevista", dataFormatada);
+      addLine("Produto", item.produto, "Quantidade", `${item.quantidade || '0'} Ton`);
+      addLine("Tipo Carga", item.tipocarga, "DI / Pedido", `${item.di || '-'} / ${item.pedido || '-'}`);
+      y += 5;
+
+      // 3. Cliente
+      addSectionTitle("Cliente");
+      addLine("Razão Social", item.cliente);
+      addLine("CNPJ", item.cnpjcliente);
+      addLine("Endereço", item.endereco);
+      y += 5;
+
+      // 4. Logística e Transporte
+      addSectionTitle("Logística e Transporte");
+      addLine("Transportadora", item.transportadora);
+      addLine("CNPJ Transp.", item.cnpjtransportadora);
+      addLine("Motorista", item.motorista);
+      addLine("CPF Motorista", item.cpfmotorista);
+      
+      const placas = [item.placacavalo, item.placacarreta1, item.placacarreta2, item.placacarreta3].filter(Boolean);
+      addLine("Placas", placas.length > 0 ? placas.join(' / ').toUpperCase() : '-');
+      y += 5;
+
+      // 5. Observações
+      addSectionTitle("Observações");
+      doc.setFont("helvetica", "italic");
+      doc.text(item.observacao || 'Nenhuma observação registrada.', 15, y, { maxWidth: 180 });
+
+      // 6. Rodapé
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(150, 150, 150);
+      doc.text(`Documento gerado eletronicamente em: ${new Date().toLocaleString('pt-BR')}`, 15, 285);
+
+      doc.save(`SE7-Comprovante-Carga-${item.id}.pdf`);
     }
 
     function logout() {
