@@ -378,10 +378,38 @@
 
     function editarAgendamento(item) {
       abrirFormulario();
-      Object.keys(item).forEach(chave => {
-        const campo = document.getElementById(chave);
-        if (campo) campo.value = chave === 'dataHora' && item[chave] ? item[chave].substring(0, 16) : item[chave] || '';
-      });
+
+      document.getElementById('tipoCarga').value = item.tipocarga || '';
+      document.getElementById('di').value = item.di || '';
+      document.getElementById('pedido').value = item.pedido || '';
+      
+      if (item.datahora) {
+        document.getElementById('dataHora').value = item.datahora.substring(0, 16);
+      } else {
+        document.getElementById('dataHora').value = '';
+      }
+
+      document.getElementById('cnpjCliente').value = item.cnpjcliente || '';
+      document.getElementById('cliente').value = item.cliente || '';
+      document.getElementById('endereco').value = item.endereco || '';
+      
+      document.getElementById('cnpjTransportadora').value = item.cnpjtransportadora || '';
+      document.getElementById('transportadora').value = item.transportadora || '';
+      
+      document.getElementById('cpfMotorista').value = item.cpfmotorista || '';
+      document.getElementById('motorista').value = item.motorista || '';
+      
+      document.getElementById('placaCavalo').value = item.placacavalo || '';
+      document.getElementById('placaCarreta1').value = item.placacarreta1 || '';
+      document.getElementById('placaCarreta2').value = item.placacarreta2 || '';
+      document.getElementById('placaCarreta3').value = item.placacarreta3 || '';
+      
+      document.getElementById('produto').value = item.produto || '';
+      document.getElementById('quantidade').value = item.quantidade || '';
+      document.getElementById('status').value = item.status || 'Agendado';
+      document.getElementById('observacao').value = item.observacao || '';
+
+      // Configurações ocultas e título do modal
       document.getElementById('agendamentoId').value = item.id;
       document.getElementById('tituloFormulario').textContent = 'Editar Agendamento';
     }
