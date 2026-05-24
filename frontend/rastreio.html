@@ -135,5 +135,18 @@
       document.getElementById('resultadoRastreio').classList.remove('d-none');
     }
   </script>
+  <script src="utils.js"></script>
+
+  <script>
+      const token = localStorage.getItem('token');
+      
+      // Agora você usa a função global limpa e segura!
+      const usuario = lerTokenSeguro(token);
+      
+      if (usuario) {
+          console.log("Nome perfeito:", usuario.nome);
+          // Código para colocar o nome na tela...
+      }
+  </script>
 </body>
 </html>
