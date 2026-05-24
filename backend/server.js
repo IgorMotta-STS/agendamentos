@@ -202,12 +202,13 @@ app.put('/api/perfil', autenticarToken, async (req, res) => {
   }
 });
 
-// ROTA PÚBLICA DE RASTREIO
+// ROTA PÚBLICA DE RASTREIO (Não usa autenticarToken)
 app.get('/api/rastreio/:codigo', async (req, res) => {
   try {
-    const { codigo } = req.params;
+    // 1. Decodifica a URL (Transforma %2F de volta em barra '/')
+    const codigo = decodeURIComponent(req.params.codigo);
     
-    // CORRIGIDO: dataHora e atualizadoEm para datahora e atualizadoem
+    // 2. CORREÇÃO: datahora e atualizadoem tudo minúsculo!
     let query = supabase.from('agendamentos').select('id, cliente, transportadora, produto, status, datahora, atualizadoem');
     
     if (!isNaN(codigo)) {
