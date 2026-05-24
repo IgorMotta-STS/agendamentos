@@ -24,31 +24,27 @@
 
   <nav class="navbar navbar-dark bg-primary shadow-sm py-3">
     <div class="container d-flex justify-content-between align-items-center">
-      
       <a class="navbar-brand d-flex align-items-center text-white m-0" href="#">
         <img src="assets/se7logo.png" alt="Logo SE7 Terminais" height="30" class="me-2" style="filter: brightness(0) invert(1);">
         <span class="fw-bolder fs-4" style="letter-spacing: 1px;">SE7</span>
         <span class="fw-normal ms-1 fs-5">Terminais</span>
         <span class="fw-medium ms-2 fs-5 d-none d-md-inline"> - Rastreamento Público</span>
       </a>
-
       <a href="login.html" class="btn btn-outline-light btn-sm px-3 fw-semibold">
         Fazer Login <i class="bi bi-box-arrow-in-right ms-1"></i>
       </a>
-
     </div>
   </nav>
 
-  <div class="container d-flex flex-column justify-content-center align-items-center" style="min-height: calc(100vh - 140px);">
+  <div class="container d-flex flex-column justify-content-center align-items-center" style="min-height: calc(100vh - 140px); padding-top: 2rem;">
     
-    <div class="text-center mb-4 mt-5">
+    <div class="text-center mb-4">
       <h2 class="fw-bold text-dark">Rastreamento de Cargas</h2>
       <p class="text-muted">Consulte o status do seu agendamento em tempo real.</p>
     </div>
 
-    <div class="card border-0 shadow-lg" style="max-width: 500px; width: 100%; border-radius: 12px;">
+    <div class="card border-0 shadow-lg mb-4" style="max-width: 500px; width: 100%; border-radius: 12px;">
       <div class="card-body p-4 p-md-5">
-        
         <div class="text-center mb-4">
           <i class="bi bi-box-seam text-primary" style="font-size: 3rem;"></i>
         </div>
@@ -58,11 +54,60 @@
             <label class="form-label fw-semibold text-secondary small mb-1">Identificação da Carga</label>
             <input type="text" id="inputBusca" class="form-control form-control-lg bg-light" placeholder="Ex: ID 123 ou DI 00/0000000-0" required>
           </div>
-          <button type="submit" class="btn btn-primary btn-lg fw-bold mt-2">Buscar Carga</button>
+          <button type="submit" id="btnBuscar" class="btn btn-primary btn-lg fw-bold mt-2">Buscar Carga</button>
         </form>
-        
       </div>
     </div>
+
+    <div id="resultadoRastreio" class="card border-0 shadow-sm w-100 d-none mb-5" style="max-width: 600px; border-radius: 12px;">
+      <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+          <h5 class="fw-bold text-primary mb-0">Detalhes da Carga <span id="resId" class="text-secondary"></span></h5>
+          <span id="dataAgendado" class="badge bg-light text-dark border"></span>
+        </div>
+        
+        <div class="row mb-4">
+          <div class="col-6 mb-3">
+            <small class="text-muted d-block">Produto</small>
+            <span id="resProduto" class="fw-semibold"></span>
+          </div>
+          <div class="col-6 mb-3">
+            <small class="text-muted d-block">Cliente</small>
+            <span id="resCliente" class="fw-semibold"></span>
+          </div>
+          <div class="col-12">
+            <small class="text-muted d-block">Transportadora</small>
+            <span id="resTransp" class="fw-semibold"></span>
+          </div>
+        </div>
+
+        <h6 class="fw-bold text-secondary mb-3">Status Operacional</h6>
+        <div class="position-relative ms-3">
+          <div class="step pending" id="step1">
+            <div class="step-icon"><i class="bi bi-calendar-check"></i></div>
+            <div class="ms-3">
+              <h6 class="mb-0 fw-bold">Agendado</h6>
+              <small class="text-muted">Aguardando chegada no terminal</small>
+            </div>
+          </div>
+          <div class="step pending" id="step2">
+            <div class="step-icon"><i class="bi bi-truck"></i></div>
+            <div class="ms-3">
+              <h6 class="mb-0 fw-bold">Em andamento</h6>
+              <small class="text-muted">Veículo no pátio / Operação em curso</small>
+            </div>
+          </div>
+          <div class="step pending mb-0" id="step3">
+            <div class="step-icon"><i class="bi bi-check2-circle"></i></div>
+            <div class="ms-3">
+              <h6 class="mb-0 fw-bold">Finalizado</h6>
+              <small class="text-muted">Carga liberada e concluída</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <footer class="text-center py-4 text-muted small mt-auto">
@@ -70,124 +115,75 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script>
-    document.getElementById('formRastreio').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const codigo = document.getElementById('codigoBusca').value.trim();
-      const btn = document.getElementById('btnBuscar');
-      
-      btn.disabled = true;
-      btn.textContent = 'Buscando...';
-
-      try {
-        const res = await fetch(`https://se7-backend.onrender.com/api/rastreio/${codigo}`);
-        const dados = await res.json();
-
-        if (res.ok) {
-          preencherRastreio(dados);
-        } else {
-          document.getElementById('resultadoRastreio').classList.add('d-none');
-          Swal.fire('Não Encontrado', 'Não localizamos nenhuma carga com este código ou DI.', 'warning');
-        }
-      } catch (error) {
-        Swal.fire('Erro', 'Falha ao conectar com o sistema de rastreamento.', 'error');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Buscar';
-      }
-    });
-
-    function preencherRastreio(dados) {
-      document.getElementById('resId').textContent = `#${dados.id}`;
-      document.getElementById('resProduto').textContent = dados.produto;
-      document.getElementById('resCliente').textContent = dados.cliente;
-      document.getElementById('resTransp').textContent = dados.transportadora;
-
-      const dataFormatada = dados.dataHora ? new Date(dados.dataHora).toLocaleString('pt-BR') : 'Data não informada';
-      document.getElementById('dataAgendado').textContent = `Previsto para: ${dataFormatada}`;
-
-      // Lógica das cores da linha do tempo
-      const s1 = document.getElementById('step1');
-      const s2 = document.getElementById('step2');
-      const s3 = document.getElementById('step3');
-
-      // Reseta tudo para pendente
-      [s1, s2, s3].forEach(el => el.className = 'step pending');
-
-      if (dados.status === 'Agendado') {
-        s1.classList.add('active');
-      } else if (dados.status === 'Em andamento') {
-        s1.classList.add('completed');
-        s2.classList.add('active');
-      } else if (dados.status === 'Finalizado') {
-        s1.classList.add('completed');
-        s2.classList.add('completed');
-        s3.classList.add('completed');
-      }
-
-      document.getElementById('resultadoRastreio').classList.remove('d-none');
-    }
-  </script>
   <script src="utils.js"></script>
-
+  
   <script>
-      const token = localStorage.getItem('token');
-      
-      // Agora você usa a função global limpa e segura!
-      const usuario = lerTokenSeguro(token);
-      
-      if (usuario) {
-          console.log("Nome perfeito:", usuario.nome);
-          // Código para colocar o nome na tela...
-      }
-  </script>
-  <script>
-    // URL da sua API
     const API = 'https://se7-backend.onrender.com/api';
 
     document.getElementById('formRastreio').addEventListener('submit', async function(e) {
-      e.preventDefault(); // Impede a página de recarregar
+      e.preventDefault();
 
       const inputBusca = document.getElementById('inputBusca').value.trim();
-      const btnSubmit = this.querySelector('button[type="submit"]');
-      const textoOriginalBtn = btnSubmit.innerHTML;
+      const btnSubmit = document.getElementById('btnBuscar');
+      const resultadoDiv = document.getElementById('resultadoRastreio');
 
-      // Se o campo estiver vazio, não faz nada
       if (!inputBusca) return;
 
-      // 1. UX: Altera o botão para o estado de "Carregando"
+      // Protege a barra (/) da DI para enviar na URL em segurança
+      const codigoSeguro = encodeURIComponent(inputBusca);
+
       btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Buscando...';
       btnSubmit.disabled = true;
+      resultadoDiv.classList.add('d-none'); // Esconde o resultado anterior
 
       try {
-        // 2. Faz a requisição para o seu backend
-        // (Ajuste a rota se o seu backend usar um caminho diferente para o rastreio público)
-        const response = await fetch(`${API}/agendamentos/${inputBusca}`);
+        const response = await fetch(`${API}/rastreio/${codigoSeguro}`);
 
-        // Se o backend retornar erro (como 404 Not Found)
-        if (!response.ok) {
-          throw new Error('Carga não encontrada');
+        if (!response.ok) throw new Error('Não encontrado');
+        
+        const dados = await response.json();
+        
+        // Preenche o Cartão Visual
+        document.getElementById('resId').textContent = `#${dados.id}`;
+        document.getElementById('resProduto').textContent = dados.produto || '-';
+        document.getElementById('resCliente').textContent = dados.cliente || '-';
+        document.getElementById('resTransp').textContent = dados.transportadora || '-';
+
+        const dataFormatada = dados.datahora ? new Date(dados.datahora).toLocaleString('pt-BR') : 'Sem data';
+        document.getElementById('dataAgendado').textContent = `Previsto: ${dataFormatada}`;
+
+        // Lógica Visual da Linha do Tempo
+        const s1 = document.getElementById('step1');
+        const s2 = document.getElementById('step2');
+        const s3 = document.getElementById('step3');
+
+        // Reseta tudo
+        [s1, s2, s3].forEach(el => el.className = 'step pending');
+
+        if (dados.status === 'Agendado') {
+          s1.classList.add('active');
+        } else if (dados.status === 'Em andamento') {
+          s1.classList.add('completed');
+          s2.classList.add('active');
+        } else if (dados.status === 'Finalizado') {
+          s1.classList.add('completed');
+          s2.classList.add('completed');
+          s3.classList.add('completed');
         }
 
-        const dados = await response.json();
-
-        // Se a carga for encontrada, você pode redirecionar ou exibir os dados aqui
-        console.log("Carga encontrada:", dados);
-        // Exemplo: window.location.href = `resultado.html?id=${dados.id}`;
+        // Mostra o cartão na tela suavemente
+        resultadoDiv.classList.remove('d-none');
 
       } catch (error) {
-        // 3. UX: Exibe o alerta bonito de erro
         Swal.fire({
           icon: 'error',
           title: 'Não encontrado',
-          text: 'Não localizamos nenhuma carga com esta identificação. Verifique os números e tente novamente.',
-          confirmButtonColor: '#0083CB' // Usa a cor azul da sua marca no botão do alerta!
+          text: 'Não localizamos nenhuma carga com esta identificação. Verifique se a DI possui a barra e o traço.',
+          confirmButtonColor: '#0083CB'
         });
       } finally {
-        // 4. Devolve o botão ao estado normal
-        btnSubmit.innerHTML = textoOriginalBtn;
+        btnSubmit.innerHTML = 'Buscar Carga';
         btnSubmit.disabled = false;
-        document.getElementById('inputBusca').value = ''; // Limpa o campo
       }
     });
   </script>
