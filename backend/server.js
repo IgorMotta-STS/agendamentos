@@ -35,7 +35,8 @@ app.use(express.json());
 async function registrarLog(usuarioEmail, acao) {
   try {
     await supabase.from('logs').insert([
-      { usuario: usuarioEmail, acao, dataHora: new Date().toISOString() }
+      // CORRIGIDO: dataHora para datahora
+      { usuario: usuarioEmail, acao, datahora: new Date().toISOString() }
     ]);
   } catch (error) {
     console.error('Erro ao registrar log no Supabase:', error.message);
@@ -97,10 +98,7 @@ function somenteAdmin(req, res, next) {
 // =============================
 app.post('/api/cadastro', async (req, res) => {
   try {
-    // CORREÇÃO DE SEGURANÇA: Remove a opção de enviar o perfil no req.body
     const { nome, email, senha } = req.body;
-    
-    // Força o perfil a ser sempre 'usuario' de forma rígida
     const perfilSeguro = 'usuario';
 
     if (!nome || !email || !senha) {
@@ -119,7 +117,6 @@ app.post('/api/cadastro', async (req, res) => {
 
     const senhaHash = await bcrypt.hash(senha, 10);
     
-    // Aplica a variável protegida no banco de dados
     const { error } = await supabase.from('users').insert([
       { nome, email: email.toLowerCase(), senha: senhaHash, perfil: perfilSeguro, ativo: true }
     ]);
@@ -180,7 +177,6 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// ROTA DE PERFIL (O próprio usuário atualiza sua senha)
 app.put('/api/perfil', autenticarToken, async (req, res) => {
   try {
     const { senhaNova } = req.body;
@@ -206,13 +202,13 @@ app.put('/api/perfil', autenticarToken, async (req, res) => {
   }
 });
 
-// ROTA PÚBLICA DE RASTREIO (Não usa autenticarToken)
+// ROTA PÚBLICA DE RASTREIO
 app.get('/api/rastreio/:codigo', async (req, res) => {
   try {
     const { codigo } = req.params;
     
-    // Busca pelo ID do agendamento ou pelo número exato da DI
-    let query = supabase.from('agendamentos').select('id, cliente, transportadora, produto, status, dataHora, atualizadoEm');
+    // CORRIGIDO: dataHora e atualizadoEm para datahora e atualizadoem
+    let query = supabase.from('agendamentos').select('id, cliente, transportadora, produto, status, datahora, atualizadoem');
     
     if (!isNaN(codigo)) {
       query = query.or(`id.eq.${codigo},di.eq.${codigo}`);
@@ -240,7 +236,8 @@ app.get('/api/agendamentos', autenticarToken, async (req, res) => {
     let query = supabase.from('agendamentos').select('*');
     
     if (req.usuario.perfil !== 'admin') {
-      query = query.eq('usuarioId', req.usuario.id);
+      // CORRIGIDO: usuarioId para usuarioid
+      query = query.eq('usuarioid', req.usuario.id);
     }
 
     const { data: agendamentos, error } = await query;
@@ -254,12 +251,17 @@ app.get('/api/agendamentos', autenticarToken, async (req, res) => {
 
 app.post('/api/agendamentos', autenticarToken, async (req, res) => {
   try {
-    const criadoEm = new Date().toISOString();
+    // FILTRO MÁGICO
+    const bodyMinusculo = {};
+    for (const key in req.body) {
+      bodyMinusculo[key.toLowerCase()] = req.body[key];
+    }
+
     const payload = {
-      ...req.body,
-      usuarioId: req.usuario.id,
-      usuarioNome: req.usuario.nome,
-      criadoEm
+      ...bodyMinusculo,
+      usuarioid: req.usuario.id,
+      usuarionome: req.usuario.nome,
+      criadoem: new Date().toISOString()
     };
 
     const { data, error } = await supabase
@@ -273,7 +275,7 @@ app.post('/api/agendamentos', autenticarToken, async (req, res) => {
     await registrarLog(req.usuario.email, `Criou agendamento #${data.id}`);
     res.status(201).json(data);
   } catch (error) {
-    console.error(error);
+    console.error('ERRO NO SUPABASE:', error);
     res.status(500).json({ erro: 'Erro interno no servidor ao criar agendamento.' });
   }
 });
@@ -292,14 +294,25 @@ app.put('/api/agendamentos/:id', autenticarToken, async (req, res) => {
       return res.status(404).json({ erro: 'Agendamento não encontrado.' });
     }
 
-    if (req.usuario.perfil !== 'admin' && agendamento.usuarioId !== req.usuario.id) {
+    // CORRIGIDO: agendamento.usuarioId para agendamento.usuarioid
+    if (req.usuario.perfil !== 'admin' && agendamento.usuarioid !== req.usuario.id) {
       return res.status(403).json({ erro: 'Acesso negado.' });
     }
 
-    const atualizadoEm = new Date().toISOString();
+    // FILTRO MÁGICO
+    const bodyMinusculo = {};
+    for (const key in req.body) {
+      bodyMinusculo[key.toLowerCase()] = req.body[key];
+    }
+
+    const payloadAtualizacao = {
+      ...bodyMinusculo,
+      atualizadoem: new Date().toISOString()
+    };
+
     const { data, error } = await supabase
       .from('agendamentos')
-      .update({ ...req.body, atualizadoEm })
+      .update(payloadAtualizacao)
       .eq('id', id)
       .select()
       .single();
@@ -309,7 +322,7 @@ app.put('/api/agendamentos/:id', autenticarToken, async (req, res) => {
     await registrarLog(req.usuario.email, `Editou agendamento #${id}`);
     res.json(data);
   } catch (error) {
-    console.error(error);
+    console.error('ERRO NO SUPABASE:', error);
     res.status(500).json({ erro: 'Erro interno no servidor ao atualizar agendamento.' });
   }
 });
@@ -328,7 +341,8 @@ app.delete('/api/agendamentos/:id', autenticarToken, async (req, res) => {
       return res.status(404).json({ erro: 'Agendamento não encontrado.' });
     }
 
-    if (req.usuario.perfil !== 'admin' && agendamento.usuarioId !== req.usuario.id) {
+    // CORRIGIDO: agendamento.usuarioId para agendamento.usuarioid
+    if (req.usuario.perfil !== 'admin' && agendamento.usuarioid !== req.usuario.id) {
       return res.status(403).json({ erro: 'Acesso negado.' });
     }
 
@@ -384,7 +398,8 @@ app.get('/api/logs', autenticarToken, somenteAdmin, async (req, res) => {
     const { data: logs, error } = await supabase
       .from('logs')
       .select('*')
-      .order('dataHora', { ascending: false });
+      // CORRIGIDO: dataHora para datahora
+      .order('datahora', { ascending: false });
 
     if (error) throw error;
     res.json(logs || []);
