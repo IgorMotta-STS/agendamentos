@@ -418,21 +418,30 @@
       const cnpjInput = e.target.value.replace(/\D/g, '');
       if (cnpjInput.length !== 14) return;
 
-      document.getElementById('cliente').value = "Buscando na Receita...";
+      const campoCliente = document.getElementById('cliente');
+      const campoEndereco = document.getElementById('endereco');
+
+      campoCliente.value = "Consultando CNPJ...";
+      campoCliente.readOnly = true; 
       
       try {
-        const res = await fetch(`https://api.allorigins.win/raw?url=https://www.receitaws.com.br/v1/cnpj/${cnpjInput}`);
+        const res = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${cnpjInput}`);
+        
+        if (!res.ok) {
+          throw new Error("CNPJ Inválido ou não encontrado");
+        }
+        
         const data = await res.json();
         
-        if (data.nome) {
-          document.getElementById('cliente').value = data.nome;
-          document.getElementById('endereco').value = `${data.logradouro || ''}, ${data.municipio || ''} - ${data.uf || ''}`.trim();
-        } else {
-          throw new Error("CNPJ Inválido");
-        }
+        campoCliente.value = data.razao_social;
+        campoEndereco.value = `${data.logradouro || ''}, ${data.numero || ''} - ${data.municipio || ''}/${data.uf || ''}`.trim();
+        
       } catch (error) {
-        document.getElementById('cliente').value = "";
-        Swal.fire('Atenção', 'Não foi possível localizar este CNPJ na Receita Federal.', 'warning');
+        campoCliente.value = "";
+        campoEndereco.value = "";
+        Swal.fire('Atenção', 'Não foi possível localizar este CNPJ.', 'warning');
+      } finally {
+        campoCliente.readOnly = false; 
       }
     }
 
