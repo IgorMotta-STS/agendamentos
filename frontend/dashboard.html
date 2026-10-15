@@ -64,13 +64,14 @@
               </tr>
             </thead>
             <tbody id="tbodyAgendamentos">
-              </tbody>
+            </tbody>
           </table>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- Modal Formulario Agendamento -->
   <div class="modal fade" id="modalAgendamento" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl">
       <div class="modal-content bg-body">
@@ -190,6 +191,7 @@
     </div>
   </div>
 
+  <!-- Modal Visualizar -->
   <div class="modal fade" id="modalVisualizar" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content border-0 shadow-lg">
@@ -307,12 +309,12 @@
 
     async function carregarAgendamentos() {
       try {
-        const res = await fetch(`${API}/agendamentos`, { headers: { Authorization: `Bearer ${token}` } });
+        const res = await fetchAutenticado(`${API}/agendamentos`);
+        if (!res) return;
         
         let dados;
         try {
             dados = await res.json();
-            // SALVANDO NA MEMÓRIA PARA O PDF
             window.agendamentosCarregados = dados;
         } catch(e) {
             dados = null;
@@ -344,13 +346,10 @@
               <td class="ps-3 fw-bold text-body-secondary">#${item.id}</td>
               <td class="fw-semibold">${item.cliente || '-'}</td>
               <td>${item.transportadora || '-'}</td>
-              
               <td><span class="badge bg-secondary border">${item.placacavalo || '-'}</span></td>
-              
               <td>${item.produto || '-'}</td>
               <td>${item.quantidade || '-'}</td>
               <td><span class="badge ${corBadge}">${item.status || 'Agendado'}</span></td>
-              
               <td class="text-end pe-4 text-nowrap">
                 <button class="btn btn-sm btn-outline-info me-1" onclick='visualizarAgendamento(${JSON.stringify(item)})' title="Visualizar Detalhes"><i class="bi bi-eye"></i></button>
                 <button class="btn btn-sm btn-outline-primary me-1" onclick='editarAgendamento(${JSON.stringify(item)})' title="Editar"><i class="bi bi-pencil"></i></button>
@@ -406,13 +405,13 @@
         const id = valor('agendamentoId');
         const url = id ? `${API}/agendamentos/${id}` : `${API}/agendamentos`;
         
-        const res = await fetch(url, {
+        const res = await fetchAutenticado(url, {
           method: id ? 'PUT' : 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(obterDadosFormulario())
         });
 
-        if (!res.ok) throw new Error('Falha ao salvar no banco.');
+        if (!res || !res.ok) throw new Error('Falha ao salvar no banco.');
         
         modalInstance.hide();
         carregarAgendamentos();
@@ -435,7 +434,6 @@
     }
 
     function visualizarAgendamento(item) {
-      // SALVA O ITEM NA MEMÓRIA PARA O PDF
       window.itemVisualizacaoAtual = item;
       
       let corBadge = 'bg-info text-dark';
@@ -525,9 +523,11 @@
 
       if (confirmacao.isConfirmed) {
         try {
-          await fetch(`${API}/agendamentos/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
-          carregarAgendamentos();
-          Swal.fire('Excluído!', 'O agendamento foi removido.', 'success');
+          const res = await fetchAutenticado(`${API}/agendamentos/${id}`, { method: 'DELETE' });
+          if (res && res.ok) {
+            carregarAgendamentos();
+            Swal.fire('Excluído!', 'O agendamento foi removido.', 'success');
+          }
         } catch(e) {
           Swal.fire('Erro!', 'Não foi possível excluir.', 'error');
         }
@@ -596,9 +596,6 @@
       doc.save(`SE7-Relatorio-Agendamentos-${dataArquivo}.pdf`);
     }
 
-    // ==========================================
-    // NOVA FUNÇÃO: EXPORTAR TICKET INDIVIDUAL
-    // ==========================================
     function exportarDetalhesPDF() {
       const item = window.itemVisualizacaoAtual;
       if (!item) return;
@@ -606,7 +603,6 @@
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF('p', 'mm', 'a4'); 
 
-      // 1. Cabeçalho (Azul SE7)
       doc.setFillColor(0, 131, 203);
       doc.rect(0, 0, 210, 24, 'F');
       doc.setFont("helvetica", "bold");
@@ -645,7 +641,6 @@
         y += 7;
       };
 
-      // 2. Informações da Carga
       addSectionTitle("Informações da Carga");
       let dataFormatada = '-';
       if (item.datahora) {
@@ -656,14 +651,12 @@
       addLine("Tipo Carga", item.tipocarga, "DI / Pedido", `${item.di || '-'} / ${item.pedido || '-'}`);
       y += 5;
 
-      // 3. Cliente
       addSectionTitle("Cliente");
       addLine("Razão Social", item.cliente);
       addLine("CNPJ", item.cnpjcliente);
       addLine("Endereço", item.endereco);
       y += 5;
 
-      // 4. Logística e Transporte
       addSectionTitle("Logística e Transporte");
       addLine("Transportadora", item.transportadora);
       addLine("CNPJ Transp.", item.cnpjtransportadora);
@@ -674,12 +667,10 @@
       addLine("Placas", placas.length > 0 ? placas.join(' / ').toUpperCase() : '-');
       y += 5;
 
-      // 5. Observações
       addSectionTitle("Observações");
       doc.setFont("helvetica", "italic");
       doc.text(item.observacao || 'Nenhuma observação registrada.', 15, y, { maxWidth: 180 });
 
-      // 6. Rodapé
       doc.setFont("helvetica", "normal");
       doc.setFontSize(8);
       doc.setTextColor(150, 150, 150);

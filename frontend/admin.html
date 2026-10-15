@@ -77,6 +77,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="utils.js"></script>
   <script>
     const API = 'https://se7-backend.onrender.com/api';
     const token = localStorage.getItem('token');
@@ -108,7 +109,9 @@
 
     async function carregarUsuarios() {
       try {
-        const res = await fetch(`${API}/users`, { headers: { 'Authorization': `Bearer ${token}` } });
+        const res = await fetchAutenticado(`${API}/users`);
+        if (!res) return;
+        
         const dados = await res.json();
         const tbody = document.getElementById('tbodyUsuarios');
         tbody.innerHTML = '';
@@ -116,11 +119,9 @@
         dados.forEach(u => {
           const ehOMesmoUsuario = u.id === usuarioLogado.id;
           
-          // Estilização das Badges de Perfil e Status
           const badgePerfil = u.perfil === 'admin' ? 'bg-danger' : 'bg-secondary';
           const badgeStatus = u.ativo ? 'bg-success' : 'bg-dark';
 
-          // Definição dos botões de ação dinâmicos
           const botaoPerfilHTML = u.perfil === 'admin' 
             ? `<button class="btn btn-xs btn-outline-secondary me-1" onclick="alterarPerfil('${u.id}', 'usuario')" ${ehOMesmoUsuario ? 'disabled title="Você não pode se rebaixar"' : 'title="Rebaixar para Usuário comum"'}><i class="bi bi-person-down"></i></button>`
             : `<button class="btn btn-xs btn-outline-danger me-1" onclick="alterarPerfil('${u.id}', 'admin')" title="Promover a Admin"><i class="bi bi-shield-check"></i></button>`;
@@ -148,7 +149,6 @@
       }
     }
 
-    // INTERAÇÃO: ALTERAR PERFIL (PROMOVER / REBAIXAR)
     async function alterarPerfil(id, perfilAtual) {
       const novoPerfil = perfilAtual === 'admin' ? 'usuario' : 'admin';
       const mensagemTexto = novoPerfil === 'admin' 
@@ -168,17 +168,17 @@
 
       if (confirmacao.isConfirmed) {
         try {
-          const res = await fetch(`${API}/users/${id}`, {
+          const res = await fetchAutenticado(`${API}/users/${id}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ perfil: novoPerfil })
           });
 
-          if (res.ok) {
+          if (res && res.ok) {
             Swal.fire('Sucesso!', 'Perfil modificado com sucesso no banco.', 'success');
             carregarUsuarios();
-            carregarLogs(); // Atualiza a auditoria em tempo real
-          } else {
+            carregarLogs();
+          } else if (res) {
             Swal.fire('Erro', 'Não foi possível processar a alteração.', 'error');
           }
         } catch (error) {
@@ -187,7 +187,6 @@
       }
     }
 
-    // INTERAÇÃO: ALTERAR STATUS (ATIVAR / DESATIVAR)
     async function alterarStatus(id, statusAtivo) {
       const novoStatus = !statusAtivo;
       
@@ -204,17 +203,17 @@
 
       if (confirmacao.isConfirmed) {
         try {
-          const res = await fetch(`${API}/users/${id}`, {
+          const res = await fetchAutenticado(`${API}/users/${id}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ativo: novoStatus })
           });
 
-          if (res.ok) {
+          if (res && res.ok) {
             Swal.fire('Concluído!', `Status atualizado com sucesso.`, 'success');
             carregarUsuarios();
             carregarLogs();
-          } else {
+          } else if (res) {
             Swal.fire('Erro', 'Falha ao atualizar o status.', 'error');
           }
         } catch (error) {
@@ -225,7 +224,9 @@
 
     async function carregarLogs() {
       try {
-        const res = await fetch(`${API}/logs`, { headers: { 'Authorization': `Bearer ${token}` } });
+        const res = await fetchAutenticado(`${API}/logs`);
+        if (!res) return;
+
         const dados = await res.json();
         const tbody = document.getElementById('tbodyLogs');
         tbody.innerHTML = '';

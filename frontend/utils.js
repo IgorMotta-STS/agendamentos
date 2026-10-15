@@ -2,9 +2,7 @@ function lerTokenSeguro(token) {
     if (!token) return null;
     try {
         const base64Url = token.split('.')[1];
-        // O replace corrige caracteres de URL para o formato Base64 padrão
         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        // O map traduz perfeitamente qualquer acento (UTF-8)
         const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
             return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
         }).join(''));
@@ -12,5 +10,42 @@ function lerTokenSeguro(token) {
     } catch (error) {
         console.error("Erro ao decodificar o token:", error);
         return null;
+    }
+}
+
+// Função central de Fetch com tratamento automático de sessão expirada
+async function fetchAutenticado(url, options = {}) {
+    const token = localStorage.getItem('token');
+    
+    // Garante o cabeçalho de Autorização
+    options.headers = {
+        ...options.headers,
+        'Authorization': `Bearer ${token}`
+    };
+
+    try {
+        const response = await fetch(url, options);
+
+        // Se o token expirou ou for inválido
+        if (response.status === 401 || response.status === 403) {
+            localStorage.clear();
+            if (typeof Swal !== 'undefined') {
+                await Swal.fire({
+                    title: 'Sessão Expirada',
+                    text: 'Sua sessão expirou por inatividade. Faça login novamente.',
+                    icon: 'warning',
+                    confirmButtonText: 'Ir para o Login'
+                });
+            } else {
+                alert('Sua sessão expirou. Faça login novamente.');
+            }
+            window.location.href = 'login.html';
+            return null;
+        }
+
+        return response;
+    } catch (error) {
+        console.error("Erro na requisição:", error);
+        throw error;
     }
 }
