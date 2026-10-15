@@ -49,3 +49,17 @@ async function fetchAutenticado(url, options = {}) {
         throw error;
     }
 }
+
+// Exemplo de chamada segura no erp.html usando a nova função centralizada
+async function registrarPesagem(dadosPesagem) {
+    const res = await fetchAutenticado(`${API}/api/pesagens`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dadosPesagem)
+    });
+
+    if (!res || !res.ok) return;
+    
+    const resultado = await res.json();
+    Swal.fire('Sucesso!', 'Pesagem registrada com sucesso.', 'success');
+}
