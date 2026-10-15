@@ -1,0 +1,27 @@
+[
+  {
+    "id": 1,
+    "nome": "Administrador",
+    "email": "admin@empresa.com",
+    "senha": "$2b$10$KwAe6ulEd97.2LmFwoQVzuTIenyUyJRE7aSjRdzdvqmr.TILJXfG6",
+    "perfil": "admin",
+    "ativo": true,
+    "createdAt": "2026-05-12T00:16:22.781Z"
+  },
+  {
+    "id": 2,
+    "nome": "igor mota",
+    "email": "igmota@icloud.com",
+    "senha": "$2b$10$MXl8IFEIyqxba26yZqORAuU3sHBKHIlCPlEG5wi4aUpZK1/G02Kd2",
+    "perfil": "usuario",
+    "ativo": true
+  },
+  {
+    "id": 3,
+    "nome": "teste",
+    "email": "guive337@gmail.com",
+    "senha": "$2b$10$N4gy6JNRSrJPnDrU8oUwnOzflmppWi0VLikPrloUeenVZnYFTgykO",
+    "perfil": "usuario",
+    "ativo": true
+  }
+]
