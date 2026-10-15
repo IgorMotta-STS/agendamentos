@@ -1,214 +1,707 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Módulo ERP - Balança & Pátio | SE7 Terminais</title>
-  
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css" rel="stylesheet">
-  <link href="style.css" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ERP Logístico - Balança & Pátio | SE7 Terminais</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css" rel="stylesheet">
+<style>
+:root{
+  --bg:#eef1f6; --surface:#ffffff; --surface-2:#f6f8fb; --line:#dfe4ec;
+  --fg:#1d2433; --muted:#5b6578; --accent:#0d6efd; --accent-fg:#ffffff; --accent-soft:#e7f1ff;
+  --side:#14203a; --side-fg:#c9d3e6; --side-active:#ffffff;
+  --ok:#198754; --warn:#ffc107; --bad:#dc3545; --ok-soft:#e3f4ea; --bad-soft:#fbe6e7; --warn-soft:#fbf1d9;
+  --st-agendado:#1d4f91; --st-pesagem1:#146b3a; --st-vistoria:#6e5a00; --st-pesagem2:#173f6e;
+  --st-nf:#5b1f72; --st-saida:#1d6a44; --st-gin:#1b7a4c; --st-gout:#152442; --st-finalizado:#4a5568;
+  --font-display:"Lexend", system-ui, sans-serif; --font-body:"Lexend", system-ui, sans-serif;
+  --font-mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
+  --r:10px; --shadow:0 1px 2px rgba(20,32,58,.06), 0 4px 14px rgba(20,32,58,.06);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0f1420; --surface:#18202f; --surface-2:#1e2738; --line:#2b3549;
+  --fg:#e6ebf4; --muted:#9aa6bb; --accent:#0d6efd; --accent-fg:#ffffff; --accent-soft:#1a2c4e;
+  --side:#0a0f1a; --side-fg:#9aa6bb; --side-active:#ffffff;
+  --ok:#4cc38a; --warn:#e2b44a; --bad:#f07178; --ok-soft:#173527; --bad-soft:#3a1d22; --warn-soft:#352b14;
+  --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0f1420; --surface:#18202f; --surface-2:#1e2738; --line:#2b3549;
+  --fg:#e6ebf4; --muted:#9aa6bb; --accent:#0d6efd; --accent-fg:#ffffff; --accent-soft:#1a2c4e;
+  --side:#0a0f1a; --side-fg:#9aa6bb; --side-active:#ffffff;
+  --ok:#4cc38a; --warn:#e2b44a; --bad:#f07178; --ok-soft:#173527; --bad-soft:#3a1d22; --warn-soft:#352b14;
+  --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:14px;line-height:1.5;font-weight:400;margin:0}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0;line-height:1.2}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid #0d6efd;outline-offset:2px;border-radius:4px}
+.skip{position:absolute;left:-999px;top:8px;background:var(--accent);color:var(--accent-fg);padding:8px 14px;border-radius:6px;z-index:50}
+.skip:focus{left:8px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.num{font-variant-numeric:tabular-nums}
+
+.app{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:100vh}
+.side{background:var(--side);color:var(--side-fg);padding:20px 14px;display:flex;flex-direction:column;gap:22px;position:sticky;top:0;height:100vh}
+.brand{display:flex;align-items:center;gap:10px;padding:0 6px;color:#fff}
+.brand-mark{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#0d6efd,#0b5ed7);display:grid;place-items:center;font-weight:700;font-size:15px;color:#fff}
+.brand small{display:block;color:var(--side-fg);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav-label{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#7f8ba3;padding:12px 10px 4px}
+.nav button{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;color:var(--side-fg);font-size:13.5px}
+.nav button svg{width:18px;height:18px;flex:none}
+.nav button:hover{background:rgba(255,255,255,.06);color:#fff}
+.nav button[aria-current="page"]{background:rgba(255,255,255,.1);color:var(--side-active);font-weight:500;box-shadow:inset 3px 0 0 var(--accent)}
+.nav button:focus-visible{outline:3px solid var(--accent)}
+.side-foot{margin-top:auto;font-size:12px;padding:10px;border-top:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:10px}
+.user-box{display:flex;gap:10px;align-items:center}
+.avatar{width:32px;height:32px;border-radius:50%;background:#0d6efd;display:grid;place-items:center;color:#fff;font-weight:600;font-size:12px;flex:none}
+.sys-nav{display:flex;gap:6px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.08);padding-top:8px}
+.sys-nav a, .sys-nav button{all:unset;cursor:pointer;font-size:11.5px;background:rgba(255,255,255,.08);color:#fff;padding:4px 8px;border-radius:4px;text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+.sys-nav a:hover, .sys-nav button:hover{background:rgba(255,255,255,.15)}
+
+main{padding-block:22px 40px;padding-inline:24px;min-width:0;display:flex;flex-direction:column;gap:18px}
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.page-head h1{font-size:22px;font-weight:600}
+.crumb{font-size:13px;color:var(--muted)} .crumb b{color:var(--accent);font-weight:500}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;min-width:0;box-shadow:var(--shadow)}
+.panel h2{font-size:16px;font-weight:600;margin-bottom:12px}
+.panel-sub{color:var(--muted);font-size:13px;margin:-8px 0 14px}
+
+.filters{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:center}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field.inline{flex-direction:row;align-items:center;gap:8px}
+.field label,.lbl{font-size:12.5px;color:var(--muted);font-weight:500}
+.input,select.input{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 11px;min-height:38px;min-width:0;width:100%}
+.input:focus{border-color:var(--accent);outline:2px solid var(--accent-soft)}
+.input[aria-invalid="true"]{border-color:var(--bad)}
+.err{color:var(--bad);font-size:12px;min-height:0}
+.filters .input{width:auto}
+
+.btn{border:0;border-radius:8px;padding:8px 14px;min-height:36px;cursor:pointer;font-weight:500;background:var(--accent);color:var(--accent-fg);display:inline-flex;align-items:center;gap:6px;justify-content:center;white-space:nowrap}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--fg);border:1px solid var(--line)}
+.btn.ok{background:var(--ok);color:#fff}
+.btn.sm{padding:5px 11px;min-height:30px;font-size:12.5px}
+.btn:disabled{opacity:.45;cursor:not-allowed;filter:none}
+
+/* cards de status */
+.yard{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) minmax(0,.75fr) minmax(0,.75fr);grid-template-rows:auto auto;gap:14px}
+.st{all:unset;box-sizing:border-box;cursor:pointer;position:relative;overflow:hidden;color:#fff;border-radius:var(--r);padding:16px 14px 12px;min-height:112px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:var(--shadow)}
+.st:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.st[aria-pressed="true"]{box-shadow:0 0 0 3px var(--bg),0 0 0 6px currentColor}
+.st h3{font-size:15px;font-weight:500;position:relative;z-index:1}
+.st .count{align-self:flex-end;display:flex;align-items:baseline;gap:6px;position:relative;z-index:1}
+.st .count b{font-size:32px;font-weight:600;line-height:1}
+.st .count span{font-size:12.5px;font-weight:600}
+.st .wm{position:absolute;right:10px;top:8px;width:74px;height:74px;opacity:.16}
+.gate{grid-row:span 2;color:#fff;border-radius:var(--r);padding:16px 14px;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow)}
+.gate h3{font-size:14px;font-weight:600;text-align:center;position:relative;z-index:1}
+.gate .who{display:flex;gap:12px;align-items:center;position:relative;z-index:1;min-width:0}
+.gate .pic{width:48px;height:48px;border-radius:50%;background:#e9edf3;display:grid;place-items:center;flex:none;border:2px solid rgba(255,255,255,.4)}
+.gate .pic svg{width:34px;height:34px}
+.gate .meta{font-size:12.5px;min-width:0;line-height:1.55}
+.gate .meta i{opacity:.85}
+.gate .wm{position:absolute;right:8px;top:8px;width:70px;height:70px;opacity:.14}
+.gate .gate-foot{margin-top:auto;font-size:11.5px;opacity:.85;position:relative;z-index:1}
+
+/* tabela */
+.table-wrap{overflow-x:auto;border-radius:8px}
+table{border-collapse:collapse;width:100%;min-width:760px}
+thead th{background:var(--thead,var(--st-nf));color:#fff;font-weight:500;font-size:14px;padding:11px 12px;text-align:center}
+tbody td{padding:12px;border-bottom:1px solid var(--line);text-align:center;vertical-align:middle;font-size:13.5px}
+tbody tr:hover td{background:var(--surface-2)}
+.weights{font-size:12.5px;line-height:1.6} .weights small{color:var(--muted)}
+.empty{padding:26px;text-align:center;color:var(--muted)}
+
+/* placa Mercosul */
+.plate{display:inline-flex;flex-direction:column;border:2px solid #111;border-radius:5px;background:#fff;width:100px;overflow:hidden;vertical-align:middle}
+.plate .top{background:#1f4aa8;color:#fff;font-size:6.5px;letter-spacing:.2em;text-align:center;line-height:9px;height:9px}
+.plate .txt{font-family:var(--font-mono);font-weight:700;color:#111;font-size:17px;letter-spacing:.04em;text-align:center;line-height:24px}
+.plates{display:inline-flex;flex-direction:column;gap:4px}
+
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:500;color:#fff;white-space:nowrap}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.8}
+
+/* agendamento */
+.split{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:18px;align-items:start}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.form-grid .full{grid-column:1/-1}
+fieldset{border:0;padding:0;margin:0;min-width:0}
+legend{font-size:12.5px;color:var(--muted);font-weight:500;margin-bottom:6px;padding:0}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
+.slot{position:relative}
+.slot input{position:absolute;opacity:0;inset:0;cursor:pointer}
+.slot label{display:flex;flex-direction:column;align-items:center;gap:2px;border:1px solid var(--line);border-radius:8px;padding:8px 4px;cursor:pointer;background:var(--surface)}
+.slot label b{font-family:var(--font-mono);font-size:14px}
+.slot label small{font-size:11px;color:var(--muted)}
+.slot .bar{height:4px;width:70%;background:var(--line);border-radius:2px;overflow:hidden}
+.slot .bar i{display:block;height:100%;background:var(--ok)}
+.slot.full label{opacity:.5;cursor:not-allowed;text-decoration:line-through}
+.slot.full .bar i{background:var(--bad)}
+.slot input:checked+label{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.slot input:focus-visible+label{outline:3px solid var(--accent);outline-offset:2px}
+.rules{margin:0;padding-left:18px;color:var(--muted);font-size:12.5px;display:grid;gap:4px}
+.list{display:flex;flex-direction:column;gap:8px}
+.row-card{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);flex-wrap:wrap}
+.row-card .grow{flex:1;min-width:140px}
+.row-card .t{font-weight:500} .row-card .s{color:var(--muted);font-size:12.5px}
+.time{font-family:var(--font-mono);font-size:13px;background:var(--surface-2);border:1px solid var(--line);padding:3px 8px;border-radius:6px}
+
+/* balança */
+.scale-pick{display:flex;flex-direction:column;gap:8px}
+.pick{all:unset;box-sizing:border-box;cursor:pointer;display:flex;gap:12px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);flex-wrap:wrap}
+.pick[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.pick:focus-visible{outline:3px solid var(--accent)}
+.readout{background:#0b120d;border-radius:10px;padding:16px 18px;color:#7dffa8;font-family:var(--font-mono);display:flex;flex-direction:column;gap:4px;border:1px solid #1f3a28}
+.readout .lab{color:#4fae72;font-size:11px;letter-spacing:.14em;text-transform:uppercase;display:flex;justify-content:space-between}
+.readout .val{font-size:44px;font-weight:700;letter-spacing:.04em;text-align:right;line-height:1.1;text-shadow:0 0 12px rgba(125,255,168,.35)}
+.readout .val small{font-size:18px;margin-left:6px}
+.stable{display:inline-flex;align-items:center;gap:6px}
+.stable i{width:8px;height:8px;border-radius:50%;background:#3a5a44}
+.stable.on i{background:#7dffa8;box-shadow:0 0 6px #7dffa8}
+.calc{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.calc div{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.calc span{display:block;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.calc b{font-family:var(--font-mono);font-size:17px}
+.calc .liq{background:var(--accent-soft);border-color:var(--accent)}
+.formula{font-family:var(--font-mono);font-size:12px;color:var(--muted)}
+.ticket{border:1px dashed var(--muted);border-radius:8px;padding:14px 16px;font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);line-height:1.7}
+.ticket h3{font-family:var(--font-mono);font-size:13px;text-align:center;border-bottom:1px dashed var(--muted);padding-bottom:6px;margin-bottom:6px}
+.ticket .r{display:flex;justify-content:space-between;gap:10px}
+.notice{border-radius:8px;padding:10px 12px;font-size:13px}
+.notice.bad{background:var(--bad-soft);color:var(--bad)}
+.notice.ok{background:var(--ok-soft);color:var(--ok)}
+.notice.warn{background:var(--warn-soft);color:var(--warn)}
+
+/* indicadores */
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow)}
+.kpi span{font-size:12.5px;color:var(--muted)}
+.kpi b{display:block;font-size:26px;font-weight:600;margin-top:4px}
+.kpi small{font-size:12px}
+.up{color:var(--ok)} .down{color:var(--bad)}
+.charts{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:18px}
+.chart svg{width:100%;height:auto;display:block}
+.hbar{display:grid;grid-template-columns:130px minmax(0,1fr) 70px;align-items:center;gap:10px;font-size:13px;padding:6px 0}
+.hbar .trk{height:12px;background:var(--surface-2);border-radius:6px;overflow:hidden;border:1px solid var(--line)}
+.hbar .trk i{display:block;height:100%;background:var(--accent);border-radius:6px}
+.hbar b{font-family:var(--font-mono);font-size:12.5px;text-align:right}
+
+/* arquitetura */
+.layers{display:flex;flex-direction:column;gap:0}
+.layer{border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;background:var(--surface);display:grid;grid-template-columns:200px minmax(0,1fr);gap:16px}
+.layer h3{font-size:15px;font-weight:600}
+.layer .k{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{font-size:12px;border:1px solid var(--line);background:var(--surface-2);border-radius:6px;padding:3px 8px}
+.mods{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.mod{border-left:3px solid var(--accent);background:var(--surface-2);padding:8px 10px;border-radius:0 6px 6px 0;font-size:13px}
+.mod b{display:block;font-weight:500}
+.mod span{color:var(--muted);font-size:12px}
+.arrow{align-self:center;color:var(--muted);font-size:12px;font-family:var(--font-mono);padding:8px 0;display:flex;align-items:center;gap:8px}
+.arrow::before{content:"↓";font-size:18px;color:var(--accent)}
+
+.toast{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--side);color:#fff;padding:12px 16px;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:340px;font-size:13.5px;z-index:40;border-left:4px solid #4cc38a}
+
+@media (max-width:1180px){
+  .yard{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .gate{grid-row:auto;min-height:150px}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  .side{position:static;height:auto;padding:12px 16px;gap:10px}
+  .nav{flex-direction:row;overflow-x:auto;gap:4px}
+  .nav-label,.side-foot{display:none}
+  .nav button{white-space:nowrap}
+  .split,.charts{grid-template-columns:1fr}
+  .layer{grid-template-columns:1fr}
+  main{padding-inline:16px}
+}
+@media (max-width:620px){
+  .yard{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .form-grid{grid-template-columns:1fr}
+  .kpis{grid-template-columns:1fr 1fr}
+  .calc{grid-template-columns:1fr}
+  .readout .val{font-size:34px}
+  .hbar{grid-template-columns:96px minmax(0,1fr) 60px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
 </head>
-<body class="bg-light">
+<body>
 
-  <!-- Navbar Padronizada SE7 -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
-    <div class="container-fluid px-4">
-      <a class="navbar-brand d-flex align-items-center text-white" href="dashboard.html">
-        <img src="assets/se7logo.png" alt="Logo SE7 Terminais" height="30" class="me-2" style="filter: brightness(0) invert(1);">
-        <span class="fw-bolder fs-4" style="letter-spacing: 1px;">SE7</span>
-        <span class="fw-normal ms-1 fs-5">Terminais - ERP / Balança</span>
-      </a>
-      
-      <div class="d-flex align-items-center gap-3">
-        <span id="usuarioInfo" class="text-white small fw-semibold"></span>
-        <a href="dashboard.html" class="btn btn-outline-light btn-sm"><i class="bi bi-arrow-left me-1"></i>Painel Operacional</a>
-        <button id="btnAdmin" class="btn btn-outline-light btn-sm d-none" onclick="window.location.href='admin.html'"><i class="bi bi-shield-lock me-1"></i>Admin</button>
-        <button class="btn btn-danger btn-sm fw-bold" onclick="logout()"><i class="bi bi-box-arrow-right me-1"></i>Sair</button>
-      </div>
+<a class="skip" href="#conteudo">Pular para o conteúdo</a>
+<div class="app">
+  <aside class="side" aria-label="Menu principal">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">S7</div>
+      <div><b>SE7 Terminais</b><small>ERP Logístico</small></div>
     </div>
-  </nav>
-
-  <!-- Conteúdo Principal do ERP -->
-  <div class="container-fluid px-4 py-4">
     
-    <!-- Cabeçalho de Ações e Filtros -->
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 bg-body p-3 rounded shadow-sm border">
-      <h4 class="mb-2 mb-md-0 fw-bold text-body"><i class="bi bi-truck text-primary me-2"></i>Controle de Pesagem & Pátio</h4>
-      
-      <div class="d-flex flex-wrap gap-2 align-items-center">
-        <div class="input-group" style="max-width: 300px;">
-          <span class="input-group-text bg-transparent"><i class="bi bi-search"></i></span>
-          <input type="text" id="pesquisaErp" class="form-control" placeholder="Buscar placa, ticket ou motorista...">
-        </div>
-        
-        <button class="btn btn-outline-secondary" onclick="carregarPesagens()"><i class="bi bi-arrow-clockwise"></i></button>
-        <button class="btn btn-success fw-bold" onclick="abrirModalPesagem()"><i class="bi bi-plus-lg me-1"></i>Nova Pesagem</button>
+    <nav class="nav" id="nav">
+      <div class="nav-label">Operações</div>
+      <button data-view="patio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Painel do Pátio</button>
+      <button data-view="agendamento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Agendamento</button>
+      <button data-view="portaria"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v18M5 7h14M5 7l-3 7h6zM19 7l-3 7h6zM8 21h8"/></svg>Portaria &amp; Balança</button>
+      <div class="nav-label">Gestão</div>
+      <button data-view="indicadores"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Indicadores</button>
+      <button data-view="auditoria"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Log de Movimentação</button>
+      <button data-view="arquitetura"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 2 2 7l10 5 10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Arquitetura</button>
+    </nav>
+
+    <!-- Rodapé da Sidebar integrando a identidade SE7 e os atalhos de sistema -->
+    <div class="side-foot">
+      <div class="user-box">
+        <div class="avatar" id="userAvatar" aria-hidden="true">US</div>
+        <div style="min-width:0"><div style="color:#fff;font-weight:500;text-overflow:ellipsis;overflow:hidden" id="userName">Usuário</div><div style="font-size:11px;color:var(--side-fg)" id="userRole">Operador</div></div>
+      </div>
+      <div class="sys-nav">
+        <a href="dashboard.html"><i class="bi bi-arrow-left"></i> Painel</a>
+        <a href="admin.html" id="linkAdmin" class="d-none"><i class="bi bi-shield-lock"></i> Admin</a>
+        <button onclick="logout()" style="margin-left:auto"><i class="bi bi-box-arrow-right"></i> Sair</button>
       </div>
     </div>
+  </aside>
 
-    <!-- Tabela de Movimentações / Balança -->
-    <div class="card border shadow-sm bg-body">
-      <div class="card-body p-0">
-        <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
-            <thead class="table-light">
-              <tr>
-                <th class="ps-3">Ticket #</th>
-                <th>Placa Cavalo</th>
-                <th>Motorista</th>
-                <th>Produto</th>
-                <th>Tara (t)</th>
-                <th>Bruto (t)</th>
-                <th>Líquido (t)</th>
-                <th>Status</th>
-                <th class="text-end pe-4">Ações</th>
-              </tr>
-            </thead>
-            <tbody id="tbodyPesagens">
-              <tr>
-                <td colspan="9" class="text-center py-5 text-muted">Carregando dados operacionais...</td>
-              </tr>
-            </tbody>
-          </table>
+  <main id="conteudo" tabindex="-1">
+    <div class="page-head"><h1 id="pageTitle">Painel do Pátio</h1><div class="crumb" id="crumb"></div></div>
+
+    <!-- ============ PAINEL DO PÁTIO ============ -->
+    <section data-sec="patio" aria-labelledby="pageTitle">
+      <div style="display:flex;flex-direction:column;gap:18px">
+        <form class="panel filters" id="filtros" aria-label="Filtros do painel">
+          <div class="field inline"><label for="fDe">De</label><input class="input" type="date" id="fDe"></div>
+          <div class="field inline"><label for="fAte">Até</label><input class="input" type="date" id="fAte"></div>
+          <div class="field inline"><label for="fCli">Cliente</label><select class="input" id="fCli"></select></div>
+          <div class="field inline"><label for="fProd">Produto</label><select class="input" id="fProd"></select></div>
+        </form>
+        <div class="yard" id="yard"></div>
+        <div class="panel">
+          <h2 id="tblTitle">Aguardando N.F.</h2>
+          <div class="table-wrap"><table aria-labelledby="tblTitle"><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
         </div>
       </div>
-    </div>
-  </div>
+    </section>
 
-  <!-- Modal de Nova Pesagem / Movimentação -->
-  <div class="modal fade" id="modalPesagem" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content bg-body">
-        <div class="modal-header border-bottom">
-          <h5 class="modal-title fw-bold text-primary" id="tituloModalPesagem">Registrar Pesagem / Balança</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="formPesagem">
-            <input type="hidden" id="pesagemId">
-            
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label class="form-label fw-semibold text-body-secondary">ID Agendamento ou Placa</label>
-                <input type="text" id="buscaAgendamento" class="form-control bg-body" placeholder="Ex: ABC-1234" required>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label fw-semibold text-body-secondary">Operação de Balança</label>
-                <select id="tipoOperacao" class="form-select bg-body" required>
-                  <option value="">Selecione...</option>
-                  <option value="TARA">1. Pesagem de Tara (Entrada Vazio)</option>
-                  <option value="BRUTO">2. Pesagem de Bruto (Saída Carregado)</option>
-                </select>
-              </div>
-
-              <div class="col-md-6">
-                <label class="form-label fw-semibold text-body-secondary">Peso Registrado (Ton)</label>
-                <input type="number" id="valorPeso" class="form-control bg-body" step="0.01" min="0" required placeholder="0.00">
-              </div>
-              <div class="col-md-6">
-                <label class="form-label fw-semibold text-body-secondary">Observações da Balança</label>
-                <input type="text" id="obsPesagem" class="form-control bg-body" placeholder="Lacre, avarias ou detalhes...">
-              </div>
+    <!-- ============ AGENDAMENTO ============ -->
+    <section data-sec="agendamento" hidden>
+      <div class="split">
+        <form class="panel" id="agForm" novalidate>
+          <h2>Novo agendamento de carga</h2>
+          <p class="panel-sub">Portal da transportadora. A janela só é confirmada se houver vaga e os dados forem válidos.</p>
+          <div class="form-grid">
+            <div class="field"><label for="aTransp">Transportadora</label><select class="input" id="aTransp"></select></div>
+            <div class="field"><label for="aMot">Motorista</label><input class="input" id="aMot" placeholder="Nome completo" autocomplete="off"><span class="err" id="eMot"></span></div>
+            <div class="field"><label for="aCpf">CPF do motorista</label><input class="input num" id="aCpf" inputmode="numeric" placeholder="000.000.000-00" maxlength="14"><span class="err" id="eCpf"></span></div>
+            <div class="field"><label for="aPlaca">Placa do cavalo</label><input class="input num" id="aPlaca" placeholder="ABC1D23" maxlength="7" style="text-transform:uppercase"><span class="err" id="ePlaca"></span></div>
+            <div class="field"><label for="aPlaca2">Placa da carreta <span style="font-weight:400">(opcional)</span></label><input class="input num" id="aPlaca2" placeholder="ABC1D23" maxlength="7" style="text-transform:uppercase"><span class="err" id="ePlaca2"></span></div>
+            <div class="field"><label for="aData">Data</label><input class="input" type="date" id="aData"><span class="err" id="eData"></span></div>
+            <div class="field"><label for="aCli">Cliente</label><select class="input" id="aCli"></select></div>
+            <div class="field"><label for="aProd">Produto</label><select class="input" id="aProd"></select></div>
+            <fieldset class="full"><legend>Janela de horário <span id="slotInfo" style="font-weight:400"></span></legend><div class="slots" id="slots" role="radiogroup"></div><span class="err" id="eSlot"></span></fieldset>
+            <div class="full" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end">
+              <button type="reset" class="btn ghost">Limpar</button>
+              <button type="submit" class="btn">Confirmar agendamento</button>
             </div>
-            
-            <div class="mt-4 text-end border-top pt-3">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-              <button type="submit" class="btn btn-success fw-bold px-4" id="btnSalvarPesagem">
-                <span class="spinner-border spinner-border-sm d-none me-1" id="spinnerPesagem" role="status"></span>
-                <span>Salvar Pesagem</span>
-              </button>
-            </div>
-          </form>
+          </div>
+        </form>
+        <div style="display:flex;flex-direction:column;gap:18px;min-width:0">
+          <div class="panel">
+            <h2>Regras de validação</h2>
+            <ul class="rules">
+              <li>Máximo de <b>3 veículos por janela</b> de 1 hora.</li>
+              <li>Placa no padrão Mercosul (ABC1D23) ou antigo (ABC1234).</li>
+              <li>A mesma placa não pode ter dois agendamentos no mesmo dia.</li>
+              <li>Não é permitido agendar datas ou horários já passados.</li>
+            </ul>
+          </div>
+          <div class="panel">
+            <h2 id="agListTitle">Agendamentos do dia</h2>
+            <div class="list" id="agList"></div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
+    </section>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="utils.js"></script>
+    <!-- ============ PORTARIA & BALANÇA ============ -->
+    <section data-sec="portaria" hidden>
+      <div class="split">
+        <div style="display:flex;flex-direction:column;gap:18px;min-width:0">
+          <div class="panel">
+            <h2>Portaria · Check-in</h2>
+            <p class="panel-sub">Confira a placa do veículo na cancela e registre a entrada.</p>
+            <div class="field" style="margin-bottom:12px"><label for="pBusca">Buscar placa ou motorista</label><input class="input" id="pBusca" placeholder="Ex.: DSD3231" autocomplete="off"></div>
+            <div class="list" id="pEntrada"></div>
+          </div>
+          <div class="panel">
+            <h2>Portaria · Liberação de saída</h2>
+            <p class="panel-sub">Veículos com N.F. emitida, prontos para deixar o terminal.</p>
+            <div class="list" id="pSaida"></div>
+          </div>
+        </div>
+        <div class="panel" style="display:flex;flex-direction:column;gap:14px">
+          <h2 style="margin:0">Balança rodoviária 01</h2>
+          <div><div class="lbl" id="pickLbl" style="margin-bottom:6px">Veículo na plataforma</div><div class="scale-pick" id="pick" role="group" aria-labelledby="pickLbl"></div></div>
+          <div class="readout" aria-live="polite">
+            <div class="lab"><span id="roTipo">Aguardando veículo</span><span class="stable" id="roStable"><i></i>ESTÁVEL</span></div>
+            <div class="val num"><span id="roVal">0</span><small>kg</small></div>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+            <button class="btn ghost" id="btnLer" type="button">Capturar leitura</button>
+            <div class="field" style="flex:1;min-width:150px"><label for="pesoManual">Peso (kg) · editar se necessário</label><input class="input num" id="pesoManual" inputmode="numeric"></div>
+            <button class="btn" id="btnPesar" type="button">Registrar pesagem</button>
+          </div>
+          <div id="pesoMsg" aria-live="polite"></div>
+          <div class="calc">
+            <div><span>Tara</span><b class="num" id="cTara">—</b></div>
+            <div><span>Bruto</span><b class="num" id="cBruto">—</b></div>
+            <div class="liq"><span>Peso líquido</span><b class="num" id="cLiq">—</b></div>
+          </div>
+          <div class="formula">Líquido = Bruto − Tara · 1ª pesagem (vazio) = tara · 2ª pesagem (carregado) = bruto</div>
+          <div id="ticket"></div>
+        </div>
+      </div>
+    </section>
 
-  <script>
-    const API = 'https://se7-backend.onrender.com/api';
-    const token = localStorage.getItem('token');
-    let modalPesagemInstance;
+    <!-- ============ INDICADORES ============ -->
+    <section data-sec="indicadores" hidden>
+      <div style="display:flex;flex-direction:column;gap:18px">
+        <div class="kpis" id="kpis"></div>
+        <div class="charts">
+          <div class="panel chart"><h2>Toneladas expedidas · últimos 7 dias</h2><div id="chWeek"></div></div>
+          <div class="panel"><h2>Volume por produto · semana</h2><div id="chProd"></div></div>
+        </div>
+        <div class="panel chart"><h2>Veículos no pátio por status · agora</h2><div id="chStatus"></div></div>
+      </div>
+    </section>
 
-    if (!token) window.location.href = 'login.html';
+    <!-- ============ AUDITORIA ============ -->
+    <section data-sec="auditoria" hidden>
+      <div class="panel">
+        <h2>log_movimentacao</h2>
+        <p class="panel-sub">Histórico de pátio para auditoria. Toda mudança de status gera um registro.</p>
+        <div class="table-wrap"><table style="--thead:var(--st-gout)"><thead><tr><th>Data/hora</th><th>Placa</th><th>Evento</th><th>Módulo</th><th>Usuário</th></tr></thead><tbody id="logBody"></tbody></table></div>
+      </div>
+    </section>
 
-    window.onload = function () {
-      modalPesagemInstance = new bootstrap.Modal(document.getElementById('modalPesagem'));
-      carregarUsuarioERP();
-      carregarPesagens();
-    };
+    <!-- ============ ARQUITETURA ============ -->
+    <section data-sec="arquitetura" hidden>
+      <div class="layers">
+        <div class="layer"><div><div class="k">Camada 1</div><h3>Apresentação</h3><div class="chips"><span class="chip">HTML5</span><span class="chip">CSS3</span><span class="chip">Bootstrap</span><span class="chip">WCAG</span></div></div>
+          <div class="mods"><div class="mod"><b>Portal Web</b><span>Tela “Agendamento”</span></div><div class="mod"><b>Terminal de Portaria &amp; Balança</b><span>Tela “Portaria &amp; Balança”</span></div><div class="mod"><b>Dashboard Gerencial</b><span>Telas “Painel do Pátio” e “Indicadores”</span></div></div></div>
+        <div class="arrow">Requisições HTTPS · API REST (JavaScript Fetch)</div>
+        <div class="layer"><div><div class="k">Camada 2</div><h3>Negócio</h3><div class="chips"><span class="chip">Node.js</span><span class="chip">Express</span><span class="chip">Jest</span></div></div>
+          <div class="mods"><div class="mod"><b>Agendamento</b><span>POST /agendamentos · valida janela e placa</span></div><div class="mod"><b>Portaria e Pátio</b><span>PATCH /veiculos/:id/status</span></div><div class="mod"><b>Pesagem</b><span>POST /pesagens · líquido = bruto − tara</span></div><div class="mod"><b>Relatórios</b><span>GET /relatorios/dashboard</span></div></div></div>
+        <div class="arrow">Queries SQL · Supabase Client</div>
+        <div class="layer"><div><div class="k">Camada 3</div><h3>Dados e Nuvem</h3><div class="chips"><span class="chip">Supabase (PostgreSQL)</span><span class="chip">Render</span><span class="chip">Git/GitHub</span></div></div>
+          <div class="mods"><div class="mod"><b>usuarios</b><span>Operadores e perfis de acesso</span></div><div class="mod"><b>veiculos &amp; motoristas</b><span>Cadastros base</span></div><div class="mod"><b>agendamentos</b><span>Reservas e status</span></div><div class="mod"><b>pesagens_tickets</b><span>Tara, bruto e líquido</span></div><div class="mod"><b>log_movimentacao</b><span>Histórico e auditoria</span></div></div></div>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-    function carregarUsuarioERP() {
-      const payload = lerTokenSeguro(token);
-      if (payload) {
-        document.getElementById('usuarioInfo').textContent = `${payload.nome} (${payload.perfil})`;
-        if (payload.perfil === 'admin') {
-          document.getElementById('btnAdmin').classList.remove('d-none');
-        }
-      }
-    }
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="utils.js"></script>
+<script>
+(function(){
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const pad=n=>String(n).padStart(2,'0');
+const today=new Date(); today.setSeconds(0,0);
+const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const TODAY=iso(today);
+const ago=m=>new Date(Date.now()-m*60000);
+const fmtTs=d=>d?pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+String(d.getFullYear()).slice(2)+' '+pad(d.getHours())+':'+pad(d.getMinutes()):'--/--/-- --:--';
+const kg=n=>n==null?'—':n.toLocaleString('pt-BR')+' kg';
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
-    function abrirModalPesagem() {
-      document.getElementById('formPesagem').reset();
-      document.getElementById('pesagemId').value = '';
-      modalPesagemInstance.show();
-    }
+// Validação de token e sessão ao carregar o ERP
+const token = localStorage.getItem('token');
+if (!token) window.location.href = 'login.html';
 
-    async function carregarPesagens() {
-      try {
-        // Exemplo seguro utilizando fetchAutenticado do utils.js
-        const res = await fetchAutenticado(`${API}/pesagens`);
-        if (!res) return;
+const payload = lerTokenSeguro(token);
+let OPER = 'Operador';
+if (payload) {
+  OPER = payload.nome || 'Operador';
+  $('#userName').textContent = OPER;
+  $('#userRole').textContent = payload.perfil === 'admin' ? 'Administrador' : 'Operador';
+  const initials = OPER.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+  $('#userAvatar').textContent = initials;
+  if (payload.perfil === 'admin') {
+    $('#linkAdmin').classList.remove('d-none');
+  }
+}
 
-        const dados = await res.json();
-        const tbody = document.getElementById('tbodyPesagens');
+const CLIENTES=['QUIMICA AMPARO - AMPARO','AGROSUL FERTILIZANTES - PAULINIA','CEREALISTA RIO CLARO','VIDROTEC - JUNDIAI'];
+const PRODUTOS=['SULFATO DE SODIO','UREIA GRANULADA','CLORETO DE POTASSIO','BARRILHA LEVE'];
+const TRANSP=['Rodoviário Sete Rios','TransAmparo Cargas','Expresso Campinas','Logística Vale Verde'];
 
-        if (!dados || !Array.isArray(dados) || dados.length === 0) {
-          tbody.innerHTML = `
-            <tr>
-              <td colspan="9" class="text-center py-5">
-                <i class="bi bi-clipboard-x text-body-tertiary" style="font-size: 3rem;"></i>
-                <h6 class="mt-3 text-body-secondary fw-bold">Nenhuma pesagem registrada hoje</h6>
-                <p class="text-body-tertiary mb-0">Utilize o botão "Nova Pesagem" para iniciar o fluxo na balança.</p>
-              </td>
-            </tr>
-          `;
-          return;
-        }
+const ST={
+ agendado:{label:'Agendamentos',short:'Agendado',c:'var(--st-agendado)',ic:'cal',act:'Registrar entrada'},
+ pesagem1:{label:'Aguardando 1ª Pesagem',short:'1ª pesagem',c:'var(--st-pesagem1)',ic:'scale',act:'Ir para balança'},
+ vistoria:{label:'Aguardando Vistoria',short:'Vistoria',c:'var(--st-vistoria)',ic:'shield',act:'Aprovar vistoria'},
+ pesagem2:{label:'Aguardando 2ª Pesagem',short:'2ª pesagem',c:'var(--st-pesagem2)',ic:'scale',act:'Ir para balança'},
+ nf:{label:'Aguardando N.F.',short:'Aguardando N.F.',c:'var(--st-nf)',ic:'doc',act:'Gerar NF'},
+ saida:{label:'Aguardando Saída',short:'Aguard. saída',c:'var(--st-saida)',ic:'check',act:'Liberar saída'},
+ finalizado:{label:'Finalizados',short:'Finalizado',c:'var(--st-finalizado)'}
+};
+const ORDER=['agendado','pesagem1','vistoria','pesagem2','nf','saida'];
+const ICON={
+ cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 14h3v3H8z"/>',
+ scale:'<path d="M12 3v18M5 7h14M5 7l-3 7h6zM19 7l-3 7h6zM8 21h8"/>',
+ shield:'<path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m8.5 12 2.5 2.5 4.5-5"/>',
+ doc:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/>',
+ check:'<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>',
+ clip:'<rect x="5" y="4" width="14" height="18" rx="2"/><path d="M9 4V2h6v2M9 13l2 2 4-4"/>',
+ truck:'<path d="M2 6h12v10H2zM14 9h4l4 4v3h-8z"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>'
+};
+const svgI=(k,cls)=>'<svg class="'+cls+'" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" aria-hidden="true">'+ICON[k]+'</svg>';
+const PERSON='<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="15" r="8" fill="#b9c1cc"/><path d="M5 38c1-9 7-13 15-13s14 4 15 13z" fill="#b9c1cc"/></svg>';
 
-        tbody.innerHTML = '';
-        dados.forEach(p => {
-          tbody.innerHTML += `
-            <tr>
-              <td class="ps-3 fw-bold text-primary">#${p.id || '-'}</td>
-              <td><span class="badge bg-secondary">${p.placacavalo || '-'}</span></td>
-              <td>${p.motorista || '-'}</td>
-              <td>${p.produto || '-'}</td>
-              <td>${p.tara || '0.00'} t</td>
-              <td>${p.bruto || '0.00'} t</td>
-              <td class="fw-bold text-success">${p.liquido || '0.00'} t</td>
-              <td><span class="badge bg-info text-dark">${p.status || 'Em andamento'}</span></td>
-              <td class="text-end pe-4">
-                <button class="btn btn-sm btn-outline-primary me-1" title="Editar"><i class="bi bi-pencil"></i></button>
-                <button class="btn btn-sm btn-outline-danger" title="Excluir"><i class="bi bi-trash"></i></button>
-              </td>
-            </tr>
-          `;
-        });
-      } catch (error) {
-        console.error("Erro ao carregar pesagens:", error);
-      }
-    }
+let seq=580;
+const V=[];
+function mk(o){const v=Object.assign({id:++seq,data:TODAY,tara:null,bruto:null,taraTs:null,brutoTs:null,entrada:null,saidaTs:null,nf:null,placa2:''},o);V.push(v);return v;}
+const h=today.getHours();
+const slotAt=off=>pad(Math.min(17,Math.max(7,h+off)))+':00';
+mk({cliente:CLIENTES[0],produto:PRODUTOS[0],placa:'DSD3231',placa2:'DSE4410',motorista:'Marcos Aurélio Lima',transp:TRANSP[1],janela:slotAt(-2),status:'nf',entrada:ago(140),tara:26000,taraTs:ago(120),bruto:50000,brutoTs:ago(25)});
+mk({cliente:CLIENTES[1],produto:PRODUTOS[1],placa:'FKR8C21',motorista:'Juliana Prado',transp:TRANSP[0],janela:slotAt(-1),status:'pesagem2',entrada:ago(95),tara:17420,taraTs:ago(80)});
+mk({cliente:CLIENTES[2],produto:PRODUTOS[2],placa:'GHT2E77',placa2:'GHT2E78',motorista:'Roberto Siqueira',transp:TRANSP[2],janela:slotAt(-1),status:'vistoria',entrada:ago(50),tara:15880,taraTs:ago(38)});
+mk({cliente:CLIENTES[0],produto:PRODUTOS[0],placa:'BRA2E19',motorista:'Anderson Melo',transp:TRANSP[1],janela:slotAt(0),status:'pesagem1',entrada:ago(12)});
+mk({cliente:CLIENTES[3],produto:PRODUTOS[3],placa:'QPL5H03',motorista:'Fernanda Costa',transp:TRANSP[3],janela:slotAt(0),status:'agendado'});
+mk({cliente:CLIENTES[1],produto:PRODUTOS[1],placa:'MTZ7A42',placa2:'MTZ7A43',motorista:'Paulo Henrique Dias',transp:TRANSP[0],janela:slotAt(1),status:'agendado'});
+mk({cliente:CLIENTES[2],produto:PRODUTOS[2],placa:'EXP4B90',motorista:'Sérgio Nunes',transp:TRANSP[2],janela:slotAt(1),status:'agendado'});
+mk({cliente:CLIENTES[0],produto:PRODUTOS[0],placa:'KLM1F56',motorista:'Ricardo Alves',transp:TRANSP[3],janela:slotAt(-3),status:'saida',entrada:ago(230),tara:16100,taraTs:ago(210),bruto:47300,brutoTs:ago(70),nf:'000.184.552'});
+mk({cliente:CLIENTES[1],produto:PRODUTOS[1],placa:'RTA9D11',motorista:'Gustavo Moreira',transp:TRANSP[0],janela:slotAt(-4),status:'finalizado',entrada:ago(300),tara:17050,taraTs:ago(285),bruto:49870,brutoTs:ago(220),nf:'000.184.549',saidaTs:ago(200)});
+mk({cliente:CLIENTES[3],produto:PRODUTOS[3],placa:'NVB3C64',motorista:'Luana Ferraz',transp:TRANSP[3],janela:slotAt(-5),status:'finalizado',entrada:ago(360),tara:14900,taraTs:ago(345),bruto:41200,brutoTs:ago(290),nf:'000.184.547',saidaTs:ago(268)});
+mk({cliente:CLIENTES[2],produto:PRODUTOS[2],placa:'JUP6G28',motorista:'Diego Matos',transp:TRANSP[2],janela:slotAt(-5),status:'finalizado',entrada:ago(380),tara:15600,taraTs:ago(362),bruto:44950,brutoTs:ago(318),nf:'000.184.548',saidaTs:ago(301)});
 
-    function logout() {
-      localStorage.clear();
-      window.location.href = 'login.html';
-    }
-  </script>
+let LOG=[];
+function log(v,evento,modulo,ts){LOG.unshift({ts:ts||new Date(),placa:v.placa,evento,modulo,user:OPER});}
+V.slice().reverse().forEach(v=>{
+  if(v.saidaTs) log(v,'Saída liberada na portaria','Portaria e Pátio',v.saidaTs);
+  if(v.nf) log(v,'N.F. '+v.nf+' vinculada','Portaria e Pátio',new Date(v.brutoTs.getTime()+600000));
+  if(v.brutoTs) log(v,'2ª pesagem (bruto) '+kg(v.bruto),'Pesagem',v.brutoTs);
+  if(v.taraTs) log(v,'1ª pesagem (tara) '+kg(v.tara),'Pesagem',v.taraTs);
+  if(v.entrada) log(v,'Entrada registrada no gate','Portaria e Pátio',v.entrada);
+});
+LOG.sort((a,b)=>b.ts-a.ts);
+
+let gateIn=V.find(v=>v.placa==='BRA2E19');
+let gateOut=V.find(v=>v.placa==='RTA9D11');
+let selStatus='nf', view='patio', pickId=null, lastTicket=null;
+
+const TITLES={patio:'Painel do Pátio',agendamento:'Agendamento de Cargas',portaria:'Portaria & Balança',indicadores:'Dashboard Gerencial',auditoria:'Log de Movimentação',arquitetura:'Arquitetura do Sistema'};
+const GROUP={patio:'Operações',agendamento:'Operações',portaria:'Operações',indicadores:'Gestão',auditoria:'Gestão',arquitetura:'Gestão'};
+function go(v,focus){
+  view=v;
+  $$('[data-sec]').forEach(s=>s.hidden=s.dataset.sec!==v);
+  $$('#nav button').forEach(b=>b.dataset.view===v?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
+  $('#pageTitle').textContent=TITLES[v];
+  $('#crumb').innerHTML=GROUP[v]+' / <b>'+TITLES[v]+'</b>';
+  try{history.replaceState(null,'','#'+v);}catch(e){}
+  render();
+  if(focus) $('#conteudo').focus();
+}
+$('#nav').addEventListener('click',e=>{const b=e.target.closest('button[data-view]');if(b)go(b.dataset.view,true);});
+
+function setStatus(v,s,evento,modulo){v.status=s;log(v,evento,modulo);render();}
+function doEntrada(v){v.entrada=new Date();gateIn=v;setStatus(v,'pesagem1','Entrada registrada no gate','Portaria e Pátio');toast(v.placa+' entrou no pátio. Próximo passo: 1ª pesagem (tara).');}
+function doVistoria(v){setStatus(v,'pesagem2','Vistoria aprovada · carregamento concluído','Portaria e Pátio');toast('Vistoria de '+v.placa+' aprovada. Encaminhe para a 2ª pesagem.');}
+function doNF(v){v.nf='000.'+(184500+v.id).toString().replace(/(\d{3})(\d{3})/,'$1.$2');setStatus(v,'saida','N.F. '+v.nf+' emitida','Portaria e Pátio');toast('N.F. '+v.nf+' gerada para '+v.placa+'.');}
+function doSaida(v){v.saidaTs=new Date();gateOut=v;setStatus(v,'finalizado','Saída liberada na portaria','Portaria e Pátio');toast(v.placa+' liberado. Ciclo encerrado.');}
+function action(v){
+  if(v.status==='agendado')doEntrada(v);
+  else if(v.status==='vistoria')doVistoria(v);
+  else if(v.status==='nf')doNF(v);
+  else if(v.status==='saida')doSaida(v);
+  else {pickId=v.id;go('portaria',true);}
+}
+
+function filtered(){
+  const de=$('#fDe').value,ate=$('#fAte').value,c=$('#fCli').value,p=$('#fProd').value;
+  return V.filter(v=>(!de||v.data>=de)&&(!ate||v.data<=ate)&&(!c||v.cliente===c)&&(!p||v.produto===p));
+}
+function renderPatio(){
+  const list=filtered();
+  const cnt=s=>list.filter(v=>v.status===s).length;
+  const card=s=>'<button type="button" class="st" style="background:'+ST[s].c+'" aria-pressed="'+(selStatus===s)+'" data-st="'+s+'"><h3>'+ST[s].label+'</h3>'+svgI(ST[s].ic,'wm')+'<div class="count"><b class="num">'+cnt(s)+'</b><span>Autos</span></div></button>';
+  const gate=(t,v,c,ic,when)=>'<div class="gate" style="background:'+c+'"><h3>'+t+'</h3>'+svgI(ic,'wm')+'<div class="who"><div class="pic">'+PERSON+'</div><div class="meta">'+(v?'<b>'+esc(v.motorista)+'</b><br>'+v.placa+'<br>'+fmtTs(when):'<i>Sem nome</i><br><i>Sem placa</i><br>--/--/-- --:--')+'</div></div><div class="gate-foot">'+(v?esc(v.cliente):'')+'</div></div>';
+  $('#yard').innerHTML=card('agendado')+card('pesagem1')+card('vistoria')+gate('Gate · ENTRADA',gateIn,'var(--st-gin)','clip',gateIn&&gateIn.entrada)+gate('Gate · SAÍDA',gateOut,'var(--st-gout)','truck',gateOut&&gateOut.saidaTs)
+    +card('pesagem2')+card('nf')+card('saida');
+  const s=ST[selStatus];
+  $('#tblTitle').textContent=s.label;
+  $('#thead').parentElement.style.setProperty('--thead',s.c);
+  $('#thead').innerHTML='<tr><th scope="col">ID</th><th scope="col">Cliente</th><th scope="col">Produto</th><th scope="col">Placas</th><th scope="col">'+(selStatus==='agendado'?'Janela':'Pesos')+'</th><th scope="col">Peso Líquido</th><th scope="col">Ação</th></tr>';
+  const rows=list.filter(v=>v.status===selStatus);
+  $('#tbody').innerHTML=rows.length?rows.map(v=>{
+    const w=selStatus==='agendado'?'<span class="time">'+v.janela+'</span><div class="weights"><small>'+esc(v.transp)+'</small></div>'
+      :'<div class="weights num">'+(v.tara!=null?'<b>Tara:</b> '+kg(v.tara)+' <small>- '+fmtTs(v.taraTs)+'</small>':'<small>Tara pendente</small>')+'<br>'+(v.bruto!=null?'<b>Bruto:</b> '+kg(v.bruto)+' <small>- '+fmtTs(v.brutoTs)+'</small>':'<small>Bruto pendente</small>')+'</div>';
+    const liq=v.bruto!=null&&v.tara!=null?kg(v.bruto-v.tara):'—';
+    return '<tr><td class="num">'+v.id+'</td><td>'+esc(v.cliente)+'</td><td>'+esc(v.produto)+'</td><td>'+platesHTML(v)+'</td><td>'+w+'</td><td class="num">'+liq+'</td><td><button class="btn sm" style="background:'+s.c+';color:#fff" data-act="'+v.id+'">'+s.act+'</button></td></tr>';
+  }).join(''):'<tr><td colspan="7" class="empty">Nenhum veículo nesta etapa para os filtros selecionados.</td></tr>';
+}
+$('#yard').addEventListener('click',e=>{const b=e.target.closest('[data-st]');if(b){selStatus=b.dataset.st;renderPatio();$('[data-st="'+selStatus+'"]').focus();}});
+$('#tbody').addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(b)action(V.find(v=>v.id==b.dataset.act));});
+$('#filtros').addEventListener('change',renderPatio);
+
+const SLOTS=[];for(let i=7;i<=17;i++)SLOTS.push(pad(i)+':00');
+const CAP=3;
+const PLACA_RE=/^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$/;
+function renderSlots(){
+  const d=$('#aData').value, cur=($('input[name=slot]:checked')||{}).value;
+  const now=new Date();
+  $('#slots').innerHTML=SLOTS.map((s,i)=>{
+    const used=V.filter(v=>v.data===d&&v.janela===s).length;
+    const past=d<TODAY||(d===TODAY&&parseInt(s)<=now.getHours());
+    const full=used>=CAP||past;
+    return '<div class="slot'+(full?' full':'')+'"><input type="radio" name="slot" id="sl'+i+'" value="'+s+'"'+(full?' disabled':'')+(cur===s&&!full?' checked':'')+'><label for="sl'+i+'"><b>'+s+'</b><small>'+(past?'encerrada':(CAP-used)+' de '+CAP+' vagas')+'</small><span class="bar"><i style="width:'+(used/CAP*100)+'%"></i></span></label></div>';
+  }).join('');
+  const livres=SLOTS.filter((s,i)=>!$('#sl'+i).disabled).length;
+  $('#slotInfo').textContent='· '+livres+' janelas disponíveis';
+}
+function renderAgList(){
+  const d=$('#aData').value||TODAY;
+  const [y,m,dd]=d.split('-');
+  $('#agListTitle').textContent='Agendamentos de '+dd+'/'+m+'/'+y;
+  const rows=V.filter(v=>v.data===d).sort((a,b)=>a.janela.localeCompare(b.janela));
+  $('#agList').innerHTML=rows.length?rows.map(v=>'<div class="row-card"><span class="time">'+v.janela+'</span><div class="grow"><div class="t">'+v.placa+' · '+esc(v.motorista)+'</div><div class="s">'+esc(v.produto)+' → '+esc(v.cliente)+'</div></div>'+pill(v.status)+'</div>').join(''):'<div class="empty">Nenhum agendamento para esta data.</div>';
+}
+function setErr(id,msg,input){$('#'+id).textContent=msg||'';if(input)input.setAttribute('aria-invalid',msg?'true':'false');if(input&&msg)input.setAttribute('aria-describedby',id);}
+$('#aCpf').addEventListener('input',e=>{let d=e.target.value.replace(/\D/g,'').slice(0,11);e.target.value=d.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})\.(\d{3})(\d)/,'$1.$2.$3').replace(/(\d{3})\.(\d{3})\.(\d{3})(\d)/,'$1.$2.$3-$4');});
+['#aPlaca','#aPlaca2'].forEach(s=>$(s).addEventListener('input',e=>e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'')));
+$('#aData').addEventListener('change',()=>{renderSlots();renderAgList();});
+$('#agForm').addEventListener('reset',()=>setTimeout(()=>{$('#aData').value=TODAY;$$('#agForm .err').forEach(e=>e.textContent='');$$('#agForm [aria-invalid]').forEach(e=>e.setAttribute('aria-invalid','false'));renderSlots();renderAgList();}));
+$('#agForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const mot=$('#aMot'),cpf=$('#aCpf'),pl=$('#aPlaca'),pl2=$('#aPlaca2'),dt=$('#aData');
+  const slot=($('input[name=slot]:checked')||{}).value;
+  let ok=true,first=null;const f=(id,msg,el)=>{setErr(id,msg,el);if(msg){ok=false;first=first||el;}};
+  f('eMot',mot.value.trim().split(/\s+/).length<2?'Informe nome e sobrenome do motorista.':'',mot);
+  f('eCpf',cpf.value.replace(/\D/g,'').length!==11?'CPF deve ter 11 dígitos.':'',cpf);
+  let pm='';if(!PLACA_RE.test(pl.value))pm='Placa inválida. Use o formato ABC1D23.';else if(V.some(v=>v.data===dt.value&&v.placa===pl.value))pm='Esta placa já tem agendamento nesta data.';
+  f('ePlaca',pm,pl);
+  f('ePlaca2',pl2.value&&!PLACA_RE.test(pl2.value)?'Placa da carreta inválida.':'',pl2);
+  f('eData',!dt.value||dt.value<TODAY?'Escolha hoje ou uma data futura.':'',dt);
+  $('#eSlot').textContent=slot?'':'Selecione uma janela com vaga.';if(!slot){ok=false;first=first||$('#slots input:not(:disabled)');}
+  if(!ok){first&&first.focus();return;}
+  const v=mk({cliente:$('#aCli').value,produto:$('#aProd').value,placa:pl.value,placa2:pl2.value,motorista:mot.value.trim(),transp:$('#aTransp').value,janela:slot,data:dt.value,status:'agendado'});
+  log(v,'Agendamento criado para '+slot+' ('+dt.value.split('-').reverse().join('/')+')','Agendamento');
+  toast('Agendamento #'+v.id+' confirmado: '+v.placa+' às '+slot+'.');
+  const keepDate=dt.value;$('#agForm').reset();setTimeout(()=>{$('#aData').value=keepDate;renderSlots();renderAgList();});
+});
+
+function renderPortaria(){
+  const q=$('#pBusca').value.trim().toUpperCase();
+  const ent=V.filter(v=>v.status==='agendado'&&v.data===TODAY&&(!q||v.placa.includes(q)||v.motorista.toUpperCase().includes(q)));
+  $('#pEntrada').innerHTML=ent.length?ent.map(v=>'<div class="row-card">'+plateHTML(v.placa)+'<div class="grow"><div class="t">'+esc(v.motorista)+'</div><div class="s">Janela '+v.janela+' · '+esc(v.transp)+'</div></div><button class="btn sm ok" data-in="'+v.id+'">Registrar entrada</button></div>').join(''):'<div class="empty">'+(q?'Nenhum agendamento encontrado para “'+esc(q)+'”. Sem agendamento, a entrada não é permitida.':'Nenhum veículo agendado aguardando entrada.')+'</div>';
+  const sai=V.filter(v=>v.status==='saida');
+  $('#pSaida').innerHTML=sai.length?sai.map(v=>'<div class="row-card">'+plateHTML(v.placa)+'<div class="grow"><div class="t">N.F. '+v.nf+'</div><div class="s">'+kg(v.bruto-v.tara)+' de '+esc(v.produto)+'</div></div><button class="btn sm" style="background:var(--st-gout);color:#fff" data-out="'+v.id+'">Liberar saída</button></div>').join(''):'<div class="empty">Nenhum veículo aguardando saída.</div>';
+  const fila=V.filter(v=>v.status==='pesagem1'||v.status==='pesagem2');
+  if(!fila.some(v=>v.id===pickId))pickId=fila.length?fila[0].id:null;
+  $('#pick').innerHTML=fila.length?fila.map(v=>'<button type="button" class="pick" aria-pressed="'+(v.id===pickId)+'" data-pick="'+v.id+'">'+plateHTML(v.placa)+'<div class="grow" style="flex:1;min-width:120px"><div class="t" style="font-weight:500">'+esc(v.motorista)+'</div><div class="s" style="color:var(--muted);font-size:12.5px">'+esc(v.produto)+'</div></div>'+pill(v.status)+'</button>').join(''):'<div class="empty">Plataforma livre. Nenhum veículo aguardando pesagem.</div>';
+  const v=V.find(x=>x.id===pickId);
+  $('#btnLer').disabled=$('#btnPesar').disabled=$('#pesoManual').disabled=!v;
+  $('#roTipo').textContent=v?(v.status==='pesagem1'?'1ª pesagem · TARA (vazio)':'2ª pesagem · BRUTO (carregado)'):'Aguardando veículo';
+  calc();
+  $('#ticket').innerHTML=lastTicket?ticketHTML(lastTicket):'';
+}
+function calc(){
+  const v=V.find(x=>x.id===pickId);const p=parseInt(($('#pesoManual').value||'').replace(/\D/g,''))||null;
+  let t=v?v.tara:null,b=v?v.bruto:null;
+  if(v&&v.status==='pesagem1')t=p; if(v&&v.status==='pesagem2')b=p;
+  $('#cTara').textContent=kg(t);$('#cBruto').textContent=kg(b);
+  $('#cLiq').textContent=t!=null&&b!=null?kg(b-t):'—';
+}
+function ticketHTML(v){return '<div class="ticket" aria-label="Ticket de pesagem"><h3>SE7 TERMINAIS · TICKET DE PESAGEM Nº '+(9000+v.id)+'</h3><div class="r"><span>Placa</span><span>'+v.placa+(v.placa2?' / '+v.placa2:'')+'</span></div><div class="r"><span>Motorista</span><span>'+esc(v.motorista)+'</span></div><div class="r"><span>Produto</span><span>'+esc(v.produto)+'</span></div><div class="r"><span>Tara</span><span>'+kg(v.tara)+' · '+fmtTs(v.taraTs)+'</span></div><div class="r"><span>Bruto</span><span>'+kg(v.bruto)+' · '+fmtTs(v.brutoTs)+'</span></div><div class="r"><b>LÍQUIDO</b><b>'+(v.bruto!=null?kg(v.bruto-v.tara):'aguardando 2ª pesagem')+'</b></div></div>';}
+$('#pBusca').addEventListener('input',renderPortaria);
+$('#pEntrada').addEventListener('click',e=>{const b=e.target.closest('[data-in]');if(b)doEntrada(V.find(v=>v.id==b.dataset.in));});
+$('#pSaida').addEventListener('click',e=>{const b=e.target.closest('[data-out]');if(b)doSaida(V.find(v=>v.id==b.dataset.out));});
+$('#pick').addEventListener('click',e=>{const b=e.target.closest('[data-pick]');if(b){pickId=+b.dataset.pick;$('#pesoManual').value='';$('#roVal').textContent='0';$('#pesoMsg').innerHTML='';renderPortaria();$('[data-pick="'+pickId+'"]').focus();}});
+$('#pesoManual').addEventListener('input',e=>{const n=parseInt(e.target.value.replace(/\D/g,''))||0;$('#roVal').textContent=n.toLocaleString('pt-BR');calc();});
+$('#btnLer').addEventListener('click',()=>{
+  const v=V.find(x=>x.id===pickId);if(!v)return;
+  const target=v.status==='pesagem1'?14500+Math.round(Math.random()*120)*20:v.tara+24000+Math.round(Math.random()*500)*20;
+  const st=$('#roStable');st.classList.remove('on');let n=0;
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const tick=()=>{n++;const val=n>=8||reduce?target:Math.round((target+(Math.random()-.5)*1800/n)/10)*10;$('#roVal').textContent=val.toLocaleString('pt-BR');
+    if(n>=8||reduce){st.classList.add('on');$('#pesoManual').value=target;calc();}else setTimeout(tick,90);};
+  tick();
+});
+$('#btnPesar').addEventListener('click',()=>{
+  const v=V.find(x=>x.id===pickId);if(!v)return;
+  const p=parseInt(($('#pesoManual').value||'').replace(/\D/g,''));
+  const msg=$('#pesoMsg');
+  if(!p||p<3000||p>74000){msg.innerHTML='<div class="notice bad">Peso fora da faixa da balança (3.000 a 74.000 kg). Capture a leitura novamente.</div>';return;}
+  if(v.status==='pesagem2'&&p<=v.tara){msg.innerHTML='<div class="notice bad">O peso bruto ('+kg(p)+') precisa ser maior que a tara ('+kg(v.tara)+'). Confira se o veículo foi carregado.</div>';return;}
+  $('#pesoManual').value='';$('#roVal').textContent='0';$('#roStable').classList.remove('on');
+  if(v.status==='pesagem1'){v.tara=p;v.taraTs=new Date();lastTicket=v;msg.innerHTML='<div class="notice ok">Tara de '+v.placa+' registrada: '+kg(p)+'. Veículo segue para carregamento e vistoria.</div>';setStatus(v,'vistoria','1ª pesagem (tara) '+kg(p),'Pesagem');}
+  else{
+    if(p>57000){msg.innerHTML='<div class="notice warn">Atenção: '+kg(p)+' acima do PBTC de 57.000 kg. Pesagem registrada com alerta de excesso.</div>';}
+    else msg.innerHTML='<div class="notice ok">Bruto registrado. Peso líquido calculado: '+kg(p-v.tara)+'. Veículo aguardando N.F.</div>';
+    v.bruto=p;v.brutoTs=new Date();lastTicket=v;setStatus(v,'nf','2ª pesagem (bruto) '+kg(p)+' · líquido '+kg(p-v.tara),'Pesagem');
+  }
+  toast('Pesagem de '+v.placa+' registrada.');
+});
+
+const WEEK=[{d:6,t:412},{d:5,t:388},{d:4,t:455},{d:3,t:301},{d:2,t:478},{d:1,t:436}];
+const PRODW={'SULFATO DE SODIO':812,'UREIA GRANULADA':694,'CLORETO DE POTASSIO':548,'BARRILHA LEVE':416};
+function renderIndicadores(){
+  const exp=V.filter(v=>v.data===TODAY&&v.bruto!=null);
+  const tonHoje=exp.reduce((a,v)=>a+(v.bruto-v.tara),0)/1000;
+  const fin=V.filter(v=>v.saidaTs&&v.entrada);
+  const tm=fin.length?fin.reduce((a,v)=>a+(v.saidaTs-v.entrada),0)/fin.length/60000:0;
+  const noPatio=V.filter(v=>['pesagem1','vistoria','pesagem2','nf','saida'].includes(v.status)).length;
+  const ag=V.filter(v=>v.data===TODAY).length, cumpr=V.filter(v=>v.data===TODAY&&v.status!=='agendado').length;
+  const media=WEEK.reduce((a,w)=>a+w.t,0)/WEEK.length;
+  $('#kpis').innerHTML=[
+    ['Toneladas expedidas hoje',tonHoje.toLocaleString('pt-BR',{maximumFractionDigits:1})+' t','<small class="muted" style="color:var(--muted)">média da semana: '+Math.round(media)+' t/dia</small>'],
+    ['Veículos no pátio agora',noPatio,'<small style="color:var(--muted)">capacidade: 12 vagas</small>'],
+    ['Tempo médio no pátio',Math.floor(tm/60)+'h '+pad(Math.round(tm%60)),'<small class="'+(tm>120?'down':'up')+'">'+(tm>120?'acima':'dentro')+' da meta de 2h</small>'],
+    ['Agendamentos cumpridos',cumpr+' / '+ag,'<small style="color:var(--muted)">'+(ag?Math.round(cumpr/ag*100):0)+'% dos agendados de hoje chegaram</small>']
+  ].map(k=>'<div class="kpi"><span>'+k[0]+'</span><b class="num">'+k[1]+'</b>'+k[2]+'</div>').join('');
+  const data=WEEK.map(w=>{const d=new Date(today);d.setDate(d.getDate()-w.d);return{l:pad(d.getDate())+'/'+pad(d.getMonth()+1),t:w.t};}).concat([{l:'Hoje',t:Math.round(tonHoje),today:true}]);
+  const W=560,H=240,L=40,B=28,T=16,max=500,cw=(W-L-10)/data.length;
+  const y=v=>T+(H-T-B)*(1-v/max);
+  let s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Toneladas expedidas por dia nos últimos 7 dias">';
+  [0,100,200,300,400,500].forEach(g=>{s+='<line x1="'+L+'" x2="'+(W-6)+'" y1="'+y(g)+'" y2="'+y(g)+'" stroke="var(--line)"/><text x="'+(L-6)+'" y="'+(y(g)+4)+'" text-anchor="end" font-size="10.5" fill="var(--muted)">'+g+'</text>';});
+  data.forEach((d,i)=>{const x=L+i*cw+cw*.2,w=cw*.6;s+='<rect x="'+x+'" y="'+y(d.t)+'" width="'+w+'" height="'+(y(0)-y(d.t))+'" rx="4" fill="'+(d.today?'var(--accent)':'var(--st-agendado)')+'" opacity="'+(d.today?1:.75)+'"/><text x="'+(x+w/2)+'" y="'+(y(d.t)-5)+'" text-anchor="middle" font-size="11" font-weight="600" fill="var(--fg)">'+d.t+'</text><text x="'+(x+w/2)+'" y="'+(H-9)+'" text-anchor="middle" font-size="10.5" fill="var(--muted)">'+d.l+'</text>';});
+  $('#chWeek').innerHTML=s+'</svg>';
+  const pw=Object.assign({},PRODW);exp.forEach(v=>pw[v.produto]=(pw[v.produto]||0)+Math.round((v.bruto-v.tara)/1000));
+  const pm=Math.max(...Object.values(pw));
+  $('#chProd').innerHTML=Object.entries(pw).sort((a,b)=>b[1]-a[1]).map(([k,v])=>'<div class="hbar"><span>'+k.toLowerCase().replace(/^./,c=>c.toUpperCase())+'</span><span class="trk"><i style="width:'+(v/pm*100)+'%"></i></span><b>'+v+' t</b></div>').join('');
+  const sts=ORDER.map(k=>({k,n:V.filter(v=>v.status===k).length}));
+  const tot=sts.reduce((a,b)=>a+b.n,0)||1;
+  let x=0;let bar='<svg viewBox="0 0 600 34" role="img" aria-label="Distribuição dos veículos por status">';
+  sts.forEach(s=>{const w=s.n/tot*600;if(w>0)bar+='<rect x="'+x+'" y="0" width="'+w+'" height="34" fill="'+ST[s.k].c+'"/>'+(w>24?'<text x="'+(x+w/2)+'" y="22" text-anchor="middle" font-size="13" font-weight="600" fill="#fff">'+s.n+'</text>':'');x+=w;});
+  $('#chStatus').innerHTML=bar+'</svg><div style="display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:12px">'+sts.map(s=>'<span style="display:inline-flex;gap:6px;align-items:center;font-size:12.5px"><i style="width:10px;height:10px;border-radius:3px;background:'+ST[s.k].c+'"></i>'+ST[s.k].label+' ('+s.n+')</span>').join('')+'</div>';
+}
+
+function renderLog(){$('#logBody').innerHTML=LOG.map(l=>'<tr><td class="num">'+fmtTs(l.ts)+'</td><td>'+plateHTML(l.placa)+'</td><td style="text-align:left">'+esc(l.evento)+'</td><td>'+l.modulo+'</td><td>'+l.user+'</td></tr>').join('');}
+
+function render(){
+  if(view==='patio')renderPatio();
+  if(view==='agendamento'){renderSlots();renderAgList();}
+  if(view==='portaria')renderPortaria();
+  if(view==='indicadores')renderIndicadores();
+  if(view==='auditoria')renderLog();
+}
+
+opts($('#fCli'),CLIENTES,true);opts($('#fProd'),PRODUTOS,true);
+opts($('#aCli'),CLIENTES);opts($('#aProd'),PRODUTOS);opts($('#aTransp'),TRANSP);
+$('#fDe').value=TODAY;$('#fAte').value=TODAY;$('#aData').value=TODAY;$('#aData').min=TODAY;
+const start=(location.hash||'').slice(1);
+go(TITLES[start]?start:'patio',false);
+
+function logout() {
+  localStorage.clear();
+  window.location.href = 'login.html';
+}
+})();
+</script>
 </body>
 </html>
