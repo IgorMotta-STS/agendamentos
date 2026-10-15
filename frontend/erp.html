@@ -88,7 +88,6 @@ main{padding-block:22px 40px;padding-inline:24px;min-width:0;display:flex;flex-d
 .btn.sm{padding:5px 11px;min-height:30px;font-size:12.5px}
 .btn:disabled{opacity:.45;cursor:not-allowed;filter:none}
 
-/* cards de status */
 .yard{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) minmax(0,.75fr) minmax(0,.75fr);grid-template-rows:auto auto;gap:14px}
 .st{all:unset;box-sizing:border-box;cursor:pointer;position:relative;overflow:hidden;color:#fff;border-radius:var(--r);padding:16px 14px 12px;min-height:112px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:var(--shadow)}
 .st:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
@@ -108,7 +107,6 @@ main{padding-block:22px 40px;padding-inline:24px;min-width:0;display:flex;flex-d
 .gate .wm{position:absolute;right:8px;top:8px;width:70px;height:70px;opacity:.14}
 .gate .gate-foot{margin-top:auto;font-size:11.5px;opacity:.85;position:relative;z-index:1}
 
-/* tabela */
 .table-wrap{overflow-x:auto;border-radius:8px}
 table{border-collapse:collapse;width:100%;min-width:760px}
 thead th{background:var(--thead,var(--st-nf));color:#fff;font-weight:500;font-size:14px;padding:11px 12px;text-align:center}
@@ -117,7 +115,6 @@ tbody tr:hover td{background:var(--surface-2)}
 .weights{font-size:12.5px;line-height:1.6} .weights small{color:var(--muted)}
 .empty{padding:26px;text-align:center;color:var(--muted)}
 
-/* placa Mercosul */
 .plate{display:inline-flex;flex-direction:column;border:2px solid #111;border-radius:5px;background:#fff;width:100px;overflow:hidden;vertical-align:middle}
 .plate .top{background:#1f4aa8;color:#fff;font-size:6.5px;letter-spacing:.2em;text-align:center;line-height:9px;height:9px}
 .plate .txt{font-family:var(--font-mono);font-weight:700;color:#111;font-size:17px;letter-spacing:.04em;text-align:center;line-height:24px}
@@ -126,7 +123,6 @@ tbody tr:hover td{background:var(--surface-2)}
 .pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:500;color:#fff;white-space:nowrap}
 .pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.8}
 
-/* agendamento */
 .split{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:18px;align-items:start}
 .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .form-grid .full{grid-column:1/-1}
@@ -151,7 +147,6 @@ legend{font-size:12.5px;color:var(--muted);font-weight:500;margin-bottom:6px;pad
 .row-card .t{font-weight:500} .row-card .s{color:var(--muted);font-size:12.5px}
 .time{font-family:var(--font-mono);font-size:13px;background:var(--surface-2);border:1px solid var(--line);padding:3px 8px;border-radius:6px}
 
-/* balança */
 .scale-pick{display:flex;flex-direction:column;gap:8px}
 .pick{all:unset;box-sizing:border-box;cursor:pointer;display:flex;gap:12px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);flex-wrap:wrap}
 .pick[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
@@ -177,7 +172,6 @@ legend{font-size:12.5px;color:var(--muted);font-weight:500;margin-bottom:6px;pad
 .notice.ok{background:var(--ok-soft);color:var(--ok)}
 .notice.warn{background:var(--warn-soft);color:var(--warn)}
 
-/* indicadores */
 .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
 .kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow)}
 .kpi span{font-size:12.5px;color:var(--muted)}
@@ -191,7 +185,6 @@ legend{font-size:12.5px;color:var(--muted);font-weight:500;margin-bottom:6px;pad
 .hbar .trk i{display:block;height:100%;background:var(--accent);border-radius:6px}
 .hbar b{font-family:var(--font-mono);font-size:12.5px;text-align:right}
 
-/* arquitetura */
 .layers{display:flex;flex-direction:column;gap:0}
 .layer{border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;background:var(--surface);display:grid;grid-template-columns:200px minmax(0,1fr);gap:16px}
 .layer h3{font-size:15px;font-weight:600}
@@ -254,7 +247,6 @@ legend{font-size:12.5px;color:var(--muted);font-weight:500;margin-bottom:6px;pad
       <button data-view="arquitetura"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 2 2 7l10 5 10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Arquitetura</button>
     </nav>
 
-    <!-- Rodapé da Sidebar integrando a identidade SE7 e os atalhos de sistema -->
     <div class="side-foot">
       <div class="user-box">
         <div class="avatar" id="userAvatar" aria-hidden="true">US</div>
@@ -293,35 +285,37 @@ legend{font-size:12.5px;color:var(--muted);font-weight:500;margin-bottom:6px;pad
       <div class="split">
         <form class="panel" id="agForm" novalidate>
           <h2>Novo agendamento de carga</h2>
-          <p class="panel-sub">Portal da transportadora. A janela só é confirmada se houver vaga e os dados forem válidos.</p>
+          <p class="panel-sub">Portal integrado ao Supabase. A janela é confirmada diretamente no banco de dados.</p>
           <div class="form-grid">
-            <div class="field"><label for="aTransp">Transportadora</label><select class="input" id="aTransp"></select></div>
-            <div class="field"><label for="aMot">Motorista</label><input class="input" id="aMot" placeholder="Nome completo" autocomplete="off"><span class="err" id="eMot"></span></div>
-            <div class="field"><label for="aCpf">CPF do motorista</label><input class="input num" id="aCpf" inputmode="numeric" placeholder="000.000.000-00" maxlength="14"><span class="err" id="eCpf"></span></div>
-            <div class="field"><label for="aPlaca">Placa do cavalo</label><input class="input num" id="aPlaca" placeholder="ABC1D23" maxlength="7" style="text-transform:uppercase"><span class="err" id="ePlaca"></span></div>
-            <div class="field"><label for="aPlaca2">Placa da carreta <span style="font-weight:400">(opcional)</span></label><input class="input num" id="aPlaca2" placeholder="ABC1D23" maxlength="7" style="text-transform:uppercase"><span class="err" id="ePlaca2"></span></div>
-            <div class="field"><label for="aData">Data</label><input class="input" type="date" id="aData"><span class="err" id="eData"></span></div>
-            <div class="field"><label for="aCli">Cliente</label><select class="input" id="aCli"></select></div>
-            <div class="field"><label for="aProd">Produto</label><select class="input" id="aProd"></select></div>
-            <fieldset class="full"><legend>Janela de horário <span id="slotInfo" style="font-weight:400"></span></legend><div class="slots" id="slots" role="radiogroup"></div><span class="err" id="eSlot"></span></fieldset>
+            <div class="field"><label for="aTransp">Transportadora</label><input class="input" id="aTransp" required placeholder="Nome da transportadora"></div>
+            <div class="field"><label for="aCnpjTransp">CNPJ Transportadora</label><input class="input" id="aCnpjTransp" placeholder="00.000.000/0000-00"></div>
+            <div class="field"><label for="aMot">Motorista</label><input class="input" id="aMot" placeholder="Nome completo" autocomplete="off" required><span class="err" id="eMot"></span></div>
+            <div class="field"><label for="aCpf">CPF do motorista</label><input class="input num" id="aCpf" inputmode="numeric" placeholder="000.000.000-00" maxlength="14" required><span class="err" id="eCpf"></span></div>
+            <div class="field"><label for="aPlaca">Placa do cavalo</label><input class="input num" id="aPlaca" placeholder="ABC1D23" maxlength="8" style="text-transform:uppercase" required><span class="err" id="ePlaca"></span></div>
+            <div class="field"><label for="aPlaca2">Placa da carreta <span style="font-weight:400">(opcional)</span></label><input class="input num" id="aPlaca2" placeholder="ABC1D23" maxlength="8" style="text-transform:uppercase"></div>
+            <div class="field"><label for="aData">Data/Hora Prevista</label><input class="input" type="datetime-local" id="aData" required><span class="err" id="eData"></span></div>
+            <div class="field"><label for="aTipoCarga">Tipo de Carga</label><select class="input" id="aTipoCarga"><option>Granel</option><option>Bigbag 1000kg</option><option>Bigbag 500kg</option><option>Sacaria 50kg</option></select></div>
+            <div class="field"><label for="aCli">Cliente (Razão Social)</label><input class="input" id="aCli" required placeholder="Nome do cliente"></div>
+            <div class="field"><label for="aProd">Produto</label><input class="input" id="aProd" required placeholder="Produto"></div>
+            <div class="field"><label for="aQtd">Quantidade (Ton)</label><input class="input num" type="number" id="aQtd" step="0.01" min="0" placeholder="0.00"></div>
+            <div class="field"><label for="aDi">DI / Pedido</label><input class="input" id="aDi" placeholder="00/0000000-0"></div>
+            
             <div class="full" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end">
               <button type="reset" class="btn ghost">Limpar</button>
-              <button type="submit" class="btn">Confirmar agendamento</button>
+              <button type="submit" class="btn">Salvar no Supabase</button>
             </div>
           </div>
         </form>
         <div style="display:flex;flex-direction:column;gap:18px;min-width:0">
           <div class="panel">
-            <h2>Regras de validação</h2>
+            <h2>Integração Ativa</h2>
             <ul class="rules">
-              <li>Máximo de <b>3 veículos por janela</b> de 1 hora.</li>
-              <li>Placa no padrão Mercosul (ABC1D23) ou antigo (ABC1234).</li>
-              <li>A mesma placa não pode ter dois agendamentos no mesmo dia.</li>
-              <li>Não é permitido agendar datas ou horários já passados.</li>
+              <li>Os agendamentos cadastrados aqui aparecem instantaneamente no Painel Operacional e vice-versa.</li>
+              <li>Dados salvos de forma segura via API REST no Render/Supabase.</li>
             </ul>
           </div>
           <div class="panel">
-            <h2 id="agListTitle">Agendamentos do dia</h2>
+            <h2 id="agListTitle">Agendamentos Recentes</h2>
             <div class="list" id="agList"></div>
           </div>
         </div>
@@ -334,36 +328,29 @@ legend{font-size:12.5px;color:var(--muted);font-weight:500;margin-bottom:6px;pad
         <div style="display:flex;flex-direction:column;gap:18px;min-width:0">
           <div class="panel">
             <h2>Portaria · Check-in</h2>
-            <p class="panel-sub">Confira a placa do veículo na cancela e registre a entrada.</p>
-            <div class="field" style="margin-bottom:12px"><label for="pBusca">Buscar placa ou motorista</label><input class="input" id="pBusca" placeholder="Ex.: DSD3231" autocomplete="off"></div>
+            <p class="panel-sub">Veículos cadastrados aguardando entrada.</p>
+            <div class="field" style="margin-bottom:12px"><label for="pBusca">Buscar placa ou cliente</label><input class="input" id="pBusca" placeholder="Ex.: ABC-1234" autocomplete="off"></div>
             <div class="list" id="pEntrada"></div>
-          </div>
-          <div class="panel">
-            <h2>Portaria · Liberação de saída</h2>
-            <p class="panel-sub">Veículos com N.F. emitida, prontos para deixar o terminal.</p>
-            <div class="list" id="pSaida"></div>
           </div>
         </div>
         <div class="panel" style="display:flex;flex-direction:column;gap:14px">
-          <h2 style="margin:0">Balança rodoviária 01</h2>
-          <div><div class="lbl" id="pickLbl" style="margin-bottom:6px">Veículo na plataforma</div><div class="scale-pick" id="pick" role="group" aria-labelledby="pickLbl"></div></div>
-          <div class="readout" aria-live="polite">
-            <div class="lab"><span id="roTipo">Aguardando veículo</span><span class="stable" id="roStable"><i></i>ESTÁVEL</span></div>
-            <div class="val num"><span id="roVal">0</span><small>kg</small></div>
+          <h2 style="margin:0">Balança Rodoviária & Status</h2>
+          <div class="table-wrap">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Placa</th>
+                  <th>Cliente</th>
+                  <th>Status</th>
+                  <th class="text-end">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyBalanca">
+                <tr><td colspan="5" class="empty">Carregando agendamentos do Supabase...</td></tr>
+              </tbody>
+            </table>
           </div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
-            <button class="btn ghost" id="btnLer" type="button">Capturar leitura</button>
-            <div class="field" style="flex:1;min-width:150px"><label for="pesoManual">Peso (kg) · editar se necessário</label><input class="input num" id="pesoManual" inputmode="numeric"></div>
-            <button class="btn" id="btnPesar" type="button">Registrar pesagem</button>
-          </div>
-          <div id="pesoMsg" aria-live="polite"></div>
-          <div class="calc">
-            <div><span>Tara</span><b class="num" id="cTara">—</b></div>
-            <div><span>Bruto</span><b class="num" id="cBruto">—</b></div>
-            <div class="liq"><span>Peso líquido</span><b class="num" id="cLiq">—</b></div>
-          </div>
-          <div class="formula">Líquido = Bruto − Tara · 1ª pesagem (vazio) = tara · 2ª pesagem (carregado) = bruto</div>
-          <div id="ticket"></div>
         </div>
       </div>
     </section>
@@ -373,33 +360,32 @@ legend{font-size:12.5px;color:var(--muted);font-weight:500;margin-bottom:6px;pad
       <div style="display:flex;flex-direction:column;gap:18px">
         <div class="kpis" id="kpis"></div>
         <div class="charts">
-          <div class="panel chart"><h2>Toneladas expedidas · últimos 7 dias</h2><div id="chWeek"></div></div>
-          <div class="panel"><h2>Volume por produto · semana</h2><div id="chProd"></div></div>
+          <div class="panel chart"><h2>Volume por produto</h2><div id="chProd"></div></div>
+          <div class="panel chart"><h2>Veículos no pátio por status</h2><div id="chStatus"></div></div>
         </div>
-        <div class="panel chart"><h2>Veículos no pátio por status · agora</h2><div id="chStatus"></div></div>
       </div>
     </section>
 
     <!-- ============ AUDITORIA ============ -->
     <section data-sec="auditoria" hidden>
       <div class="panel">
-        <h2>log_movimentacao</h2>
-        <p class="panel-sub">Histórico de pátio para auditoria. Toda mudança de status gera um registro.</p>
-        <div class="table-wrap"><table style="--thead:var(--st-gout)"><thead><tr><th>Data/hora</th><th>Placa</th><th>Evento</th><th>Módulo</th><th>Usuário</th></tr></thead><tbody id="logBody"></tbody></table></div>
+        <h2>Logs de Auditoria (Servidor)</h2>
+        <p class="panel-sub">Histórico de movimentações obtido diretamente da API.</p>
+        <div class="table-wrap"><table style="--thead:var(--st-gout)"><thead><tr><th>Data/Hora</th><th>Operador</th><th>Ação Executada</th></tr></thead><tbody id="logBody"></tbody></table></div>
       </div>
     </section>
 
     <!-- ============ ARQUITETURA ============ -->
     <section data-sec="arquitetura" hidden>
       <div class="layers">
-        <div class="layer"><div><div class="k">Camada 1</div><h3>Apresentação</h3><div class="chips"><span class="chip">HTML5</span><span class="chip">CSS3</span><span class="chip">Bootstrap</span><span class="chip">WCAG</span></div></div>
-          <div class="mods"><div class="mod"><b>Portal Web</b><span>Tela “Agendamento”</span></div><div class="mod"><b>Terminal de Portaria &amp; Balança</b><span>Tela “Portaria &amp; Balança”</span></div><div class="mod"><b>Dashboard Gerencial</b><span>Telas “Painel do Pátio” e “Indicadores”</span></div></div></div>
-        <div class="arrow">Requisições HTTPS · API REST (JavaScript Fetch)</div>
-        <div class="layer"><div><div class="k">Camada 2</div><h3>Negócio</h3><div class="chips"><span class="chip">Node.js</span><span class="chip">Express</span><span class="chip">Jest</span></div></div>
-          <div class="mods"><div class="mod"><b>Agendamento</b><span>POST /agendamentos · valida janela e placa</span></div><div class="mod"><b>Portaria e Pátio</b><span>PATCH /veiculos/:id/status</span></div><div class="mod"><b>Pesagem</b><span>POST /pesagens · líquido = bruto − tara</span></div><div class="mod"><b>Relatórios</b><span>GET /relatorios/dashboard</span></div></div></div>
+        <div class="layer"><div><div class="k">Camada 1</div><h3>Apresentação</h3><div class="chips"><span class="chip">HTML5</span><span class="chip">CSS3</span><span class="chip">Bootstrap 5.3</span></div></div>
+          <div class="mods"><div class="mod"><b>Portal Web</b><span>Dashboard &amp; ERP Unificados</span></div></div></div>
+        <div class="arrow">Requisições HTTPS · API REST (fetchAutenticado)</div>
+        <div class="layer"><div><div class="k">Camada 2</div><h3>Negócio</h3><div class="chips"><span class="chip">Node.js</span><span class="chip">Express</span><span class="chip">JWT</span></div></div>
+          <div class="mods"><div class="mod"><b>API Supabase</b><span>Rotas /agendamentos, /users, /logs</span></div></div></div>
         <div class="arrow">Queries SQL · Supabase Client</div>
-        <div class="layer"><div><div class="k">Camada 3</div><h3>Dados e Nuvem</h3><div class="chips"><span class="chip">Supabase (PostgreSQL)</span><span class="chip">Render</span><span class="chip">Git/GitHub</span></div></div>
-          <div class="mods"><div class="mod"><b>usuarios</b><span>Operadores e perfis de acesso</span></div><div class="mod"><b>veiculos &amp; motoristas</b><span>Cadastros base</span></div><div class="mod"><b>agendamentos</b><span>Reservas e status</span></div><div class="mod"><b>pesagens_tickets</b><span>Tara, bruto e líquido</span></div><div class="mod"><b>log_movimentacao</b><span>Histórico e auditoria</span></div></div></div>
+        <div class="layer"><div><div class="k">Camada 3</div><h3>Dados e Nuvem</h3><div class="chips"><span class="chip">Supabase (PostgreSQL)</span><span class="chip">Render</span></div></div>
+          <div class="mods"><div class="mod"><b>Banco Relacional</b><span>Tabelas de agendamentos e logs em produção</span></div></div></div>
       </div>
     </section>
   </main>
@@ -410,17 +396,8 @@ legend{font-size:12.5px;color:var(--muted);font-weight:500;margin-bottom:6px;pad
 <script src="utils.js"></script>
 <script>
 (function(){
-const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const pad=n=>String(n).padStart(2,'0');
-const today=new Date(); today.setSeconds(0,0);
-const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
-const TODAY=iso(today);
-const ago=m=>new Date(Date.now()-m*60000);
-const fmtTs=d=>d?pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+String(d.getFullYear()).slice(2)+' '+pad(d.getHours())+':'+pad(d.getMinutes()):'--/--/-- --:--';
-const kg=n=>n==null?'—':n.toLocaleString('pt-BR')+' kg';
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-
-// Validação de token e sessão ao carregar o ERP
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const API = 'https://se7-backend.onrender.com/api';
 const token = localStorage.getItem('token');
 if (!token) window.location.href = 'login.html';
 
@@ -437,270 +414,208 @@ if (payload) {
   }
 }
 
-const CLIENTES=['QUIMICA AMPARO - AMPARO','AGROSUL FERTILIZANTES - PAULINIA','CEREALISTA RIO CLARO','VIDROTEC - JUNDIAI'];
-const PRODUTOS=['SULFATO DE SODIO','UREIA GRANULADA','CLORETO DE POTASSIO','BARRILHA LEVE'];
-const TRANSP=['Rodoviário Sete Rios','TransAmparo Cargas','Expresso Campinas','Logística Vale Verde'];
-
-const ST={
- agendado:{label:'Agendamentos',short:'Agendado',c:'var(--st-agendado)',ic:'cal',act:'Registrar entrada'},
- pesagem1:{label:'Aguardando 1ª Pesagem',short:'1ª pesagem',c:'var(--st-pesagem1)',ic:'scale',act:'Ir para balança'},
- vistoria:{label:'Aguardando Vistoria',short:'Vistoria',c:'var(--st-vistoria)',ic:'shield',act:'Aprovar vistoria'},
- pesagem2:{label:'Aguardando 2ª Pesagem',short:'2ª pesagem',c:'var(--st-pesagem2)',ic:'scale',act:'Ir para balança'},
- nf:{label:'Aguardando N.F.',short:'Aguardando N.F.',c:'var(--st-nf)',ic:'doc',act:'Gerar NF'},
- saida:{label:'Aguardando Saída',short:'Aguard. saída',c:'var(--st-saida)',ic:'check',act:'Liberar saída'},
- finalizado:{label:'Finalizados',short:'Finalizado',c:'var(--st-finalizado)'}
-};
-const ORDER=['agendado','pesagem1','vistoria','pesagem2','nf','saida'];
-const ICON={
- cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 14h3v3H8z"/>',
- scale:'<path d="M12 3v18M5 7h14M5 7l-3 7h6zM19 7l-3 7h6zM8 21h8"/>',
- shield:'<path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m8.5 12 2.5 2.5 4.5-5"/>',
- doc:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/>',
- check:'<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>',
- clip:'<rect x="5" y="4" width="14" height="18" rx="2"/><path d="M9 4V2h6v2M9 13l2 2 4-4"/>',
- truck:'<path d="M2 6h12v10H2zM14 9h4l4 4v3h-8z"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>'
-};
-const svgI=(k,cls)=>'<svg class="'+cls+'" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" aria-hidden="true">'+ICON[k]+'</svg>';
-const PERSON='<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="15" r="8" fill="#b9c1cc"/><path d="M5 38c1-9 7-13 15-13s14 4 15 13z" fill="#b9c1cc"/></svg>';
-
-let seq=580;
-const V=[];
-function mk(o){const v=Object.assign({id:++seq,data:TODAY,tara:null,bruto:null,taraTs:null,brutoTs:null,entrada:null,saidaTs:null,nf:null,placa2:''},o);V.push(v);return v;}
-const h=today.getHours();
-const slotAt=off=>pad(Math.min(17,Math.max(7,h+off)))+':00';
-mk({cliente:CLIENTES[0],produto:PRODUTOS[0],placa:'DSD3231',placa2:'DSE4410',motorista:'Marcos Aurélio Lima',transp:TRANSP[1],janela:slotAt(-2),status:'nf',entrada:ago(140),tara:26000,taraTs:ago(120),bruto:50000,brutoTs:ago(25)});
-mk({cliente:CLIENTES[1],produto:PRODUTOS[1],placa:'FKR8C21',motorista:'Juliana Prado',transp:TRANSP[0],janela:slotAt(-1),status:'pesagem2',entrada:ago(95),tara:17420,taraTs:ago(80)});
-mk({cliente:CLIENTES[2],produto:PRODUTOS[2],placa:'GHT2E77',placa2:'GHT2E78',motorista:'Roberto Siqueira',transp:TRANSP[2],janela:slotAt(-1),status:'vistoria',entrada:ago(50),tara:15880,taraTs:ago(38)});
-mk({cliente:CLIENTES[0],produto:PRODUTOS[0],placa:'BRA2E19',motorista:'Anderson Melo',transp:TRANSP[1],janela:slotAt(0),status:'pesagem1',entrada:ago(12)});
-mk({cliente:CLIENTES[3],produto:PRODUTOS[3],placa:'QPL5H03',motorista:'Fernanda Costa',transp:TRANSP[3],janela:slotAt(0),status:'agendado'});
-mk({cliente:CLIENTES[1],produto:PRODUTOS[1],placa:'MTZ7A42',placa2:'MTZ7A43',motorista:'Paulo Henrique Dias',transp:TRANSP[0],janela:slotAt(1),status:'agendado'});
-mk({cliente:CLIENTES[2],produto:PRODUTOS[2],placa:'EXP4B90',motorista:'Sérgio Nunes',transp:TRANSP[2],janela:slotAt(1),status:'agendado'});
-mk({cliente:CLIENTES[0],produto:PRODUTOS[0],placa:'KLM1F56',motorista:'Ricardo Alves',transp:TRANSP[3],janela:slotAt(-3),status:'saida',entrada:ago(230),tara:16100,taraTs:ago(210),bruto:47300,brutoTs:ago(70),nf:'000.184.552'});
-mk({cliente:CLIENTES[1],produto:PRODUTOS[1],placa:'RTA9D11',motorista:'Gustavo Moreira',transp:TRANSP[0],janela:slotAt(-4),status:'finalizado',entrada:ago(300),tara:17050,taraTs:ago(285),bruto:49870,brutoTs:ago(220),nf:'000.184.549',saidaTs:ago(200)});
-mk({cliente:CLIENTES[3],produto:PRODUTOS[3],placa:'NVB3C64',motorista:'Luana Ferraz',transp:TRANSP[3],janela:slotAt(-5),status:'finalizado',entrada:ago(360),tara:14900,taraTs:ago(345),bruto:41200,brutoTs:ago(290),nf:'000.184.547',saidaTs:ago(268)});
-mk({cliente:CLIENTES[2],produto:PRODUTOS[2],placa:'JUP6G28',motorista:'Diego Matos',transp:TRANSP[2],janela:slotAt(-5),status:'finalizado',entrada:ago(380),tara:15600,taraTs:ago(362),bruto:44950,brutoTs:ago(318),nf:'000.184.548',saidaTs:ago(301)});
-
-let LOG=[];
-function log(v,evento,modulo,ts){LOG.unshift({ts:ts||new Date(),placa:v.placa,evento,modulo,user:OPER});}
-V.slice().reverse().forEach(v=>{
-  if(v.saidaTs) log(v,'Saída liberada na portaria','Portaria e Pátio',v.saidaTs);
-  if(v.nf) log(v,'N.F. '+v.nf+' vinculada','Portaria e Pátio',new Date(v.brutoTs.getTime()+600000));
-  if(v.brutoTs) log(v,'2ª pesagem (bruto) '+kg(v.bruto),'Pesagem',v.brutoTs);
-  if(v.taraTs) log(v,'1ª pesagem (tara) '+kg(v.tara),'Pesagem',v.taraTs);
-  if(v.entrada) log(v,'Entrada registrada no gate','Portaria e Pátio',v.entrada);
-});
-LOG.sort((a,b)=>b.ts-a.ts);
-
-let gateIn=V.find(v=>v.placa==='BRA2E19');
-let gateOut=V.find(v=>v.placa==='RTA9D11');
-let selStatus='nf', view='patio', pickId=null, lastTicket=null;
+let V = [];
+let LOG = [];
+let view = 'patio';
 
 const TITLES={patio:'Painel do Pátio',agendamento:'Agendamento de Cargas',portaria:'Portaria & Balança',indicadores:'Dashboard Gerencial',auditoria:'Log de Movimentação',arquitetura:'Arquitetura do Sistema'};
 const GROUP={patio:'Operações',agendamento:'Operações',portaria:'Operações',indicadores:'Gestão',auditoria:'Gestão',arquitetura:'Gestão'};
+
 function go(v,focus){
   view=v;
-  $$('[data-sec]').forEach(s=>s.hidden=s.dataset.sec!==v);
-  $$('#nav button').forEach(b=>b.dataset.view===v?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
+  $$('[data-sec]').forEach(s=>s.hidden=s.dataset.sec!==v);$$('#nav button').forEach(b=>b.dataset.view===v?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
   $('#pageTitle').textContent=TITLES[v];
   $('#crumb').innerHTML=GROUP[v]+' / <b>'+TITLES[v]+'</b>';
   try{history.replaceState(null,'','#'+v);}catch(e){}
-  render();
+  carregarDadosAPI();
   if(focus) $('#conteudo').focus();
 }
 $('#nav').addEventListener('click',e=>{const b=e.target.closest('button[data-view]');if(b)go(b.dataset.view,true);});
 
-function setStatus(v,s,evento,modulo){v.status=s;log(v,evento,modulo);render();}
-function doEntrada(v){v.entrada=new Date();gateIn=v;setStatus(v,'pesagem1','Entrada registrada no gate','Portaria e Pátio');toast(v.placa+' entrou no pátio. Próximo passo: 1ª pesagem (tara).');}
-function doVistoria(v){setStatus(v,'pesagem2','Vistoria aprovada · carregamento concluído','Portaria e Pátio');toast('Vistoria de '+v.placa+' aprovada. Encaminhe para a 2ª pesagem.');}
-function doNF(v){v.nf='000.'+(184500+v.id).toString().replace(/(\d{3})(\d{3})/,'$1.$2');setStatus(v,'saida','N.F. '+v.nf+' emitida','Portaria e Pátio');toast('N.F. '+v.nf+' gerada para '+v.placa+'.');}
-function doSaida(v){v.saidaTs=new Date();gateOut=v;setStatus(v,'finalizado','Saída liberada na portaria','Portaria e Pátio');toast(v.placa+' liberado. Ciclo encerrado.');}
-function action(v){
-  if(v.status==='agendado')doEntrada(v);
-  else if(v.status==='vistoria')doVistoria(v);
-  else if(v.status==='nf')doNF(v);
-  else if(v.status==='saida')doSaida(v);
-  else {pickId=v.id;go('portaria',true);}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.hidden=false;clearTimeout(t.t);t.t=setTimeout(()=>t.hidden=true,3600);}
+
+// Buscar dados reais da API do Supabase via Node.js
+async function carregarDadosAPI() {
+  try {
+    const resAg = await fetchAutenticado(`${API}/agendamentos`);
+    if (resAg && resAg.ok) {
+      V = await resAg.json();
+    }
+
+    if (view === 'auditoria' || view === 'patio') {
+      const resLog = await fetchAutenticado(`${API}/logs`);
+      if (resLog && resLog.ok) {
+        LOG = await resLog.json();
+      }
+    }
+
+    render();
+  } catch (error) {
+    console.error("Erro ao sincronizar com a API:", error);
+  }
 }
 
-function filtered(){
-  const de=$('#fDe').value,ate=$('#fAte').value,c=$('#fCli').value,p=$('#fProd').value;
-  return V.filter(v=>(!de||v.data>=de)&&(!ate||v.data<=ate)&&(!c||v.cliente===c)&&(!p||v.produto===p));
+// Renderização baseada nos dados do banco
+function render(){
+  if(view==='patio') renderPatio();
+  if(view==='agendamento') renderAgList();
+  if(view==='portaria') renderPortaria();
+  if(view==='indicadores') renderIndicadores();
+  if(view==='auditoria') renderLog();
 }
+
 function renderPatio(){
-  const list=filtered();
-  const cnt=s=>list.filter(v=>v.status===s).length;
-  const card=s=>'<button type="button" class="st" style="background:'+ST[s].c+'" aria-pressed="'+(selStatus===s)+'" data-st="'+s+'"><h3>'+ST[s].label+'</h3>'+svgI(ST[s].ic,'wm')+'<div class="count"><b class="num">'+cnt(s)+'</b><span>Autos</span></div></button>';
-  const gate=(t,v,c,ic,when)=>'<div class="gate" style="background:'+c+'"><h3>'+t+'</h3>'+svgI(ic,'wm')+'<div class="who"><div class="pic">'+PERSON+'</div><div class="meta">'+(v?'<b>'+esc(v.motorista)+'</b><br>'+v.placa+'<br>'+fmtTs(when):'<i>Sem nome</i><br><i>Sem placa</i><br>--/--/-- --:--')+'</div></div><div class="gate-foot">'+(v?esc(v.cliente):'')+'</div></div>';
-  $('#yard').innerHTML=card('agendado')+card('pesagem1')+card('vistoria')+gate('Gate · ENTRADA',gateIn,'var(--st-gin)','clip',gateIn&&gateIn.entrada)+gate('Gate · SAÍDA',gateOut,'var(--st-gout)','truck',gateOut&&gateOut.saidaTs)
-    +card('pesagem2')+card('nf')+card('saida');
-  const s=ST[selStatus];
-  $('#tblTitle').textContent=s.label;
-  $('#thead').parentElement.style.setProperty('--thead',s.c);
-  $('#thead').innerHTML='<tr><th scope="col">ID</th><th scope="col">Cliente</th><th scope="col">Produto</th><th scope="col">Placas</th><th scope="col">'+(selStatus==='agendado'?'Janela':'Pesos')+'</th><th scope="col">Peso Líquido</th><th scope="col">Ação</th></tr>';
-  const rows=list.filter(v=>v.status===selStatus);
-  $('#tbody').innerHTML=rows.length?rows.map(v=>{
-    const w=selStatus==='agendado'?'<span class="time">'+v.janela+'</span><div class="weights"><small>'+esc(v.transp)+'</small></div>'
-      :'<div class="weights num">'+(v.tara!=null?'<b>Tara:</b> '+kg(v.tara)+' <small>- '+fmtTs(v.taraTs)+'</small>':'<small>Tara pendente</small>')+'<br>'+(v.bruto!=null?'<b>Bruto:</b> '+kg(v.bruto)+' <small>- '+fmtTs(v.brutoTs)+'</small>':'<small>Bruto pendente</small>')+'</div>';
-    const liq=v.bruto!=null&&v.tara!=null?kg(v.bruto-v.tara):'—';
-    return '<tr><td class="num">'+v.id+'</td><td>'+esc(v.cliente)+'</td><td>'+esc(v.produto)+'</td><td>'+platesHTML(v)+'</td><td>'+w+'</td><td class="num">'+liq+'</td><td><button class="btn sm" style="background:'+s.c+';color:#fff" data-act="'+v.id+'">'+s.act+'</button></td></tr>';
-  }).join(''):'<tr><td colspan="7" class="empty">Nenhum veículo nesta etapa para os filtros selecionados.</td></tr>';
-}
-$('#yard').addEventListener('click',e=>{const b=e.target.closest('[data-st]');if(b){selStatus=b.dataset.st;renderPatio();$('[data-st="'+selStatus+'"]').focus();}});
-$('#tbody').addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(b)action(V.find(v=>v.id==b.dataset.act));});
-$('#filtros').addEventListener('change',renderPatio);
+  const yard = $('#yard');
+  const agendados = V.filter(v => v.status === 'Agendado').length;
+  const emAndamento = V.filter(v => v.status === 'Em andamento').length;
+  const finalizados = V.filter(v => v.status === 'Finalizado').length;
 
-const SLOTS=[];for(let i=7;i<=17;i++)SLOTS.push(pad(i)+':00');
-const CAP=3;
-const PLACA_RE=/^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$/;
-function renderSlots(){
-  const d=$('#aData').value, cur=($('input[name=slot]:checked')||{}).value;
-  const now=new Date();
-  $('#slots').innerHTML=SLOTS.map((s,i)=>{
-    const used=V.filter(v=>v.data===d&&v.janela===s).length;
-    const past=d<TODAY||(d===TODAY&&parseInt(s)<=now.getHours());
-    const full=used>=CAP||past;
-    return '<div class="slot'+(full?' full':'')+'"><input type="radio" name="slot" id="sl'+i+'" value="'+s+'"'+(full?' disabled':'')+(cur===s&&!full?' checked':'')+'><label for="sl'+i+'"><b>'+s+'</b><small>'+(past?'encerrada':(CAP-used)+' de '+CAP+' vagas')+'</small><span class="bar"><i style="width:'+(used/CAP*100)+'%"></i></span></label></div>';
-  }).join('');
-  const livres=SLOTS.filter((s,i)=>!$('#sl'+i).disabled).length;
-  $('#slotInfo').textContent='· '+livres+' janelas disponíveis';
+  yard.innerHTML = `
+    <div class="panel" style="grid-column: span 3; background: var(--surface);">
+      <h3>Resumo Operacional (Supabase)</h3>
+      <div style="display:flex; gap:20px; margin-top:10px">
+        <div><b>Agendados:</b> ${agendados}</div>
+        <div><b>Em andamento:</b> ${emAndamento}</div>
+        <div><b>Finalizados:</b> ${finalizados}</div>
+        <div><b>Total no Banco:</b> ${V.length}</div>
+      </div>
+    </div>
+  `;
+
+  const tbody = $('#tbody');
+  tbody.innerHTML = V.length ? V.map(v => `
+    <tr>
+      <td class="num">#${v.id}</td>
+      <td>${v.cliente || '-'}</td>
+      <td>${v.produto || '-'}</td>
+      <td><span class="badge bg-secondary">${v.placacavalo || '-'}</span></td>
+      <td>${v.quantidade || '0'} Ton</td>
+      <td><span class="badge bg-info text-dark">${v.status || 'Agendado'}</span></td>
+      <td>
+        <button class="btn sm" onclick="atualizarStatus(${v.id}, 'Em andamento')">Progredir</button>
+      </td>
+    </tr>
+  `).join('') : '<tr><td colspan="7" class="empty">Nenhum registro encontrado no banco de dados.</td></tr>';
 }
+
+async function atualizarStatus(id, novoStatus) {
+  try {
+    const item = V.find(x => x.id == id);
+    if (!item) return;
+    item.status = novoStatus;
+
+    const res = await fetchAutenticado(`${API}/agendamentos/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(item)
+    });
+
+    if (res && res.ok) {
+      toast(`Status do agendamento #${id} atualizado para ${novoStatus}!`);
+      carregarDadosAPI();
+    }
+  } catch(e) {
+    Swal.fire('Erro', 'Não foi possível atualizar o status.', 'error');
+  }
+}
+
 function renderAgList(){
-  const d=$('#aData').value||TODAY;
-  const [y,m,dd]=d.split('-');
-  $('#agListTitle').textContent='Agendamentos de '+dd+'/'+m+'/'+y;
-  const rows=V.filter(v=>v.data===d).sort((a,b)=>a.janela.localeCompare(b.janela));
-  $('#agList').innerHTML=rows.length?rows.map(v=>'<div class="row-card"><span class="time">'+v.janela+'</span><div class="grow"><div class="t">'+v.placa+' · '+esc(v.motorista)+'</div><div class="s">'+esc(v.produto)+' → '+esc(v.cliente)+'</div></div>'+pill(v.status)+'</div>').join(''):'<div class="empty">Nenhum agendamento para esta data.</div>';
+  $('#agList').innerHTML = V.slice(-5).reverse().map(v => `
+    <div class="row-card">
+      <div class="grow"><div class="t">#${v.id} · ${v.placacavalo || '-'} · ${esc(v.motorista || 'Motorista')}</div><div class="s">${esc(v.produto || '-')} → ${esc(v.cliente || '-')}</div></div>
+      <span class="pill" style="background:var(--st-agendado)">${v.status || 'Agendado'}</span>
+    </div>
+  `).join('') || '<div class="empty">Nenhum agendamento recente.</div>';
 }
-function setErr(id,msg,input){$('#'+id).textContent=msg||'';if(input)input.setAttribute('aria-invalid',msg?'true':'false');if(input&&msg)input.setAttribute('aria-describedby',id);}
-$('#aCpf').addEventListener('input',e=>{let d=e.target.value.replace(/\D/g,'').slice(0,11);e.target.value=d.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})\.(\d{3})(\d)/,'$1.$2.$3').replace(/(\d{3})\.(\d{3})\.(\d{3})(\d)/,'$1.$2.$3-$4');});
-['#aPlaca','#aPlaca2'].forEach(s=>$(s).addEventListener('input',e=>e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'')));
-$('#aData').addEventListener('change',()=>{renderSlots();renderAgList();});
-$('#agForm').addEventListener('reset',()=>setTimeout(()=>{$('#aData').value=TODAY;$$('#agForm .err').forEach(e=>e.textContent='');$$('#agForm [aria-invalid]').forEach(e=>e.setAttribute('aria-invalid','false'));renderSlots();renderAgList();}));
-$('#agForm').addEventListener('submit',e=>{
-  e.preventDefault();
-  const mot=$('#aMot'),cpf=$('#aCpf'),pl=$('#aPlaca'),pl2=$('#aPlaca2'),dt=$('#aData');
-  const slot=($('input[name=slot]:checked')||{}).value;
-  let ok=true,first=null;const f=(id,msg,el)=>{setErr(id,msg,el);if(msg){ok=false;first=first||el;}};
-  f('eMot',mot.value.trim().split(/\s+/).length<2?'Informe nome e sobrenome do motorista.':'',mot);
-  f('eCpf',cpf.value.replace(/\D/g,'').length!==11?'CPF deve ter 11 dígitos.':'',cpf);
-  let pm='';if(!PLACA_RE.test(pl.value))pm='Placa inválida. Use o formato ABC1D23.';else if(V.some(v=>v.data===dt.value&&v.placa===pl.value))pm='Esta placa já tem agendamento nesta data.';
-  f('ePlaca',pm,pl);
-  f('ePlaca2',pl2.value&&!PLACA_RE.test(pl2.value)?'Placa da carreta inválida.':'',pl2);
-  f('eData',!dt.value||dt.value<TODAY?'Escolha hoje ou uma data futura.':'',dt);
-  $('#eSlot').textContent=slot?'':'Selecione uma janela com vaga.';if(!slot){ok=false;first=first||$('#slots input:not(:disabled)');}
-  if(!ok){first&&first.focus();return;}
-  const v=mk({cliente:$('#aCli').value,produto:$('#aProd').value,placa:pl.value,placa2:pl2.value,motorista:mot.value.trim(),transp:$('#aTransp').value,janela:slot,data:dt.value,status:'agendado'});
-  log(v,'Agendamento criado para '+slot+' ('+dt.value.split('-').reverse().join('/')+')','Agendamento');
-  toast('Agendamento #'+v.id+' confirmado: '+v.placa+' às '+slot+'.');
-  const keepDate=dt.value;$('#agForm').reset();setTimeout(()=>{$('#aData').value=keepDate;renderSlots();renderAgList();});
-});
 
 function renderPortaria(){
-  const q=$('#pBusca').value.trim().toUpperCase();
-  const ent=V.filter(v=>v.status==='agendado'&&v.data===TODAY&&(!q||v.placa.includes(q)||v.motorista.toUpperCase().includes(q)));
-  $('#pEntrada').innerHTML=ent.length?ent.map(v=>'<div class="row-card">'+plateHTML(v.placa)+'<div class="grow"><div class="t">'+esc(v.motorista)+'</div><div class="s">Janela '+v.janela+' · '+esc(v.transp)+'</div></div><button class="btn sm ok" data-in="'+v.id+'">Registrar entrada</button></div>').join(''):'<div class="empty">'+(q?'Nenhum agendamento encontrado para “'+esc(q)+'”. Sem agendamento, a entrada não é permitida.':'Nenhum veículo agendado aguardando entrada.')+'</div>';
-  const sai=V.filter(v=>v.status==='saida');
-  $('#pSaida').innerHTML=sai.length?sai.map(v=>'<div class="row-card">'+plateHTML(v.placa)+'<div class="grow"><div class="t">N.F. '+v.nf+'</div><div class="s">'+kg(v.bruto-v.tara)+' de '+esc(v.produto)+'</div></div><button class="btn sm" style="background:var(--st-gout);color:#fff" data-out="'+v.id+'">Liberar saída</button></div>').join(''):'<div class="empty">Nenhum veículo aguardando saída.</div>';
-  const fila=V.filter(v=>v.status==='pesagem1'||v.status==='pesagem2');
-  if(!fila.some(v=>v.id===pickId))pickId=fila.length?fila[0].id:null;
-  $('#pick').innerHTML=fila.length?fila.map(v=>'<button type="button" class="pick" aria-pressed="'+(v.id===pickId)+'" data-pick="'+v.id+'">'+plateHTML(v.placa)+'<div class="grow" style="flex:1;min-width:120px"><div class="t" style="font-weight:500">'+esc(v.motorista)+'</div><div class="s" style="color:var(--muted);font-size:12.5px">'+esc(v.produto)+'</div></div>'+pill(v.status)+'</button>').join(''):'<div class="empty">Plataforma livre. Nenhum veículo aguardando pesagem.</div>';
-  const v=V.find(x=>x.id===pickId);
-  $('#btnLer').disabled=$('#btnPesar').disabled=$('#pesoManual').disabled=!v;
-  $('#roTipo').textContent=v?(v.status==='pesagem1'?'1ª pesagem · TARA (vazio)':'2ª pesagem · BRUTO (carregado)'):'Aguardando veículo';
-  calc();
-  $('#ticket').innerHTML=lastTicket?ticketHTML(lastTicket):'';
+  $('#tbodyBalanca').innerHTML = V.map(v => `
+    <tr>
+      <td>#${v.id}</td>
+      <td><strong>${v.placacavalo || '-'}</strong></td>
+      <td>${v.cliente || '-'}</td>
+      <td><span class="badge bg-primary">${v.status || 'Agendado'}</span></td>
+      <td class="text-end">
+        <button class="btn sm ok" onclick="atualizarStatus(${v.id}, 'Finalizado')">Finalizar Carga</button>
+      </td>
+    </tr>
+  `).join('') || '<tr><td colspan="5" class="empty">Nenhum veículo disponível.</td></tr>';
 }
-function calc(){
-  const v=V.find(x=>x.id===pickId);const p=parseInt(($('#pesoManual').value||'').replace(/\D/g,''))||null;
-  let t=v?v.tara:null,b=v?v.bruto:null;
-  if(v&&v.status==='pesagem1')t=p; if(v&&v.status==='pesagem2')b=p;
-  $('#cTara').textContent=kg(t);$('#cBruto').textContent=kg(b);
-  $('#cLiq').textContent=t!=null&&b!=null?kg(b-t):'—';
-}
-function ticketHTML(v){return '<div class="ticket" aria-label="Ticket de pesagem"><h3>SE7 TERMINAIS · TICKET DE PESAGEM Nº '+(9000+v.id)+'</h3><div class="r"><span>Placa</span><span>'+v.placa+(v.placa2?' / '+v.placa2:'')+'</span></div><div class="r"><span>Motorista</span><span>'+esc(v.motorista)+'</span></div><div class="r"><span>Produto</span><span>'+esc(v.produto)+'</span></div><div class="r"><span>Tara</span><span>'+kg(v.tara)+' · '+fmtTs(v.taraTs)+'</span></div><div class="r"><span>Bruto</span><span>'+kg(v.bruto)+' · '+fmtTs(v.brutoTs)+'</span></div><div class="r"><b>LÍQUIDO</b><b>'+(v.bruto!=null?kg(v.bruto-v.tara):'aguardando 2ª pesagem')+'</b></div></div>';}
-$('#pBusca').addEventListener('input',renderPortaria);
-$('#pEntrada').addEventListener('click',e=>{const b=e.target.closest('[data-in]');if(b)doEntrada(V.find(v=>v.id==b.dataset.in));});
-$('#pSaida').addEventListener('click',e=>{const b=e.target.closest('[data-out]');if(b)doSaida(V.find(v=>v.id==b.dataset.out));});
-$('#pick').addEventListener('click',e=>{const b=e.target.closest('[data-pick]');if(b){pickId=+b.dataset.pick;$('#pesoManual').value='';$('#roVal').textContent='0';$('#pesoMsg').innerHTML='';renderPortaria();$('[data-pick="'+pickId+'"]').focus();}});
-$('#pesoManual').addEventListener('input',e=>{const n=parseInt(e.target.value.replace(/\D/g,''))||0;$('#roVal').textContent=n.toLocaleString('pt-BR');calc();});
-$('#btnLer').addEventListener('click',()=>{
-  const v=V.find(x=>x.id===pickId);if(!v)return;
-  const target=v.status==='pesagem1'?14500+Math.round(Math.random()*120)*20:v.tara+24000+Math.round(Math.random()*500)*20;
-  const st=$('#roStable');st.classList.remove('on');let n=0;
-  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const tick=()=>{n++;const val=n>=8||reduce?target:Math.round((target+(Math.random()-.5)*1800/n)/10)*10;$('#roVal').textContent=val.toLocaleString('pt-BR');
-    if(n>=8||reduce){st.classList.add('on');$('#pesoManual').value=target;calc();}else setTimeout(tick,90);};
-  tick();
-});
-$('#btnPesar').addEventListener('click',()=>{
-  const v=V.find(x=>x.id===pickId);if(!v)return;
-  const p=parseInt(($('#pesoManual').value||'').replace(/\D/g,''));
-  const msg=$('#pesoMsg');
-  if(!p||p<3000||p>74000){msg.innerHTML='<div class="notice bad">Peso fora da faixa da balança (3.000 a 74.000 kg). Capture a leitura novamente.</div>';return;}
-  if(v.status==='pesagem2'&&p<=v.tara){msg.innerHTML='<div class="notice bad">O peso bruto ('+kg(p)+') precisa ser maior que a tara ('+kg(v.tara)+'). Confira se o veículo foi carregado.</div>';return;}
-  $('#pesoManual').value='';$('#roVal').textContent='0';$('#roStable').classList.remove('on');
-  if(v.status==='pesagem1'){v.tara=p;v.taraTs=new Date();lastTicket=v;msg.innerHTML='<div class="notice ok">Tara de '+v.placa+' registrada: '+kg(p)+'. Veículo segue para carregamento e vistoria.</div>';setStatus(v,'vistoria','1ª pesagem (tara) '+kg(p),'Pesagem');}
-  else{
-    if(p>57000){msg.innerHTML='<div class="notice warn">Atenção: '+kg(p)+' acima do PBTC de 57.000 kg. Pesagem registrada com alerta de excesso.</div>';}
-    else msg.innerHTML='<div class="notice ok">Bruto registrado. Peso líquido calculado: '+kg(p-v.tara)+'. Veículo aguardando N.F.</div>';
-    v.bruto=p;v.brutoTs=new Date();lastTicket=v;setStatus(v,'nf','2ª pesagem (bruto) '+kg(p)+' · líquido '+kg(p-v.tara),'Pesagem');
-  }
-  toast('Pesagem de '+v.placa+' registrada.');
-});
 
-const WEEK=[{d:6,t:412},{d:5,t:388},{d:4,t:455},{d:3,t:301},{d:2,t:478},{d:1,t:436}];
-const PRODW={'SULFATO DE SODIO':812,'UREIA GRANULADA':694,'CLORETO DE POTASSIO':548,'BARRILHA LEVE':416};
 function renderIndicadores(){
-  const exp=V.filter(v=>v.data===TODAY&&v.bruto!=null);
-  const tonHoje=exp.reduce((a,v)=>a+(v.bruto-v.tara),0)/1000;
-  const fin=V.filter(v=>v.saidaTs&&v.entrada);
-  const tm=fin.length?fin.reduce((a,v)=>a+(v.saidaTs-v.entrada),0)/fin.length/60000:0;
-  const noPatio=V.filter(v=>['pesagem1','vistoria','pesagem2','nf','saida'].includes(v.status)).length;
-  const ag=V.filter(v=>v.data===TODAY).length, cumpr=V.filter(v=>v.data===TODAY&&v.status!=='agendado').length;
-  const media=WEEK.reduce((a,w)=>a+w.t,0)/WEEK.length;
-  $('#kpis').innerHTML=[
-    ['Toneladas expedidas hoje',tonHoje.toLocaleString('pt-BR',{maximumFractionDigits:1})+' t','<small class="muted" style="color:var(--muted)">média da semana: '+Math.round(media)+' t/dia</small>'],
-    ['Veículos no pátio agora',noPatio,'<small style="color:var(--muted)">capacidade: 12 vagas</small>'],
-    ['Tempo médio no pátio',Math.floor(tm/60)+'h '+pad(Math.round(tm%60)),'<small class="'+(tm>120?'down':'up')+'">'+(tm>120?'acima':'dentro')+' da meta de 2h</small>'],
-    ['Agendamentos cumpridos',cumpr+' / '+ag,'<small style="color:var(--muted)">'+(ag?Math.round(cumpr/ag*100):0)+'% dos agendados de hoje chegaram</small>']
-  ].map(k=>'<div class="kpi"><span>'+k[0]+'</span><b class="num">'+k[1]+'</b>'+k[2]+'</div>').join('');
-  const data=WEEK.map(w=>{const d=new Date(today);d.setDate(d.getDate()-w.d);return{l:pad(d.getDate())+'/'+pad(d.getMonth()+1),t:w.t};}).concat([{l:'Hoje',t:Math.round(tonHoje),today:true}]);
-  const W=560,H=240,L=40,B=28,T=16,max=500,cw=(W-L-10)/data.length;
-  const y=v=>T+(H-T-B)*(1-v/max);
-  let s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Toneladas expedidas por dia nos últimos 7 dias">';
-  [0,100,200,300,400,500].forEach(g=>{s+='<line x1="'+L+'" x2="'+(W-6)+'" y1="'+y(g)+'" y2="'+y(g)+'" stroke="var(--line)"/><text x="'+(L-6)+'" y="'+(y(g)+4)+'" text-anchor="end" font-size="10.5" fill="var(--muted)">'+g+'</text>';});
-  data.forEach((d,i)=>{const x=L+i*cw+cw*.2,w=cw*.6;s+='<rect x="'+x+'" y="'+y(d.t)+'" width="'+w+'" height="'+(y(0)-y(d.t))+'" rx="4" fill="'+(d.today?'var(--accent)':'var(--st-agendado)')+'" opacity="'+(d.today?1:.75)+'"/><text x="'+(x+w/2)+'" y="'+(y(d.t)-5)+'" text-anchor="middle" font-size="11" font-weight="600" fill="var(--fg)">'+d.t+'</text><text x="'+(x+w/2)+'" y="'+(H-9)+'" text-anchor="middle" font-size="10.5" fill="var(--muted)">'+d.l+'</text>';});
-  $('#chWeek').innerHTML=s+'</svg>';
-  const pw=Object.assign({},PRODW);exp.forEach(v=>pw[v.produto]=(pw[v.produto]||0)+Math.round((v.bruto-v.tara)/1000));
-  const pm=Math.max(...Object.values(pw));
-  $('#chProd').innerHTML=Object.entries(pw).sort((a,b)=>b[1]-a[1]).map(([k,v])=>'<div class="hbar"><span>'+k.toLowerCase().replace(/^./,c=>c.toUpperCase())+'</span><span class="trk"><i style="width:'+(v/pm*100)+'%"></i></span><b>'+v+' t</b></div>').join('');
-  const sts=ORDER.map(k=>({k,n:V.filter(v=>v.status===k).length}));
-  const tot=sts.reduce((a,b)=>a+b.n,0)||1;
-  let x=0;let bar='<svg viewBox="0 0 600 34" role="img" aria-label="Distribuição dos veículos por status">';
-  sts.forEach(s=>{const w=s.n/tot*600;if(w>0)bar+='<rect x="'+x+'" y="0" width="'+w+'" height="34" fill="'+ST[s.k].c+'"/>'+(w>24?'<text x="'+(x+w/2)+'" y="22" text-anchor="middle" font-size="13" font-weight="600" fill="#fff">'+s.n+'</text>':'');x+=w;});
-  $('#chStatus').innerHTML=bar+'</svg><div style="display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:12px">'+sts.map(s=>'<span style="display:inline-flex;gap:6px;align-items:center;font-size:12.5px"><i style="width:10px;height:10px;border-radius:3px;background:'+ST[s.k].c+'"></i>'+ST[s.k].label+' ('+s.n+')</span>').join('')+'</div>';
+  $('#kpis').innerHTML = `
+    <div class="kpi"><span>Total de Cargas</span><b class="num">${V.length}</b></div>
+    <div class="kpi"><span>Finalizadas</span><b class="num">${V.filter(v=>v.status==='Finalizado').length}</b></div>
+    <div class="kpi"><span>Em Andamento</span><b class="num">${V.filter(v=>v.status==='Em andamento').length}</b></div>
+    <div class="kpi"><span>Agendadas</span><b class="num">${V.filter(v=>v.status==='Agendado').length}</b></div>
+  `;
+  $('#chProd').innerHTML = '<p class="text-muted">Indicadores conectados em tempo real ao Supabase.</p>';
+  $('#chStatus').innerHTML = '<p class="text-muted">Distribuição sincronizada com o banco relacional.</p>';
 }
 
-function renderLog(){$('#logBody').innerHTML=LOG.map(l=>'<tr><td class="num">'+fmtTs(l.ts)+'</td><td>'+plateHTML(l.placa)+'</td><td style="text-align:left">'+esc(l.evento)+'</td><td>'+l.modulo+'</td><td>'+l.user+'</td></tr>').join('');}
-
-function render(){
-  if(view==='patio')renderPatio();
-  if(view==='agendamento'){renderSlots();renderAgList();}
-  if(view==='portaria')renderPortaria();
-  if(view==='indicadores')renderIndicadores();
-  if(view==='auditoria')renderLog();
+function renderLog(){
+  $('#logBody').innerHTML = LOG.map(l => `
+    <tr>
+      <td>${new Date(l.dataHora).toLocaleString('pt-BR')}</td>
+      <td><strong>${l.usuario || '-'}</strong></td>
+      <td>${l.acao || '-'}</td>
+    </tr>
+  `).join('') || '<tr><td colspan="3" class="empty">Nenhum log registrado.</td></tr>';
 }
 
-opts($('#fCli'),CLIENTES,true);opts($('#fProd'),PRODUTOS,true);
-opts($('#aCli'),CLIENTES);opts($('#aProd'),PRODUTOS);opts($('#aTransp'),TRANSP);
-$('#fDe').value=TODAY;$('#fAte').value=TODAY;$('#aData').value=TODAY;$('#aData').min=TODAY;
-const start=(location.hash||'').slice(1);
-go(TITLES[start]?start:'patio',false);
+// Submeter novo agendamento direto para a API
+$('#agForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const novo = {
+    tipocarga: $('#aTipoCarga').value,
+    di: $('#aDi').value,
+    pedido: '12345',
+    datahora: $('#aData').value,
+    cnpjcliente: '00.000.000/0001-00',
+    cliente: $('#aCli').value,
+    endereco: 'Endereço Automático',
+    cnpjtransportadora: $('#aCnpjTransp').value,
+    transportadora: $('#aTransp').value,
+    cpfmotorista: $('#aCpf').value,
+    motorista: $('#aMot').value,
+    placacavalo: $('#aPlaca').value.toUpperCase(),
+    placacarreta1: $('#aPlaca2').value.toUpperCase(),
+    produto: $('#aProd').value,
+    quantidade: $('#aQtd').value || 0,
+    status: 'Agendado',
+    observacao: 'Cadastrado via Módulo ERP'
+  };
+
+  try {
+    const res = await fetchAutenticado(`${API}/agendamentos`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(novo)
+    });
+
+    if (res && res.ok) {
+      toast('Agendamento salvo com sucesso no Supabase!');
+      $('#agForm').reset();
+      carregarDadosAPI();
+    } else {
+      Swal.fire('Erro', 'Falha ao salvar agendamento.', 'error');
+    }
+  } catch(err) {
+    Swal.fire('Ops!', 'Erro de conexão com o servidor.', 'error');
+  }
+});
 
 function logout() {
   localStorage.clear();
   window.location.href = 'login.html';
 }
+
+const esc = s => String(s || '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+// Inicialização
+carregarDadosAPI();
+const start = (location.hash||'').slice(1);
+go(TITLES[start] ? start : 'patio', false);
 })();
 </script>
 </body>
