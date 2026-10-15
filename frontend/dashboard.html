@@ -24,6 +24,8 @@
       
       <div class="d-flex align-items-center gap-3">
         <a href="perfil.html" id="nomeUsuario" class="text-white fw-semibold text-decoration-none btn btn-link"></a>
+        <!-- Botão ERP e Admin restritos a Administradores (ocultos por padrão) -->
+        <button id="btnErpDashboard" class="btn btn-outline-warning btn-sm fw-bold text-light d-none" onclick="window.location.href='erp.html'"><i class="bi bi-truck me-1"></i>ERP</button>
         <button id="btnAdmin" class="btn btn-outline-light btn-sm d-none" onclick="window.location.href='admin.html'">Admin</button>
         <button class="btn btn-danger btn-sm fw-bold" onclick="logout()"><i class="bi bi-box-arrow-right me-1"></i>Sair</button>
       </div>
@@ -294,8 +296,10 @@
       
       if (payload) {
         document.getElementById('nomeUsuario').textContent = `${payload.nome} (${payload.perfil})`;
+        // Exibe os botões de Admin e ERP somente se o perfil for admin
         if (payload.perfil === 'admin') {
           document.getElementById('btnAdmin').classList.remove('d-none');
+          document.getElementById('btnErpDashboard').classList.remove('d-none');
         }
       }
     }
