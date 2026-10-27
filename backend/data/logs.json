@@ -1,0 +1,92 @@
+[
+  {
+    "id": 8,
+    "usuario": "admin@empresa.com",
+    "acao": "Login no sistema",
+    "dataHora": "2026-05-12T13:10:45.271Z"
+  },
+  {
+    "id": 7,
+    "usuario": "admin@empresa.com",
+    "acao": "Login no sistema",
+    "dataHora": "2026-05-12T13:10:45.162Z"
+  },
+  {
+    "id": 6,
+    "usuario": "admin@empresa.com",
+    "acao": "Login no sistema",
+    "dataHora": "2026-05-12T00:57:33.091Z"
+  },
+  {
+    "id": 5,
+    "usuario": "admin@empresa.com",
+    "acao": "Login no sistema",
+    "dataHora": "2026-05-12T00:57:32.990Z"
+  },
+  {
+    "id": 4,
+    "usuario": "admin@empresa.com",
+    "acao": "Login no sistema",
+    "dataHora": "2026-05-12T00:52:32.802Z"
+  },
+  {
+    "id": 3,
+    "usuario": "admin@empresa.com",
+    "acao": "Login no sistema",
+    "dataHora": "2026-05-12T00:44:58.532Z"
+  },
+  {
+    "id": 2,
+    "usuario": "admin@empresa.com",
+    "acao": "Login no sistema",
+    "dataHora": "2026-05-12T00:44:24.738Z"
+  },
+  {
+    "id": 1,
+    "usuario": "admin@empresa.com",
+    "acao": "Login no sistema",
+    "dataHora": "2026-05-12T00:42:50.092Z"
+  },
+  {
+    "id": 9,
+    "usuario": "igmota@icloud.com",
+    "acao": "Cadastro de usuário",
+    "dataHora": "2026-05-12T13:24:25.037Z"
+  },
+  {
+    "id": 10,
+    "usuario": "igmota@icloud.com",
+    "acao": "Login realizado",
+    "dataHora": "2026-05-12T13:25:00.116Z"
+  },
+  {
+    "id": 11,
+    "usuario": "igmota@icloud.com",
+    "acao": "Login realizado",
+    "dataHora": "2026-05-12T13:25:00.209Z"
+  },
+  {
+    "id": 12,
+    "usuario": "igmota@icloud.com",
+    "acao": "Criou agendamento #1",
+    "dataHora": "2026-05-12T13:40:43.945Z"
+  },
+  {
+    "id": 13,
+    "usuario": "admin@empresa.com",
+    "acao": "Login realizado",
+    "dataHora": "2026-05-22T16:42:49.908Z"
+  },
+  {
+    "id": 14,
+    "usuario": "guive337@gmail.com",
+    "acao": "Cadastro de usuário",
+    "dataHora": "2026-05-22T16:43:57.177Z"
+  },
+  {
+    "id": 15,
+    "usuario": "guive337@gmail.com",
+    "acao": "Login realizado",
+    "dataHora": "2026-05-22T16:44:07.143Z"
+  }
+]

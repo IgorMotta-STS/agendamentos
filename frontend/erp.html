@@ -1,0 +1,875 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ERP Logístico - Balança & Pátio | SE7 Terminais</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css" rel="stylesheet">
+<style>
+:root{
+  --bg:#eef1f6; --surface:#ffffff; --surface-2:#f6f8fb; --line:#dfe4ec;
+  --fg:#1d2433; --muted:#5b6578; --accent:#0d6efd; --accent-fg:#ffffff; --accent-soft:#e7f1ff;
+  --side:#14203a; --side-fg:#c9d3e6; --side-active:#ffffff;
+  --ok:#198754; --warn:#ffc107; --bad:#dc3545; --ok-soft:#e3f4ea; --bad-soft:#fbe6e7; --warn-soft:#fbf1d9;
+  --st-agendado:#1d4f91; --st-pesagem1:#146b3a; --st-vistoria:#6e5a00; --st-pesagem2:#173f6e;
+  --st-nf:#5b1f72; --st-saida:#1d6a44; --st-gin:#1b7a4c; --st-gout:#152442; --st-finalizado:#4a5568;
+  --font-display:"Lexend", system-ui, sans-serif; --font-body:"Lexend", system-ui, sans-serif;
+  --font-mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
+  --r:10px; --shadow:0 1px 2px rgba(20,32,58,.06), 0 4px 14px rgba(20,32,58,.06);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0f1420; --surface:#18202f; --surface-2:#1e2738; --line:#2b3549;
+  --fg:#e6ebf4; --muted:#9aa6bb; --accent:#0d6efd; --accent-fg:#ffffff; --accent-soft:#1a2c4e;
+  --side:#0a0f1a; --side-fg:#9aa6bb; --side-active:#ffffff;
+  --ok:#4cc38a; --warn:#e2b44a; --bad:#f07178; --ok-soft:#173527; --bad-soft:#3a1d22; --warn-soft:#352b14;
+  --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0f1420; --surface:#18202f; --surface-2:#1e2738; --line:#2b3549;
+  --fg:#e6ebf4; --muted:#9aa6bb; --accent:#0d6efd; --accent-fg:#ffffff; --accent-soft:#1a2c4e;
+  --side:#0a0f1a; --side-fg:#9aa6bb; --side-active:#ffffff;
+  --ok:#4cc38a; --warn:#e2b44a; --bad:#f07178; --ok-soft:#173527; --bad-soft:#3a1d22; --warn-soft:#352b14;
+  --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:14px;line-height:1.5;font-weight:400;margin:0}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0;line-height:1.2}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid #0d6efd;outline-offset:2px;border-radius:4px}
+.skip{position:absolute;left:-999px;top:8px;background:var(--accent);color:var(--accent-fg);padding:8px 14px;border-radius:6px;z-index:50}
+.skip:focus{left:8px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.num{font-variant-numeric:tabular-nums}
+
+.app{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:100vh}
+.side{background:var(--side);color:var(--side-fg);padding:20px 14px;display:flex;flex-direction:column;gap:22px;position:sticky;top:0;height:100vh}
+.brand{display:flex;align-items:center;gap:10px;padding:0 6px;color:#fff}
+.brand-mark{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#0d6efd,#0b5ed7);display:grid;place-items:center;font-weight:700;font-size:15px;color:#fff}
+.brand small{display:block;color:var(--side-fg);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav-label{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#7f8ba3;padding:12px 10px 4px}
+.nav button{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;color:var(--side-fg);font-size:13.5px}
+.nav button svg{width:18px;height:18px;flex:none}
+.nav button:hover{background:rgba(255,255,255,.06);color:#fff}
+.nav button[aria-current="page"]{background:rgba(255,255,255,.1);color:var(--side-active);font-weight:500;box-shadow:inset 3px 0 0 var(--accent)}
+.nav button:focus-visible{outline:3px solid var(--accent)}
+.side-foot{margin-top:auto;font-size:12px;padding:10px;border-top:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:10px}
+.user-box{display:flex;gap:10px;align-items:center}
+.avatar{width:32px;height:32px;border-radius:50%;background:#0d6efd;display:grid;place-items:center;color:#fff;font-weight:600;font-size:12px;flex:none}
+.sys-nav{display:flex;gap:6px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.08);padding-top:8px}
+.sys-nav a, .sys-nav button{all:unset;cursor:pointer;font-size:11.5px;background:rgba(255,255,255,.08);color:#fff;padding:4px 8px;border-radius:4px;text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+.sys-nav a:hover, .sys-nav button:hover{background:rgba(255,255,255,.15)}
+
+main{padding-block:22px 40px;padding-inline:24px;min-width:0;display:flex;flex-direction:column;gap:18px}
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.page-head h1{font-size:22px;font-weight:600}
+.crumb{font-size:13px;color:var(--muted)} .crumb b{color:var(--accent);font-weight:500}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;min-width:0;box-shadow:var(--shadow)}
+.panel h2{font-size:16px;font-weight:600;margin-bottom:12px}
+.panel-sub{color:var(--muted);font-size:13px;margin:-8px 0 14px}
+
+.filters{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:center}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field.inline{flex-direction:row;align-items:center;gap:8px}
+.field label,.lbl{font-size:12.5px;color:var(--muted);font-weight:500}
+.input,select.input{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 11px;min-height:38px;min-width:0;width:100%}
+.input:focus{border-color:var(--accent);outline:2px solid var(--accent-soft)}
+.input[aria-invalid="true"]{border-color:var(--bad)}
+.err{color:var(--bad);font-size:12px;min-height:0}
+.filters .input{width:auto}
+
+.btn{border:0;border-radius:8px;padding:8px 14px;min-height:36px;cursor:pointer;font-weight:500;background:var(--accent);color:var(--accent-fg);display:inline-flex;align-items:center;gap:6px;justify-content:center;white-space:nowrap}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--fg);border:1px solid var(--line)}
+.btn.ok{background:var(--ok);color:#fff}
+.btn.sm{padding:5px 11px;min-height:30px;font-size:12.5px}
+.btn:disabled{opacity:.45;cursor:not-allowed;filter:none}
+
+.yard{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) minmax(0,.75fr) minmax(0,.75fr);grid-template-rows:auto auto;gap:14px}
+.st{all:unset;box-sizing:border-box;cursor:pointer;position:relative;overflow:hidden;color:#fff;border-radius:var(--r);padding:16px 14px 12px;min-height:112px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:var(--shadow)}
+.st:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.st[aria-pressed="true"]{box-shadow:0 0 0 3px var(--bg),0 0 0 6px currentColor}
+.st h3{font-size:15px;font-weight:500;position:relative;z-index:1}
+.st .count{align-self:flex-end;display:flex;align-items:baseline;gap:6px;position:relative;z-index:1}
+.st .count b{font-size:32px;font-weight:600;line-height:1}
+.st .count span{font-size:12.5px;font-weight:600}
+.gate{grid-row:span 2;color:#fff;border-radius:var(--r);padding:16px 14px;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow)}
+.gate h3{font-size:14px;font-weight:600;text-align:center;position:relative;z-index:1}
+.gate .who{display:flex;gap:12px;align-items:center;position:relative;z-index:1;min-width:0}
+.gate .meta{font-size:12.5px;min-width:0;line-height:1.55}
+.gate .meta i{opacity:.85}
+.gate .gate-foot{margin-top:auto;font-size:11.5px;opacity:.85;position:relative;z-index:1}
+
+.table-wrap{overflow-x:auto;border-radius:8px}
+table{border-collapse:collapse;width:100%;min-width:760px}
+thead th{background:var(--thead,var(--st-nf));color:#fff;font-weight:500;font-size:14px;padding:11px 12px;text-align:center}
+tbody td{padding:12px;border-bottom:1px solid var(--line);text-align:center;vertical-align:middle;font-size:13.5px}
+tbody tr:hover td{background:var(--surface-2)}
+.weights{font-size:12.5px;line-height:1.6} .weights small{color:var(--muted)}
+.empty{padding:26px;text-align:center;color:var(--muted)}
+
+.plate{display:inline-flex;flex-direction:column;border:2px solid #111;border-radius:5px;background:#fff;width:100px;overflow:hidden;vertical-align:middle}
+.plate .top{background:#1f4aa8;color:#fff;font-size:6.5px;letter-spacing:.2em;text-align:center;line-height:9px;height:9px}
+.plate .txt{font-family:var(--font-mono);font-weight:700;color:#111;font-size:17px;letter-spacing:.04em;text-align:center;line-height:24px}
+.plates{display:inline-flex;flex-direction:column;gap:4px}
+
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:500;color:#fff;white-space:nowrap}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.8}
+
+.split{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:18px;align-items:start}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.form-grid .full{grid-column:1/-1}
+.rules{margin:0;padding-left:18px;color:var(--muted);font-size:12.5px;display:grid;gap:4px}
+.list{display:flex;flex-direction:column;gap:8px}
+.row-card{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);flex-wrap:wrap}
+.row-card .grow{flex:1;min-width:140px}
+.row-card .t{font-weight:500} .row-card .s{color:var(--muted);font-size:12.5px}
+.time{font-family:var(--font-mono);font-size:13px;background:var(--surface-2);border:1px solid var(--line);padding:3px 8px;border-radius:6px}
+
+.scale-pick{display:flex;flex-direction:column;gap:8px}
+.pick{all:unset;box-sizing:border-box;cursor:pointer;display:flex;gap:12px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);flex-wrap:wrap}
+.pick[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.pick:focus-visible{outline:3px solid var(--accent)}
+.readout{background:#0b120d;border-radius:10px;padding:16px 18px;color:#7dffa8;font-family:var(--font-mono);display:flex;flex-direction:column;gap:4px;border:1px solid #1f3a28}
+.readout .lab{color:#4fae72;font-size:11px;letter-spacing:.14em;text-transform:uppercase;display:flex;justify-content:space-between}
+.readout .val{font-size:44px;font-weight:700;letter-spacing:.04em;text-align:right;line-height:1.1;text-shadow:0 0 12px rgba(125,255,168,.35)}
+.readout .val small{font-size:18px;margin-left:6px}
+.stable{display:inline-flex;align-items:center;gap:6px}
+.stable i{width:8px;height:8px;border-radius:50%;background:#3a5a44}
+.stable.on i{background:#7dffa8;box-shadow:0 0 6px #7dffa8}
+.calc{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.calc div{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.calc span{display:block;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.calc b{font-family:var(--font-mono);font-size:17px}
+.calc .liq{background:var(--accent-soft);border-color:var(--accent)}
+.formula{font-family:var(--font-mono);font-size:12px;color:var(--muted)}
+.ticket{border:1px dashed var(--muted);border-radius:8px;padding:14px 16px;font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);line-height:1.7}
+.ticket h3{font-family:var(--font-mono);font-size:13px;text-align:center;border-bottom:1px dashed var(--muted);padding-bottom:6px;margin-bottom:6px}
+.ticket .r{display:flex;justify-content:space-between;gap:10px}
+.notice{border-radius:8px;padding:10px 12px;font-size:13px}
+.notice.bad{background:var(--bad-soft);color:var(--bad)}
+.notice.ok{background:var(--ok-soft);color:var(--ok)}
+.notice.warn{background:var(--warn-soft);color:var(--warn)}
+
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow)}
+.kpi span{font-size:12.5px;color:var(--muted)}
+.kpi b{display:block;font-size:26px;font-weight:600;margin-top:4px}
+.charts{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:18px}
+.hbar{display:grid;grid-template-columns:130px minmax(0,1fr) 70px;align-items:center;gap:10px;font-size:13px;padding:6px 0}
+.hbar .trk{height:12px;background:var(--surface-2);border-radius:6px;overflow:hidden;border:1px solid var(--line)}
+.hbar .trk i{display:block;height:100%;background:var(--accent);border-radius:6px}
+.hbar b{font-family:var(--font-mono);font-size:12.5px;text-align:right}
+
+.d-none{display:none!important}
+.st[data-etapa]{min-height:104px}
+@media print{body *{visibility:hidden}#relatorioPrint,#relatorioPrint *,#ticket,#ticket *{visibility:visible}#relatorioPrint,#ticket{position:absolute;left:0;top:0;width:100%;border:0}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<a class="skip" href="#conteudo">Pular para o conteúdo</a>
+<div class="app">
+  <aside class="side" aria-label="Menu principal">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">S7</div>
+      <div><b>SE7 Terminais</b><small>ERP Logístico</small></div>
+    </div>
+    
+    <nav class="nav" id="nav">
+      <div class="nav-label">Operações</div>
+      <button data-view="patio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Painel do Pátio</button>
+      <button data-view="agendamento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Agendamento</button>
+      <button data-view="portaria"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18M5 7h14M5 7l-3 7h6zM19 7l-3 7h6zM8 21h8"/></svg>Portaria &amp; Balança</button>
+      <div class="nav-label">Gestão</div>
+      <button data-view="indicadores"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Indicadores</button>
+      <button data-view="relatorios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Relatórios</button>
+      <button data-view="capacidade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>Capacidade &amp; Janelas</button>
+      <button data-view="cadastros"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Cadastros Base</button>
+      <button data-view="auditoria"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Log de Movimentação</button>
+    </nav>
+
+    <div class="side-foot">
+      <div class="user-box">
+        <div class="avatar" id="userAvatar" aria-hidden="true">US</div>
+        <div style="min-width:0"><div style="color:#fff;font-weight:500;text-overflow:ellipsis;overflow:hidden" id="userName">Usuário</div><div style="font-size:11px;color:var(--side-fg)" id="userRole">Operador</div></div>
+      </div>
+      <div class="sys-nav">
+        <a href="dashboard.html"><i class="bi bi-arrow-left"></i> Painel</a>
+        <a href="admin.html" id="linkAdmin" class="d-none"><i class="bi bi-shield-lock"></i> Admin</a>
+        <button type="button" id="btnSair" style="margin-left:auto"><i class="bi bi-box-arrow-right"></i> Sair</button>
+      </div>
+    </div>
+  </aside>
+
+  <main id="conteudo" tabindex="-1">
+    <div class="page-head"><h1 id="pageTitle">Painel do Pátio</h1><div class="crumb" id="crumb"></div></div>
+
+    <!-- ============ PAINEL DO PÁTIO ============ -->
+    <section data-sec="patio" aria-labelledby="pageTitle">
+      <div style="display:flex;flex-direction:column;gap:18px">
+        <form class="panel filters" id="filtros">
+          <div class="field inline"><label for="fDe">De</label><input class="input" type="date" id="fDe"></div>
+          <div class="field inline"><label for="fAte">Até</label><input class="input" type="date" id="fAte"></div>
+          <div class="field inline"><label for="fCli">Cliente</label><select class="input" id="fCli"></select></div>
+          <div class="field inline"><label for="fProd">Produto</label><select class="input" id="fProd"></select></div>
+        </form>
+        <div class="yard" id="yard"></div>
+        <div class="panel">
+          <h2 id="tblTitle">Todas as cargas</h2>
+          <div class="table-wrap"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ AGENDAMENTO ============ -->
+    <section data-sec="agendamento" hidden>
+      <div class="split">
+        <form class="panel" id="agForm" novalidate>
+          <h2>Novo agendamento de carga</h2>
+          <p class="panel-sub">Portal integrado ao Supabase. A janela é confirmada diretamente no banco de dados.</p>
+          <div class="form-grid">
+            <div class="field"><label for="aTransp">Transportadora</label><select class="input" id="aTransp" required></select></div>
+            <div class="field"><label for="aCnpjTransp">CNPJ Transportadora</label><input class="input" id="aCnpjTransp" placeholder="00.000.000/0000-00"></div>
+            <div class="field"><label for="aMot">Motorista</label><input class="input" id="aMot" placeholder="Nome completo" required><span class="err" id="eMot"></span></div>
+            <div class="field"><label for="aCpf">CPF do motorista</label><input class="input num" id="aCpf" placeholder="000.000.000-00" maxlength="14" required><span class="err" id="eCpf"></span></div>
+            <div class="field"><label for="aPlaca">Placa do cavalo</label><input class="input num" id="aPlaca" placeholder="ABC1D23" maxlength="8" style="text-transform:uppercase" required><span class="err" id="ePlaca"></span></div>
+            <div class="field"><label for="aPlaca2">Placa da carreta <span style="font-weight:400">(opcional)</span></label><input class="input num" id="aPlaca2" placeholder="ABC1D23" maxlength="8" style="text-transform:uppercase"></div>
+            <div class="field"><label for="aData">Data/Hora Prevista</label><input class="input" type="datetime-local" id="aData" required><span class="err" id="eData"></span></div>
+            <div class="field"><label for="aTipoCarga">Tipo de Carga</label><select class="input" id="aTipoCarga"><option>Granel</option><option>Bigbag 1000kg</option><option>Bigbag 500kg</option><option>Sacaria 50kg</option></select></div>
+            <div class="field"><label for="aCli">Cliente (Razão Social)</label><select class="input" id="aCli" required></select></div>
+            <div class="field"><label for="aCnpjCli">CNPJ Cliente</label><input class="input num" id="aCnpjCli" placeholder="00.000.000/0000-00" maxlength="18"></div>
+            <div class="field"><label for="aProd">Produto</label><select class="input" id="aProd" required></select></div>
+            <div class="field"><label for="aQtd">Quantidade (Ton)</label><input class="input num" type="number" id="aQtd" step="0.01" min="0" placeholder="0.00"></div>
+            <div class="field"><label for="aDi">DI / Pedido</label><input class="input" id="aDi" placeholder="00/0000000-0"></div>
+            
+            <div class="full" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end">
+              <button type="reset" class="btn ghost">Limpar</button>
+              <button type="submit" class="btn">Salvar no Supabase</button>
+            </div>
+          </div>
+        </form>
+        <div style="display:flex;flex-direction:column;gap:18px;min-width:0">
+          <div class="panel">
+            <h2>Agendamentos Recentes</h2>
+            <div class="list" id="agList"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PORTARIA & BALANÇA ============ -->
+    <section data-sec="portaria" hidden>
+      <div class="split">
+        <div style="display:flex;flex-direction:column;gap:18px;min-width:0">
+          <div class="panel">
+            <h2>Portaria · Check-in</h2>
+            <p class="panel-sub">Veículos agendados aguardando entrada no terminal.</p>
+            <div class="field" style="margin-bottom:12px"><label for="pBusca">Buscar placa, motorista ou cliente</label><input class="input" id="pBusca" placeholder="Ex.: ABC1D23"></div>
+            <div class="list" id="pEntrada"></div>
+          </div>
+          <div class="panel">
+            <h2>Portaria · Saída</h2>
+            <p class="panel-sub">Cargas pesadas e faturadas, prontas para deixar o terminal.</p>
+            <div class="list" id="pSaida"></div>
+          </div>
+        </div>
+        <div class="panel" style="display:flex;flex-direction:column;gap:14px;min-width:0">
+          <h2 style="margin:0">Balança Rodoviária</h2>
+          <p class="panel-sub" style="margin:0">Selecione um veículo no pátio para registrar a pesagem.</p>
+          <div class="scale-pick" id="bFila" role="group"></div>
+          <div id="bDetalhe"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ INDICADORES ============ -->
+    <section data-sec="indicadores" hidden>
+      <div style="display:flex;flex-direction:column;gap:18px">
+        <div class="kpis" id="kpis"></div>
+        <div class="charts">
+          <div class="panel chart"><h2>Volume por produto</h2><div id="chProd"></div></div>
+          <div class="panel chart"><h2>Veículos no pátio por status</h2><div id="chStatus"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ RELATÓRIOS (NOVO) ============ -->
+    <section data-sec="relatorios" hidden>
+      <div class="panel" id="relatorioPrint">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <h2>Relatórios &amp; Exportação Operacional</h2>
+          <button type="button" class="btn ghost" onclick="window.print()"><i class="bi bi-printer"></i> Imprimir Relatório</button>
+        </div>
+        <p class="panel-sub">Filtre as movimentações por período, status, cliente ou produto.</p>
+        <div class="filters" style="margin-bottom:16px">
+          <div class="field inline"><label for="rDe">De</label><input class="input" type="date" id="rDe"></div>
+          <div class="field inline"><label for="rAte">Até</label><input class="input" type="date" id="rAte"></div>
+          <div class="field inline"><label for="rStatus">Status</label><select class="input" id="rStatus"><option value="">Todos</option><option value="Agendado">Agendado</option><option value="Em andamento">Em andamento</option><option value="Finalizado">Finalizado</option></select></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Data</th>
+                <th>Placa</th>
+                <th>Cliente</th>
+                <th>Produto</th>
+                <th>Tara (kg)</th>
+                <th>Bruto (kg)</th>
+                <th>Líquido (t)</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyRelatorio"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CAPACIDADE & JANELAS (NOVO) ============ -->
+    <section data-sec="capacidade" hidden>
+      <div class="split">
+        <form class="panel" id="formCapacidade">
+          <h2>Gestão de Capacidade &amp; Regras</h2>
+          <p class="panel-sub">Ajuste os limites de agendamentos por janela e pátio em tempo real.</p>
+          <div class="form-grid">
+            <div class="field">
+              <label for="cLimiteJanela">Limite por Janela (Veículos / Hora)</label>
+              <input class="input num" type="number" id="cLimiteJanela" min="1" max="20" required>
+            </div>
+            <div class="field">
+              <label for="cCapacidadePatio">Capacidade Máxima do Pátio (Vagas)</label>
+              <input class="input num" type="number" id="cCapacidadePatio" min="1" max="100" required>
+            </div>
+            <div class="field full">
+              <label class="field inline" style="cursor:pointer">
+                <input type="checkbox" id="cBloqueioEmergencia" style="width:18px;height:18px">
+                <b style="color:var(--bad)">Bloqueio de Emergência / Manutenção (Impedir novos agendamentos)</b>
+              </label>
+            </div>
+            <div class="full" style="text-align:right">
+              <button type="submit" class="btn ok">Salvar Regras de Operação</button>
+            </div>
+          </div>
+        </form>
+        <div class="panel">
+          <h2>Status Operacional Atual</h2>
+          <div class="list" id="statusCapacidade"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CADASTROS BASE (NOVO) ============ -->
+    <section data-sec="cadastros" hidden>
+      <div class="split">
+        <form class="panel" id="formNovoCadastro">
+          <h2>Novo Cadastro Base</h2>
+          <p class="panel-sub">Cadastre novos clientes, produtos e transportadoras dinamicamente.</p>
+          <div class="form-grid">
+            <div class="field"><label for="cadTipo">Tipo de Registro</label><select class="input" id="cadTipo"><option value="cliente">Cliente</option><option value="produto">Produto</option><option value="transportadora">Transportadora</option></select></div>
+            <div class="field"><label for="cadNome">Nome / Razão Social</label><input class="input" id="cadNome" required placeholder="Ex.: Fertilizantes do Brasil SA"></div>
+            <div class="field full"><label for="cadDoc">Documento (CNPJ / Código)</label><input class="input" id="cadDoc" placeholder="Ex.: 00.000.000/0001-00"></div>
+            <div class="full" style="text-align:right">
+              <button type="submit" class="btn">Cadastrar Item</button>
+            </div>
+          </div>
+        </form>
+        <div class="panel">
+          <h2>Itens Cadastrados no Banco</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Tipo</th><th>Nome</th><th>Documento</th></tr></thead>
+              <tbody id="tbodyCadastros"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ AUDITORIA ============ -->
+    <section data-sec="auditoria" hidden>
+      <div class="panel">
+        <h2>Logs de Auditoria (Servidor)</h2>
+        <p class="panel-sub">Histórico de movimentações obtido diretamente da API.</p>
+        <div class="table-wrap"><table><thead><tr><th>Data/Hora</th><th>Operador</th><th>Ação Executada</th></tr></thead><tbody id="logBody"></tbody></table></div>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="utils.js"></script>
+<script>
+(function(){
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const API = 'https://se7-backend.onrender.com/api';
+const token = localStorage.getItem('token');
+const payload = lerTokenSeguro(token);
+
+if (!token || !payload || (payload.exp && payload.exp * 1000 < Date.now())) {
+  localStorage.removeItem('token');
+  window.location.href = 'login.html';
+  return;
+}
+
+const ADMIN = payload.perfil === 'admin';
+const OPER = payload.nome || 'Operador';
+$('#userName').textContent = OPER;
+$('#userRole').textContent = ADMIN ? 'Administrador' : 'Operador';
+$('#userAvatar').textContent = OPER.split(' ').filter(Boolean).map(n=>n[0]).join('').substring(0,2).toUpperCase();
+if (ADMIN) $('#linkAdmin').classList.remove('d-none');
+
+const ETAPAS = {
+  agendado:   { nome:'Agendado',                 cor:'var(--st-agendado)' },
+  pesagem1:   { nome:'Aguardando 1ª pesagem',    cor:'var(--st-pesagem1)' },
+  vistoria:   { nome:'Vistoria / Carregamento',  cor:'var(--st-vistoria)' },
+  nf:         { nome:'Aguardando N.F.',          cor:'var(--st-nf)' },
+  saida:      { nome:'Liberado p/ saída',        cor:'var(--st-saida)' },
+  finalizado: { nome:'Finalizado',               cor:'var(--st-finalizado)' }
+};
+const ORDEM = Object.keys(ETAPAS);
+const NO_PATIO = ['pesagem1','vistoria','nf','saida'];
+
+function etapa(v){
+  if (v.status === 'Finalizado') return 'finalizado';
+  if (!v.status || v.status === 'Agendado') return 'agendado';
+  if (!(Number(v.tara) > 0)) return 'pesagem1';
+  if (!(Number(v.bruto) > 0)) return 'vistoria';
+  if (!v.nf) return 'nf';
+  return 'saida';
+}
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const kg = n => Number(n) > 0 ? Number(n).toLocaleString('pt-BR') + ' kg' : '—';
+const ton = n => (Number(n)||0).toLocaleString('pt-BR',{maximumFractionDigits:2});
+function fmtData(d){
+  if (!d) return '—';
+  const dt = new Date(d);
+  return isNaN(dt) ? esc(d) : dt.toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+const pill = k => `<span class="pill" style="background:${ETAPAS[k].cor}">${ETAPAS[k].nome}</span>`;
+const placa = p => p ? `<span class="plate"><span class="top">BRASIL</span><span class="txt">${esc(p)}</span></span>` : '—';
+function toast(msg){const t=$('#toast');t.textContent=msg;t.hidden=false;clearTimeout(t.t);t.t=setTimeout(()=>t.hidden=true,3600);}
+
+let V = [];
+let LOG = [];
+let CADASTROS = [];
+let CONFIG = { limiteJanela: 3, capacidadePatio: 15, bloqueio: false };
+let LOG_PERMITIDO = ADMIN;
+let view = 'patio';
+let filtroEtapa = null;
+let selecionado = null;
+let carregando = false;
+
+const TITLES={
+  patio:'Painel do Pátio', agendamento:'Agendamento de Cargas', portaria:'Portaria & Balança',
+  indicadores:'Dashboard Gerencial', relatorios:'Relatórios Operacionais',
+  capacidade:'Gestão de Capacidade', cadastros:'Cadastros Base', auditoria:'Log de Movimentação'
+};
+const GROUP={
+  patio:'Operações', agendamento:'Operações', portaria:'Operações',
+  indicadores:'Gestão', relatorios:'Gestão', capacidade:'Gestão', cadastros:'Gestão', auditoria:'Gestão'
+};
+
+function go(v,focus){
+  view=v;
+  $$('[data-sec]').forEach(s=>s.hidden=s.dataset.sec!==v);
+  $$('#nav button').forEach(b=>b.dataset.view===v?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
+  $('#pageTitle').textContent=TITLES[v];
+  $('#crumb').innerHTML=GROUP[v]+' / <b>'+TITLES[v]+'</b>';
+  try{history.replaceState(null,'','#'+v);}catch(e){}
+  carregarDadosAPI();
+  if(focus) $('#conteudo').focus();
+}
+$('#nav').addEventListener('click',e=>{const b=e.target.closest('button[data-view]');if(b)go(b.dataset.view,true);});
+
+async function carregarDadosAPI() {
+  if (carregando) return;
+  carregando = true;
+  try {
+    const resAg = await fetchAutenticado(`${API}/agendamentos`);
+    if (resAg && resAg.ok) V = await resAg.json();
+
+    const resConfig = await fetchAutenticado(`${API}/configuracoes`);
+    if (resConfig && resConfig.ok) CONFIG = await resConfig.json();
+
+    const resCad = await fetchAutenticado(`${API}/cadastros-base`);
+    if (resCad && resCad.ok) CADASTROS = await resCad.json();
+
+    if (ADMIN && view === 'auditoria') {
+      const resLog = await fetchAutenticado(`${API}/logs`);
+      if (resLog && resLog.ok) LOG = await resLog.json();
+      else if (resLog && resLog.status === 403) LOG_PERMITIDO = false;
+    }
+    render();
+  } catch (error) {
+    console.error('Erro ao sincronizar com a API:', error);
+  } finally {
+    carregando = false;
+  }
+}
+
+async function chamar(url, metodo, corpo, padraoErro){
+  const res = await fetchAutenticado(url, {
+    method: metodo,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(corpo)
+  });
+  if (!res) return null;
+  if (!res.ok) {
+    try { const j = await res.json(); Swal.fire('Atenção', j.erro || padraoErro, 'warning'); } catch { Swal.fire('Atenção', padraoErro, 'warning'); }
+    return null;
+  }
+  return res.json();
+}
+
+async function mudarStatus(id, status, extra = {}){
+  const r = await chamar(`${API}/agendamentos/${id}/status`, 'PATCH', { status, ...extra }, 'Não foi possível atualizar o status.');
+  if (r) await carregarDadosAPI();
+  return r;
+}
+
+function render(){
+  preencherOptionsCadastros();
+  if(view==='patio') renderPatio();
+  if(view==='agendamento') renderAgList();
+  if(view==='portaria') renderPortaria();
+  if(view==='indicadores') renderIndicadores();
+  if(view==='relatorios') renderRelatorios();
+  if(view==='capacidade') renderCapacidade();
+  if(view==='cadastros') renderCadastros();
+  if(view==='auditoria') renderLog();
+}
+
+function preencherOptionsCadastros(){
+  const clis = CADASTROS.filter(c=>c.tipo==='cliente').map(c=>c.nome);
+  const prods = CADASTROS.filter(c=>c.tipo==='produto').map(c=>c.nome);
+  const transps = CADASTROS.filter(c=>c.tipo==='transportadora').map(c=>c.nome);
+
+  const selCli = $('#aCli'), selProd = $('#aProd'), selTransp = $('#aTransp');
+  if (selCli) selCli.innerHTML = (clis.length ? clis : ['QUIMICA AMPARO','AGROSUL FERTILIZANTES','VIDROTEC']).map(x=>`<option>${esc(x)}</option>`).join('');
+  if (selProd) selProd.innerHTML = (prods.length ? prods : ['SULFATO DE SODIO','UREIA GRANULADA','BARRILHA LEVE']).map(x=>`<option>${esc(x)}</option>`).join('');
+  if (selTransp) selTransp.innerHTML = (transps.length ? transps : ['Rodoviário Sete Rios','TransAmparo Cargas']).map(x=>`<option>${esc(x)}</option>`).join('');
+}
+
+function renderPatio(){
+  const base = V;
+  const cont = k => base.filter(v=>etapa(v)===k).length;
+  const ultEntrada = base.filter(v=>NO_PATIO.includes(etapa(v))).sort((a,b)=>String(b.atualizadoem||'').localeCompare(String(a.atualizadoem||'')))[0];
+  const ultSaida = base.filter(v=>etapa(v)==='finalizado').sort((a,b)=>String(b.atualizadoem||'').localeCompare(String(a.atualizadoem||'')))[0];
+  
+  const gate = (titulo, cor, v, rodape) => `
+    <div class="gate" style="background:${cor}">
+      <h3>${titulo}</h3>
+      ${v ? `<div class="who"><div class="meta"><b>${esc(v.placacavalo||'—')}</b><br>${esc(v.motorista||'—')}<br><i>${esc(v.cliente||'')}</i></div></div>
+             <div class="gate-foot">${rodape} ${fmtData(v.atualizadoem)}</div>`
+          : '<div class="gate-foot">Nenhum movimento.</div>'}
+    </div>`;
+
+  const card = k => `
+    <button type="button" class="st" data-etapa="${k}" aria-pressed="${filtroEtapa===k}" style="background:${ETAPAS[k].cor}">
+      <h3>${ETAPAS[k].nome}</h3>
+      <div class="count"><b class="num">${cont(k)}</b><span>veículo(s)</span></div>
+    </button>`;
+
+  $('#yard').innerHTML = ORDEM.slice(0,3).map(card).join('')
+    + gate('Última entrada', 'var(--st-gin)', ultEntrada, 'Atualizado')
+    + gate('Última saída', 'var(--st-gout)', ultSaida, 'Saiu')
+    + ORDEM.slice(3).map(card).join('');
+
+  const lista = filtroEtapa ? base.filter(v=>etapa(v)===filtroEtapa) : base;
+  $('#tblTitle').textContent = filtroEtapa ? ETAPAS[filtroEtapa].nome : 'Todas as cargas';
+  $('#thead').innerHTML = '<tr><th>ID</th><th>Placas</th><th>Cliente / Produto</th><th>Motorista</th><th>Previsto</th><th>Pesos</th><th>Etapa</th><th>Ação</th></tr>';
+  $('#thead').parentElement.style.setProperty('--thead', filtroEtapa ? ETAPAS[filtroEtapa].cor : 'var(--st-gout)');
+  $('#tbody').innerHTML = lista.length ? lista.map(v=>{
+    const k = etapa(v);
+    let acao = '—';
+    if (k==='agendado') acao = `<button class="btn sm" data-act="checkin" data-id="${v.id}">Check-in</button>`;
+    else if (k==='saida') acao = `<button class="btn sm ok" data-act="saida" data-id="${v.id}">Liberar saída</button>`;
+    else if (k!=='finalizado') acao = `<button class="btn sm" data-act="balanca" data-id="${v.id}">Abrir na balança</button>`;
+    return `<tr>
+      <td class="num">#${v.id}</td>
+      <td><span class="plates">${placa(v.placacavalo)}${v.placacarreta1?placa(v.placacarreta1):''}</span></td>
+      <td><b>${esc(v.cliente||'—')}</b><br><small>${esc(v.produto||'—')} · ${ton(v.quantidade)} t</small></td>
+      <td>${esc(v.motorista||'—')}</td>
+      <td>${fmtData(v.datahora)}</td>
+      <td class="weights num">T: ${kg(v.tara)}<br>B: ${kg(v.bruto)}<br><b>L: ${kg(v.liquido)}</b></td>
+      <td>${pill(k)}</td>
+      <td>${acao}</td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="8" class="empty">Nenhum registro para os filtros selecionados.</td></tr>';
+}
+
+$('#yard').addEventListener('click', e=>{
+  const b = e.target.closest('[data-etapa]'); if(!b) return;
+  filtroEtapa = filtroEtapa===b.dataset.etapa ? null : b.dataset.etapa;
+  renderPatio();
+});
+
+function renderAgList(){
+  const recentes = [...V].sort((a,b)=>b.id-a.id).slice(0,6);
+  $('#agList').innerHTML = recentes.map(v => `
+    <div class="row-card">
+      <div class="grow"><div class="t">#${v.id} · ${esc(v.placacavalo||'—')} · ${esc(v.motorista||'Motorista')}</div><div class="s">${esc(v.produto||'—')} → ${esc(v.cliente||'—')} · ${fmtData(v.datahora)}</div></div>
+      ${pill(etapa(v))}
+    </div>`).join('') || '<div class="empty">Nenhum agendamento recente.</div>';
+}
+
+function renderPortaria(){
+  const busca = $('#pBusca').value.trim().toLowerCase();
+  const casa = v => !busca || [v.placacavalo,v.placacarreta1,v.motorista,v.cliente].some(x=>String(x||'').toLowerCase().includes(busca));
+
+  const agendados = V.filter(v=>etapa(v)==='agendado' && casa(v)).sort((a,b)=>String(a.datahora||'').localeCompare(String(b.datahora||'')));
+  $('#pEntrada').innerHTML = agendados.map(v=>`
+    <div class="row-card">
+      <span class="time">${fmtData(v.datahora)}</span>
+      <div class="grow"><div class="t">${esc(v.placacavalo||'—')} · ${esc(v.motorista||'—')}</div><div class="s">#${v.id} · ${esc(v.cliente||'—')} · ${esc(v.produto||'—')}</div></div>
+      <button class="btn sm" data-act="checkin" data-id="${v.id}">Registrar entrada</button>
+    </div>`).join('') || `<div class="empty">${busca?'Nenhum veículo encontrado.':'Nenhum veículo aguardando entrada.'}</div>`;
+
+  const prontos = V.filter(v=>etapa(v)==='saida');
+  $('#pSaida').innerHTML = prontos.map(v=>`
+    <div class="row-card">
+      <div class="grow"><div class="t">${esc(v.placacavalo||'—')} · NF ${esc(v.nf)}</div><div class="s">#${v.id} · ${esc(v.cliente||'—')} · líquido ${kg(v.liquido)}</div></div>
+      <button class="btn sm ok" data-act="saida" data-id="${v.id}">Liberar saída</button>
+    </div>`).join('') || '<div class="empty">Nenhuma carga liberada para saída.</div>';
+
+  const fila = V.filter(v=>['pesagem1','vistoria','nf'].includes(etapa(v)));
+  if (selecionado && !V.some(v=>v.id==selecionado && etapa(v)!=='finalizado' && etapa(v)!=='agendado')) selecionado = null;
+  if (!selecionado && fila.length) selecionado = fila[0].id;
+
+  $('#bFila').innerHTML = fila.map(v=>`
+    <button type="button" class="pick" data-pick="${v.id}" aria-pressed="${v.id==selecionado}">
+      <b>${esc(v.placacavalo||'—')}</b><span class="grow" style="flex:1">#${v.id} · ${esc(v.cliente||'—')}</span>${pill(etapa(v))}
+    </button>`).join('') || '<div class="empty">Nenhum veículo no pátio aguardando balança.</div>';
+
+  renderBalanca();
+}
+$('#pBusca').addEventListener('input', renderPortaria);
+
+function renderBalanca(){
+  const box = $('#bDetalhe');
+  const v = V.find(x=>x.id==selecionado);
+  if (!v) { box.innerHTML=''; return; }
+  const k = etapa(v);
+  const previstoKg = (Number(v.quantidade)||0)*1000;
+  const divergencia = v.liquido && previstoKg ? Math.abs(v.liquido - previstoKg)/previstoKg : 0;
+
+  let acao = '';
+  if (k==='pesagem1' || k==='vistoria') {
+    const tipo = k==='pesagem1' ? 'tara' : 'bruto';
+    acao = `
+      <div class="readout" aria-hidden="true">
+        <div class="lab"><span>${tipo==='tara'?'1ª pesagem · tara (vazio)':'2ª pesagem · bruto (carregado)'}</span><span class="stable" id="bEstavel"><i></i>ESTÁVEL</span></div>
+        <div class="val num" id="bVisor">0<small>kg</small></div>
+      </div>
+      <form id="bForm" data-tipo="${tipo}" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
+        <div class="field" style="flex:1;min-width:160px"><label for="bPeso">Peso lido na balança (kg)</label><input class="input num" id="bPeso" type="number" min="1" max="100000" step="1" required></div>
+        <button class="btn" type="submit">Registrar ${tipo}</button>
+      </form>`;
+  } else if (k==='nf') {
+    acao = `
+      <form id="nfForm" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
+        <div class="field" style="flex:1;min-width:160px"><label for="bNf">Número da nota fiscal</label><input class="input" id="bNf" required maxlength="30" placeholder="Ex.: 000123456"></div>
+        <button class="btn" type="submit">Registrar NF</button>
+      </form>`;
+  }
+
+  box.innerHTML = `
+    <div class="row-card" style="background:var(--surface-2)">
+      <div class="grow"><div class="t">#${v.id} · ${esc(v.placacavalo||'—')} · ${esc(v.motorista||'—')}</div>
+      <div class="s">${esc(v.cliente||'—')} · ${esc(v.produto||'—')} · previsto ${ton(v.quantidade)} t</div></div>
+      ${pill(k)}
+    </div>
+    ${acao}
+    <div class="calc">
+      <div><span>Tara</span><b class="num">${kg(v.tara)}</b></div>
+      <div><span>Bruto</span><b class="num">${kg(v.bruto)}</b></div>
+      <div class="liq"><span>Líquido</span><b class="num">${kg(v.liquido)}</b></div>
+    </div>
+    ${v.liquido ? `<button type="button" class="btn ghost" id="btnTicket"><i class="bi bi-printer"></i> Imprimir ticket</button>` : ''}`;
+
+  const peso = $('#bPeso');
+  if (peso) {
+    peso.addEventListener('input', ()=>{
+      const n = Number(peso.value);
+      $('#bVisor').innerHTML = (n>0? n.toLocaleString('pt-BR') : '0') + '<small>kg</small>';
+      $('#bEstavel').classList.toggle('on', n>0);
+    });
+    $('#bForm').addEventListener('submit', async e=>{
+      e.preventDefault();
+      const tipo = e.target.dataset.tipo, n = Number(peso.value);
+      if (!(n>0)) return;
+      if (tipo==='bruto' && n <= Number(v.tara)) { Swal.fire('Atenção','O peso bruto precisa ser maior que a tara.','warning'); return; }
+      const r = await chamar(`${API}/pesagens`, 'POST', { agendamentoid: v.id, tipo, peso: n }, 'Erro ao registrar pesagem.');
+      if (r) { toast(`Pesagem de ${tipo} registrada: ${n.toLocaleString('pt-BR')} kg.`); await carregarDadosAPI(); }
+    });
+  }
+  const nfForm = $('#nfForm');
+  if (nfForm) nfForm.addEventListener('submit', async e=>{
+    e.preventDefault();
+    const nf = $('#bNf').value.trim();
+    if (await mudarStatus(v.id, 'Em andamento', { nf })) toast(`NF ${nf} registrada.`);
+  });
+  const bt = $('#btnTicket');
+  if (bt) bt.addEventListener('click', ()=>window.print());
+}
+
+function renderIndicadores(){
+  const noPatio = V.filter(v=>NO_PATIO.includes(etapa(v))).length;
+  const finalizadas = V.filter(v=>etapa(v)==='finalizado');
+  const pesadoT = V.reduce((s,v)=>s+(Number(v.liquido)||0),0)/1000;
+  $('#kpis').innerHTML = `
+    <div class="kpi"><span>Total de cargas</span><b class="num">${V.length}</b></div>
+    <div class="kpi"><span>Veículos no pátio</span><b class="num">${noPatio}</b></div>
+    <div class="kpi"><span>Cargas finalizadas</span><b class="num">${finalizadas.length}</b></div>
+    <div class="kpi"><span>Peso líquido movimentado</span><b class="num">${ton(pesadoT)} t</b></div>`;
+}
+
+function renderRelatorios(){
+  const de = $('#rDe').value, ate = $('#rAte').value, st = $('#rStatus').value;
+  const filtrados = V.filter(v=>{
+    const dia = String(v.datahora||'').slice(0,10);
+    if (de && dia && dia < de) return false;
+    if (ate && dia && dia > ate) return false;
+    if (st && v.status !== st) return false;
+    return true;
+  });
+
+  $('#tbodyRelatorio').innerHTML = filtrados.length ? filtrados.map(v=>`
+    <tr>
+      <td class="num">#${v.id}</td>
+      <td>${fmtData(v.datahora)}</td>
+      <td><b>${esc(v.placacavalo||'—')}</b></td>
+      <td>${esc(v.cliente||'—')}</td>
+      <td>${esc(v.produto||'—')}</td>
+      <td class="num">${kg(v.tara)}</td>
+      <td class="num">${kg(v.bruto)}</td>
+      <td class="num"><b>${kg(v.liquido)}</b></td>
+      <td>${pill(etapa(v))}</td>
+    </tr>`).join('') : '<tr><td colspan="9" class="empty">Nenhum registro encontrado.</td></tr>';
+}
+$('#rDe').addEventListener('input', renderRelatorios);
+$('#rAte').addEventListener('input', renderRelatorios);
+$('#rStatus').addEventListener('change', renderRelatorios);
+
+function renderCapacidade(){
+  $('#cLimiteJanela').value = CONFIG.limiteJanela || 3;
+  $('#cCapacidadePatio').value = CONFIG.capacidadePatio || 15;
+  $('#cBloqueioEmergencia').checked = !!CONFIG.bloqueio;
+
+  const noPatio = V.filter(v=>NO_PATIO.includes(etapa(v))).length;
+  $('#statusCapacidade').innerHTML = `
+    <div class="row-card"><div class="grow"><div class="t">Ocupação do Pátio</div><div class="s">${noPatio} de ${CONFIG.capacidadePatio} vagas ocupadas</div></div></div>
+    <div class="row-card"><div class="grow"><div class="t">Limite por Janela de Horário</div><div class="s">Máximo de ${CONFIG.limiteJanela} agendamentos / hora</div></div></div>
+    <div class="row-card"><div class="grow"><div class="t">Status de Entrada</div><div class="s">${CONFIG.bloqueio ? '<b style="color:var(--bad)">BLOQUEADO (Manutenção)</b>' : '<b style="color:var(--ok)">OPERACIONAL</b>'}</div></div></div>
+  `;
+}
+
+$('#formCapacidade').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const novoConfig = {
+    limiteJanela: Number($('#cLimiteJanela').value),
+    capacidadePatio: Number($('#cCapacidadePatio').value),
+    bloqueio: $('#cBloqueioEmergencia').checked
+  };
+  const r = await chamar(`${API}/configuracoes`, 'PUT', novoConfig, 'Erro ao salvar configurações.');
+  if (r) { toast('Regras operacionais atualizadas!'); carregarDadosAPI(); }
+});
+
+function renderCadastros(){
+  $('#tbodyCadastros').innerHTML = CADASTROS.length ? CADASTROS.map(c=>`
+    <tr>
+      <td><span class="badge bg-secondary">${esc(c.tipo.toUpperCase())}</span></td>
+      <td><b>${esc(c.nome)}</b></td>
+      <td>${esc(c.documento || '—')}</td>
+    </tr>`).join('') : '<tr><td colspan="3" class="empty">Nenhum cadastro base inserido.</td></tr>';
+}
+
+$('#formNovoCadastro').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const item = {
+    tipo: $('#cadTipo').value,
+    nome: $('#cadNome').value.trim(),
+    documento: $('#cadDoc').value.trim()
+  };
+  const r = await chamar(`${API}/cadastros-base`, 'POST', item, 'Erro ao cadastrar item.');
+  if (r) {
+    toast(`${item.tipo} cadastrado com sucesso!`);
+    $('#cadNome').value = '';
+    $('#cadDoc').value = '';
+    carregarDadosAPI();
+  }
+});
+
+function renderLog(){
+  if (!LOG_PERMITIDO) {
+    $('#logBody').innerHTML = '<tr><td colspan="3" class="empty">O log de auditoria é restrito ao administrador.</td></tr>';
+    return;
+  }
+  $('#logBody').innerHTML = LOG.map(l => `
+    <tr>
+      <td class="num">${fmtData(l.datahora)}</td>
+      <td><strong>${esc(l.usuario || '-')}</strong></td>
+      <td>${esc(l.acao || '-')}</td>
+    </tr>`).join('') || '<tr><td colspan="3" class="empty">Nenhum log registrado.</td></tr>';
+}
+
+document.addEventListener('click', async e=>{
+  const b = e.target.closest('[data-act]'); if(!b) return;
+  const id = Number(b.dataset.id), v = V.find(x=>x.id==id); if(!v) return;
+  if (b.dataset.act==='checkin') {
+    if (await mudarStatus(id, 'Em andamento')) { selecionado = id; toast(`Entrada do veículo ${v.placacavalo||'#'+id} registrada.`); }
+  }
+  if (b.dataset.act==='saida') {
+    if (await mudarStatus(id, 'Finalizado')) toast(`Carga #${id} finalizada.`);
+  }
+  if (b.dataset.act==='balanca') { selecionado = id; go('portaria', true); }
+});
+
+$('#agForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const placaCav = $('#aPlaca').value.toUpperCase().replace(/\s/g,'');
+  const novo = {
+    tipocarga: $('#aTipoCarga').value,
+    di: $('#aDi').value.trim(),
+    pedido: $('#aDi').value.trim(),
+    datahora: $('#aData').value,
+    cnpjcliente: $('#aCnpjCli').value.trim(),
+    cliente: $('#aCli').value,
+    cnpjtransportadora: $('#aCnpjTransp').value.trim(),
+    transportadora: $('#aTransp').value,
+    cpfmotorista: $('#aCpf').value.trim(),
+    motorista: $('#aMot').value.trim(),
+    placacavalo: placaCav,
+    placacarreta1: $('#aPlaca2').value.toUpperCase().trim(),
+    produto: $('#aProd').value,
+    quantidade: Number($('#aQtd').value) || 0,
+    status: 'Agendado'
+  };
+
+  const r = await chamar(`${API}/agendamentos`, 'POST', novo, 'Falha ao salvar agendamento.');
+  if (r) {
+    toast(`Agendamento #${r.id} salvo com sucesso!`);
+    $('#agForm').reset();
+    carregarDadosAPI();
+  }
+});
+
+$('#btnSair').addEventListener('click', ()=>{ localStorage.clear(); window.location.href = 'login.html'; });
+
+setInterval(()=>{ if (!document.hidden && !document.querySelector('.swal2-container')) carregarDadosAPI(); }, 30000);
+
+const start = (location.hash||'').slice(1);
+go(TITLES[start] ? start : 'patio', false);
+})();
+</script>
+</body>
+</html>

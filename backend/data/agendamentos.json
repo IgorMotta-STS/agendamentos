@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "tipoCarga": "Granel",
+    "di": "26/000000-1",
+    "pedido": "123456",
+    "cliente": "ADUBOS REAL",
+    "cnpjCliente": "07.170.124/0000-11",
+    "transportadora": "TRANSPANORAMA",
+    "cnpjTransportadora": "12.312.312/3131-11",
+    "motorista": "TESTE ",
+    "cpfMotorista": "123.456.789-10",
+    "placaCavalo": "ABC-1234",
+    "placaCarreta1": "DEF-5678",
+    "placaCarreta2": "",
+    "placaCarreta3": "",
+    "produto": "CLORETO DE POTASSIO",
+    "quantidade": "30000",
+    "dataHora": "2026-05-13T10:40",
+    "status": "Agendado",
+    "observacao": "",
+    "usuarioId": 2,
+    "usuarioNome": "igor mota",
+    "criadoEm": "2026-05-12T13:40:43.944Z"
+  }
+]

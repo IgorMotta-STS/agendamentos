@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Agendamentos</title>
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.6.0/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body class="bg-light">
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand d-flex align-items-center text-white" href="#">
+        <img src="assets/se7logo.png" alt="Logo SE7 Terminais" height="30" class="me-2" style="filter: brightness(0) invert(1);">
+        <span class="fw-bolder fs-4" style="letter-spacing: 1px;">SE7</span>
+        <span class="fw-normal ms-1 fs-5">Terminais</span>
+      </a>
+      
+      <div class="d-flex align-items-center gap-3">
+        <a href="perfil.html" id="nomeUsuario" class="text-white fw-semibold text-decoration-none btn btn-link"></a>
+        <!-- Botão ERP e Admin restritos a Administradores (ocultos por padrão) -->
+        <button id="btnErpDashboard" class="btn btn-outline-warning btn-sm fw-bold text-light d-none" onclick="window.location.href='erp.html'"><i class="bi bi-truck me-1"></i>ERP</button>
+        <button id="btnAdmin" class="btn btn-outline-light btn-sm d-none" onclick="window.location.href='admin.html'">Admin</button>
+        <button class="btn btn-danger btn-sm fw-bold" onclick="logout()"><i class="bi bi-box-arrow-right me-1"></i>Sair</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid px-4 py-4">
+    
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 bg-body p-3 rounded shadow-sm border">
+      <h4 class="mb-2 mb-md-0 fw-bold text-body">Meus Agendamentos</h4>
+      
+      <div class="d-flex flex-wrap gap-2 align-items-center">
+        <div class="input-group" style="max-width: 300px;">
+          <span class="input-group-text bg-transparent"><i class="bi bi-search"></i></span>
+          <input type="text" id="pesquisa" class="form-control" placeholder="Buscar placa, cliente, DI...">
+        </div>
+        
+        <button class="btn btn-outline-secondary" onclick="carregarAgendamentos()"><i class="bi bi-arrow-clockwise"></i></button>
+        <button class="btn btn-outline-danger fw-semibold" onclick="exportarPDF()"><i class="bi bi-file-earmark-pdf me-1"></i>Exportar PDF</button>
+        <button class="btn btn-primary fw-bold" onclick="abrirFormulario()"><i class="bi bi-plus-lg me-1"></i>Novo</button>
+      </div>
+    </div>
+
+    <div class="card border shadow-sm bg-body">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th class="ps-3">ID</th>
+                <th>Cliente</th>
+                <th>Transportadora</th>
+                <th>Placa Cavalo</th>
+                <th>Produto</th>
+                <th>Qtd</th>
+                <th>Status</th>
+                <th class="text-end pe-4">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyAgendamentos">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Formulario Agendamento -->
+  <div class="modal fade" id="modalAgendamento" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content bg-body">
+        <div class="modal-header border-bottom">
+          <h5 class="modal-title fw-bold text-primary" id="tituloFormulario">Novo Agendamento</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="formAgendamento">
+            <input type="hidden" id="agendamentoId">
+            
+            <div class="row g-3">
+              <div class="col-md-3">
+                <label class="form-label fw-semibold text-body-secondary">Tipo de Carga</label>
+                <select id="tipoCarga" class="form-select bg-body" required>
+                  <option value="">Selecione...</option>
+                  <option>Granel</option>
+                  <option>Bigbag 1000kg</option>
+                  <option>Bigbag 500kg</option>
+                  <option>Sacaria 50kg</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-semibold text-body-secondary">DI</label>
+                <input type="text" id="di" class="form-control bg-body mascara-di" placeholder="00/0000000-0" maxlength="12">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-semibold text-body-secondary">Pedido</label>
+                <input type="text" id="pedido" class="form-control bg-body">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-semibold text-body-secondary">Data/Hora Prevista</label>
+                <input type="datetime-local" id="dataHora" class="form-control bg-body">
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label fw-semibold text-body-secondary">CNPJ Cliente</label>
+                <input type="text" id="cnpjCliente" class="form-control bg-body mascara-cnpj" placeholder="00.000.000/0000-00" maxlength="18">
+              </div>
+              <div class="col-md-9">
+                <label class="form-label fw-semibold text-body-secondary">Nome do Cliente</label>
+                <input type="text" id="cliente" class="form-control bg-body" required>
+              </div>
+              <div class="col-md-12">
+                <label class="form-label fw-semibold text-body-secondary">Endereço do Cliente</label>
+                <input type="text" id="endereco" class="form-control bg-body" readonly placeholder="Preenchimento automático...">
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label fw-semibold text-body-secondary">CNPJ Transportadora</label>
+                <input type="text" id="cnpjTransportadora" class="form-control bg-body mascara-cnpj" maxlength="18">
+              </div>
+              <div class="col-md-9">
+                <label class="form-label fw-semibold text-body-secondary">Transportadora</label>
+                <input type="text" id="transportadora" class="form-control bg-body" required>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label fw-semibold text-body-secondary">CPF Motorista</label>
+                <input type="text" id="cpfMotorista" class="form-control bg-body mascara-cpf" maxlength="14">
+              </div>
+              <div class="col-md-9">
+                <label class="form-label fw-semibold text-body-secondary">Nome do Motorista</label>
+                <input type="text" id="motorista" class="form-control bg-body">
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label fw-semibold text-body-secondary">Placa Cavalo</label>
+                <input type="text" id="placaCavalo" class="form-control bg-body mascara-placa" maxlength="8">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-semibold text-body-secondary">Placa Carreta 1</label>
+                <input type="text" id="placaCarreta1" class="form-control bg-body mascara-placa" maxlength="8">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-semibold text-body-secondary">Placa Carreta 2</label>
+                <input type="text" id="placaCarreta2" class="form-control bg-body mascara-placa" maxlength="8">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-semibold text-body-secondary">Placa Carreta 3</label>
+                <input type="text" id="placaCarreta3" class="form-control bg-body mascara-placa" maxlength="8">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label fw-semibold text-body-secondary">Produto</label>
+                <input type="text" id="produto" class="form-control bg-body" required>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-semibold text-body-secondary">Qtd (Ton)</label>
+                <input type="number" id="quantidade" class="form-control bg-body" min="0" step="0.01">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-semibold text-body-secondary">Status</label>
+                <select id="status" class="form-select bg-body">
+                  <option>Agendado</option>
+                  <option>Em andamento</option>
+                  <option>Finalizado</option>
+                </select>
+              </div>
+
+              <div class="col-md-12">
+                <label class="form-label fw-semibold text-body-secondary">Observações</label>
+                <textarea id="observacao" class="form-control bg-body" rows="2"></textarea>
+              </div>
+            </div>
+            
+            <div class="mt-4 text-end border-top pt-3">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-success fw-bold px-4" id="btnSalvar">
+                <span class="spinner-border spinner-border-sm d-none me-1" id="spinnerSalvar" role="status"></span>
+                <span id="textoSalvar">Salvar Agendamento</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Visualizar -->
+  <div class="modal fade" id="modalVisualizar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-light border-bottom-0 pb-3">
+          <h5 class="modal-title fw-bold text-dark d-flex align-items-center">
+            <i class="bi bi-file-earmark-text text-primary me-2 fs-4"></i>
+            Detalhes da Carga <span id="visId" class="text-muted ms-2 fs-6 fw-normal"></span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4 bg-white">
+          
+          <div class="row g-4">
+            <div class="col-md-6">
+              <h6 class="fw-bold text-primary mb-3 border-bottom pb-2">Informações da Carga</h6>
+              <div class="mb-2"><small class="text-muted d-block">Status Atual</small> <span id="visStatus"></span></div>
+              <div class="mb-2"><small class="text-muted d-block">Produto & Quantidade</small> <span class="fw-semibold" id="visProduto"></span> - <span class="fw-semibold" id="visQtd"></span> Ton</div>
+              <div class="mb-2"><small class="text-muted d-block">Tipo / DI / Pedido</small> <span class="fw-semibold" id="visTipo"></span> | <span class="fw-semibold" id="visDi"></span> | <span class="fw-semibold" id="visPedido"></span></div>
+              <div class="mb-2"><small class="text-muted d-block">Data/Hora Prevista</small> <span class="fw-semibold" id="visData"></span></div>
+            </div>
+
+            <div class="col-md-6">
+              <h6 class="fw-bold text-primary mb-3 border-bottom pb-2">Cliente</h6>
+              <div class="mb-2"><small class="text-muted d-block">Razão Social</small> <span class="fw-semibold" id="visClienteNome"></span></div>
+              <div class="mb-2"><small class="text-muted d-block">CNPJ</small> <span class="fw-semibold" id="visClienteCnpj"></span></div>
+              <div class="mb-2"><small class="text-muted d-block">Endereço</small> <span class="fw-semibold" id="visClienteEnd"></span></div>
+            </div>
+
+            <div class="col-12">
+              <h6 class="fw-bold text-primary mb-3 border-bottom pb-2">Logística & Transporte</h6>
+              <div class="row">
+                <div class="col-md-6 mb-2"><small class="text-muted d-block">Transportadora (CNPJ)</small> <span class="fw-semibold" id="visTranspNome"></span> (<span id="visTranspCnpj"></span>)</div>
+                <div class="col-md-6 mb-2"><small class="text-muted d-block">Motorista (CPF)</small> <span class="fw-semibold" id="visMotNome"></span> (<span id="visMotCpf"></span>)</div>
+                <div class="col-12 mb-2"><small class="text-muted d-block">Placas (Cavalo / Carretas)</small> <span class="fw-semibold text-uppercase" id="visPlacas"></span></div>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="p-3 bg-light rounded border">
+                <small class="text-muted d-block mb-1"><i class="bi bi-info-circle me-1"></i>Observações</small>
+                <span class="fw-semibold fst-italic" id="visObs"></span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        
+        <div class="modal-footer border-top-0 bg-light justify-content-between">
+          <button type="button" class="btn btn-outline-danger fw-bold px-4" onclick="exportarDetalhesPDF()">
+            <i class="bi bi-file-earmark-pdf me-1"></i>Salvar PDF
+          </button>
+          <button type="button" class="btn btn-secondary fw-bold px-4" data-bs-dismiss="modal">Fechar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script src="utils.js"></script>
+
+  <script>
+    const API = 'https://se7-backend.onrender.com/api';
+    const token = localStorage.getItem('token');
+    let modalInstance;
+
+    if (!token) window.location.href = 'login.html';
+
+    window.onload = function () {
+      localStorage.removeItem('tema_se7');
+      modalInstance = new bootstrap.Modal(document.getElementById('modalAgendamento'));
+      carregarUsuario();
+      carregarAgendamentos();
+      aplicarEventos();
+    };
+
+    document.getElementById('pesquisa').addEventListener('keyup', function(e) {
+      const termo = e.target.value.toLowerCase();
+      const linhas = document.querySelectorAll('.linha-dado');
+      
+      linhas.forEach(linha => {
+        const textoDaLinha = linha.textContent.toLowerCase();
+        linha.style.display = textoDaLinha.includes(termo) ? '' : 'none';
+      });
+    });
+
+    function aplicarEventos() {
+      document.getElementById('formAgendamento').addEventListener('submit', salvarAgendamento);
+      document.getElementById('cnpjCliente').addEventListener('blur', buscarCNPJ);
+
+      document.querySelectorAll('.mascara-cnpj').forEach(el => el.addEventListener('input', mascaraCNPJ));
+      document.querySelectorAll('.mascara-cpf').forEach(el => el.addEventListener('input', mascaraCPF));
+      document.querySelectorAll('.mascara-placa').forEach(el => el.addEventListener('input', mascaraPlaca));
+      document.querySelectorAll('.mascara-di').forEach(el => el.addEventListener('input', mascaraDI));
+    }
+
+    function carregarUsuario() {
+      const payload = lerTokenSeguro(token);
+      
+      if (payload) {
+        document.getElementById('nomeUsuario').textContent = `${payload.nome} (${payload.perfil})`;
+        // Exibe os botões de Admin e ERP somente se o perfil for admin
+        if (payload.perfil === 'admin') {
+          document.getElementById('btnAdmin').classList.remove('d-none');
+          document.getElementById('btnErpDashboard').classList.remove('d-none');
+        }
+      }
+    }
+
+    function abrirFormulario() {
+      document.getElementById('formAgendamento').reset();
+      document.getElementById('agendamentoId').value = '';
+      document.getElementById('tituloFormulario').textContent = 'Novo Agendamento';
+      modalInstance.show();
+    }
+
+    async function carregarAgendamentos() {
+      try {
+        const res = await fetchAutenticado(`${API}/agendamentos`);
+        if (!res) return;
+        
+        let dados;
+        try {
+            dados = await res.json();
+            window.agendamentosCarregados = dados;
+        } catch(e) {
+            dados = null;
+        }
+
+        const tbody = document.getElementById('tbodyAgendamentos');
+
+        if (!res.ok || !dados || !Array.isArray(dados) || dados.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="8" class="text-center py-5">
+                <i class="bi bi-inbox text-body-tertiary" style="font-size: 3.5rem;"></i>
+                <h5 class="mt-3 text-body-secondary fw-bold">Nenhum agendamento encontrado</h5>
+                <p class="text-body-tertiary mb-0">Crie seu primeiro agendamento clicando no botão "Novo".</p>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        tbody.innerHTML = '';
+        dados.forEach(item => {
+          let corBadge = 'bg-info text-dark';
+          if (item.status === 'Finalizado') corBadge = 'bg-success';
+          if (item.status === 'Em andamento') corBadge = 'bg-warning text-dark';
+
+          tbody.innerHTML += `
+            <tr class="linha-dado">
+              <td class="ps-3 fw-bold text-body-secondary">#${item.id}</td>
+              <td class="fw-semibold">${item.cliente || '-'}</td>
+              <td>${item.transportadora || '-'}</td>
+              <td><span class="badge bg-secondary border">${item.placacavalo || '-'}</span></td>
+              <td>${item.produto || '-'}</td>
+              <td>${item.quantidade || '-'}</td>
+              <td><span class="badge ${corBadge}">${item.status || 'Agendado'}</span></td>
+              <td class="text-end pe-4 text-nowrap">
+                <button class="btn btn-sm btn-outline-info me-1" onclick='visualizarAgendamento(${JSON.stringify(item)})' title="Visualizar Detalhes"><i class="bi bi-eye"></i></button>
+                <button class="btn btn-sm btn-outline-primary me-1" onclick='editarAgendamento(${JSON.stringify(item)})' title="Editar"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-sm btn-outline-danger" onclick='excluirAgendamento("${item.id}")' title="Excluir"><i class="bi bi-trash"></i></button>
+              </td>
+            </tr>
+          `;
+        });
+      } catch (error) {
+        console.error("Erro real de comunicação:", error);
+        Swal.fire('Ops!', 'Não foi possível conectar ao servidor.', 'error');
+      }
+    }
+
+    function valor(id) { return document.getElementById(id).value; }
+
+    function obterDadosFormulario() {
+      return {
+        tipocarga: valor('tipoCarga'), 
+        di: valor('di'), 
+        pedido: valor('pedido'), 
+        datahora: valor('dataHora'),
+        cnpjcliente: valor('cnpjCliente'), 
+        cliente: valor('cliente'), 
+        endereco: valor('endereco'),
+        cnpjtransportadora: valor('cnpjTransportadora'), 
+        transportadora: valor('transportadora'),
+        cpfmotorista: valor('cpfMotorista'), 
+        motorista: valor('motorista'),
+        placacavalo: valor('placaCavalo'), 
+        placacarreta1: valor('placaCarreta1'),
+        placacarreta2: valor('placaCarreta2'), 
+        placacarreta3: valor('placaCarreta3'),
+        produto: valor('produto'), 
+        quantidade: valor('quantidade'), 
+        status: valor('status'),
+        observacao: valor('observacao')
+      };
+    }
+
+    async function salvarAgendamento(e) {
+      e.preventDefault();
+      
+      const btnSalvar = document.getElementById('btnSalvar');
+      const spinner = document.getElementById('spinnerSalvar');
+      const texto = document.getElementById('textoSalvar');
+      
+      btnSalvar.disabled = true;
+      spinner.classList.remove('d-none');
+      texto.textContent = 'Salvando...';
+
+      try {
+        const id = valor('agendamentoId');
+        const url = id ? `${API}/agendamentos/${id}` : `${API}/agendamentos`;
+        
+        const res = await fetchAutenticado(url, {
+          method: id ? 'PUT' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(obterDadosFormulario())
+        });
+
+        if (!res || !res.ok) throw new Error('Falha ao salvar no banco.');
+        
+        modalInstance.hide();
+        carregarAgendamentos();
+        
+        Swal.fire({
+          title: 'Sucesso!',
+          text: 'Agendamento salvo com segurança.',
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        });
+
+      } catch (error) {
+        Swal.fire('Ops!', 'Ocorreu um erro ao salvar o agendamento.', 'error');
+      } finally {
+        btnSalvar.disabled = false;
+        spinner.classList.add('d-none');
+        texto.textContent = 'Salvar Agendamento';
+      }
+    }
+
+    function visualizarAgendamento(item) {
+      window.itemVisualizacaoAtual = item;
+      
+      let corBadge = 'bg-info text-dark';
+      if (item.status === 'Finalizado') corBadge = 'bg-success';
+      if (item.status === 'Em andamento') corBadge = 'bg-warning text-dark';
+      
+      let dataFormatada = '-';
+      if (item.datahora) {
+        dataFormatada = new Date(item.datahora).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+      }
+
+      document.getElementById('visId').textContent = `#${item.id}`;
+      document.getElementById('visStatus').innerHTML = `<span class="badge ${corBadge} fs-6">${item.status || 'Agendado'}</span>`;
+      document.getElementById('visProduto').textContent = item.produto || '-';
+      document.getElementById('visQtd').textContent = item.quantidade || '-';
+      document.getElementById('visTipo').textContent = item.tipocarga || '-';
+      document.getElementById('visDi').textContent = item.di || '-';
+      document.getElementById('visPedido').textContent = item.pedido || '-';
+      document.getElementById('visData').textContent = dataFormatada;
+
+      document.getElementById('visClienteNome').textContent = item.cliente || '-';
+      document.getElementById('visClienteCnpj').textContent = item.cnpjcliente || '-';
+      document.getElementById('visClienteEnd').textContent = item.endereco || '-';
+
+      document.getElementById('visTranspNome').textContent = item.transportadora || '-';
+      document.getElementById('visTranspCnpj').textContent = item.cnpjtransportadora || '-';
+      document.getElementById('visMotNome').textContent = item.motorista || '-';
+      document.getElementById('visMotCpf').textContent = item.cpfmotorista || '-';
+
+      const placas = [item.placacavalo, item.placacarreta1, item.placacarreta2, item.placacarreta3].filter(Boolean);
+      document.getElementById('visPlacas').textContent = placas.length > 0 ? placas.join(' / ') : '-';
+
+      document.getElementById('visObs').textContent = item.observacao || 'Nenhuma observação registrada.';
+
+      const modalVis = new bootstrap.Modal(document.getElementById('modalVisualizar'));
+      modalVis.show();
+    }
+
+    function editarAgendamento(item) {
+      abrirFormulario();
+
+      document.getElementById('tipoCarga').value = item.tipocarga || '';
+      document.getElementById('di').value = item.di || '';
+      document.getElementById('pedido').value = item.pedido || '';
+      
+      if (item.datahora) {
+        document.getElementById('dataHora').value = item.datahora.substring(0, 16);
+      } else {
+        document.getElementById('dataHora').value = '';
+      }
+
+      document.getElementById('cnpjCliente').value = item.cnpjcliente || '';
+      document.getElementById('cliente').value = item.cliente || '';
+      document.getElementById('endereco').value = item.endereco || '';
+      
+      document.getElementById('cnpjTransportadora').value = item.cnpjtransportadora || '';
+      document.getElementById('transportadora').value = item.transportadora || '';
+      
+      document.getElementById('cpfMotorista').value = item.cpfmotorista || '';
+      document.getElementById('motorista').value = item.motorista || '';
+      
+      document.getElementById('placaCavalo').value = item.placacavalo || '';
+      document.getElementById('placaCarreta1').value = item.placacarreta1 || '';
+      document.getElementById('placaCarreta2').value = item.placacarreta2 || '';
+      document.getElementById('placaCarreta3').value = item.placacarreta3 || '';
+      
+      document.getElementById('produto').value = item.produto || '';
+      document.getElementById('quantidade').value = item.quantidade || '';
+      document.getElementById('status').value = item.status || 'Agendado';
+      document.getElementById('observacao').value = item.observacao || '';
+
+      document.getElementById('agendamentoId').value = item.id;
+      document.getElementById('tituloFormulario').textContent = 'Editar Agendamento';
+    }
+
+    async function excluirAgendamento(id) {
+      const confirmacao = await Swal.fire({
+        title: 'Tem certeza?',
+        text: "Esta ação apagará o agendamento do banco de dados!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sim, excluir!',
+        cancelButtonText: 'Cancelar'
+      });
+
+      if (confirmacao.isConfirmed) {
+        try {
+          const res = await fetchAutenticado(`${API}/agendamentos/${id}`, { method: 'DELETE' });
+          if (res && res.ok) {
+            carregarAgendamentos();
+            Swal.fire('Excluído!', 'O agendamento foi removido.', 'success');
+          }
+        } catch(e) {
+          Swal.fire('Erro!', 'Não foi possível excluir.', 'error');
+        }
+      }
+    }
+
+    async function exportarPDF() {
+      const agendamentos = window.agendamentosCarregados || [];
+
+      if (agendamentos.length === 0) {
+        Swal.fire('Atenção', 'Não há dados disponíveis para exportar no momento.', 'warning');
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF('l', 'mm', 'a4');
+
+      doc.setFillColor(0, 131, 203);
+      doc.rect(0, 0, 297, 24, 'F');
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(18);
+      doc.setTextColor(255, 255, 255);
+      doc.text("SE7 Terminais", 15, 16);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(12);
+      doc.text(" - Relatório de Agendamentos Operacionais", 60, 16);
+
+      const dataEmissao = new Date().toLocaleString('pt-BR');
+      doc.setFontSize(10);
+      doc.text(`Emitido em: ${dataEmissao}`, 230, 16);
+
+      const cabecalho = [['ID', 'Cliente / Razão Social', 'Transportadora', 'Placa Cavalo', 'Produto', 'Qtd', 'Status']];
+      
+      const linhas = agendamentos.map(item => [
+        `#${item.id}`,
+        item.cliente || '-',
+        item.transportadora || '-',
+        (item.placacavalo || '-').toUpperCase(),
+        item.produto || '-',
+        `${item.quantidade || '0'} Ton`,
+        item.status || 'Agendado'
+      ]);
+
+      doc.autoTable({
+        head: cabecalho,
+        body: linhas,
+        startY: 32,
+        theme: 'striped',
+        headStyles: { fillColor: [0, 131, 203], fontStyle: 'bold', halign: 'left' }, 
+        styles: { font: 'helvetica', fontSize: 9, cellPadding: 3.5 },
+        alternateRowStyles: { fillColor: [245, 247, 250] },
+        columnStyles: {
+          0: { cellWidth: 15 },  
+          1: { cellWidth: 65 },  
+          2: { cellWidth: 60 },  
+          3: { cellWidth: 30 },  
+          4: { cellWidth: 55 },  
+          5: { cellWidth: 20 },  
+          6: { cellWidth: 25 }   
+        }
+      });
+
+      const dataArquivo = new Date().toISOString().slice(0, 10);
+      doc.save(`SE7-Relatorio-Agendamentos-${dataArquivo}.pdf`);
+    }
+
+    function exportarDetalhesPDF() {
+      const item = window.itemVisualizacaoAtual;
+      if (!item) return;
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF('p', 'mm', 'a4'); 
+
+      doc.setFillColor(0, 131, 203);
+      doc.rect(0, 0, 210, 24, 'F');
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(18);
+      doc.setTextColor(255, 255, 255);
+      doc.text("SE7 Terminais", 15, 16);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(12);
+      doc.text(` - Ticket de Agendamento #${item.id}`, 60, 16);
+
+      let y = 35;
+      const addSectionTitle = (title) => {
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(12);
+        doc.setTextColor(0, 131, 203);
+        doc.text(title, 15, y);
+        doc.setDrawColor(200, 200, 200);
+        doc.line(15, y + 2, 195, y + 2); 
+        y += 8;
+        doc.setTextColor(40, 40, 40);
+        doc.setFontSize(10);
+      };
+
+      const addLine = (label, value, label2, value2) => {
+        doc.setFont("helvetica", "bold");
+        doc.text(`${label}:`, 15, y);
+        doc.setFont("helvetica", "normal");
+        doc.text(String(value || '-'), 45, y);
+        
+        if (label2) {
+          doc.setFont("helvetica", "bold");
+          doc.text(`${label2}:`, 110, y);
+          doc.setFont("helvetica", "normal");
+          doc.text(String(value2 || '-'), 140, y);
+        }
+        y += 7;
+      };
+
+      addSectionTitle("Informações da Carga");
+      let dataFormatada = '-';
+      if (item.datahora) {
+        dataFormatada = new Date(item.datahora).toLocaleString('pt-BR');
+      }
+      addLine("Status", item.status || 'Agendado', "Data Prevista", dataFormatada);
+      addLine("Produto", item.produto, "Quantidade", `${item.quantidade || '0'} Ton`);
+      addLine("Tipo Carga", item.tipocarga, "DI / Pedido", `${item.di || '-'} / ${item.pedido || '-'}`);
+      y += 5;
+
+      addSectionTitle("Cliente");
+      addLine("Razão Social", item.cliente);
+      addLine("CNPJ", item.cnpjcliente);
+      addLine("Endereço", item.endereco);
+      y += 5;
+
+      addSectionTitle("Logística e Transporte");
+      addLine("Transportadora", item.transportadora);
+      addLine("CNPJ Transp.", item.cnpjtransportadora);
+      addLine("Motorista", item.motorista);
+      addLine("CPF Motorista", item.cpfmotorista);
+      
+      const placas = [item.placacavalo, item.placacarreta1, item.placacarreta2, item.placacarreta3].filter(Boolean);
+      addLine("Placas", placas.length > 0 ? placas.join(' / ').toUpperCase() : '-');
+      y += 5;
+
+      addSectionTitle("Observações");
+      doc.setFont("helvetica", "italic");
+      doc.text(item.observacao || 'Nenhuma observação registrada.', 15, y, { maxWidth: 180 });
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(150, 150, 150);
+      doc.text(`Documento gerado eletronicamente em: ${new Date().toLocaleString('pt-BR')}`, 15, 285);
+
+      doc.save(`SE7-Comprovante-Carga-${item.id}.pdf`);
+    }
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = 'login.html';
+    }
+
+    async function buscarCNPJ(e) {
+      const cnpjInput = e.target.value.replace(/\D/g, '');
+      if (cnpjInput.length !== 14) return;
+
+      const campoCliente = document.getElementById('cliente');
+      const campoEndereco = document.getElementById('endereco');
+
+      campoCliente.value = "Consultando CNPJ...";
+      campoCliente.readOnly = true; 
+      
+      try {
+        const res = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${cnpjInput}`);
+        
+        if (!res.ok) {
+          throw new Error("CNPJ Inválido ou não encontrado");
+        }
+        
+        const data = await res.json();
+        
+        campoCliente.value = data.razao_social;
+        campoEndereco.value = `${data.logradouro || ''}, ${data.numero || ''} - ${data.municipio || ''}/${data.uf || ''}`.trim();
+        
+      } catch (error) {
+        campoCliente.value = "";
+        campoEndereco.value = "";
+        Swal.fire('Atenção', 'Não foi possível localizar este CNPJ.', 'warning');
+      } finally {
+        campoCliente.readOnly = false; 
+      }
+    }
+
+    function mascaraCNPJ(e) {
+      let v = e.target.value.replace(/\D/g, '').slice(0, 14);
+      v = v.replace(/^(\d{2})(\d)/, '$1.$2');
+      v = v.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+      v = v.replace(/\.(\d{3})(\d)/, '.$1/$2');
+      v = v.replace(/(\d{4})(\d)/, '$1-$2');
+      e.target.value = v;
+    }
+    function mascaraCPF(e) {
+      let v = e.target.value.replace(/\D/g, '').slice(0, 11);
+      v = v.replace(/^(\d{3})(\d)/, '$1.$2');
+      v = v.replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3');
+      v = v.replace(/\.(\d{3})(\d)/, '.$1-$2');
+      e.target.value = v;
+    }
+    function mascaraPlaca(e) {
+      let v = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 7);
+      if (v.length > 3) v = v.slice(0, 3) + '-' + v.slice(3);
+      e.target.value = v;
+    }
+    function mascaraDI(e) {
+      let v = e.target.value.replace(/\D/g, '').slice(0, 10);
+      v = v.replace(/^(\d{2})(\d)/, '$1/$2');
+      v = v.replace(/(\d{7})(\d)/, '$1-$2');
+      e.target.value = v;
+    }
+  </script>
+</body>
+</html>
