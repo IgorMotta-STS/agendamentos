@@ -22,7 +22,6 @@
   --r:10px; --shadow:0 1px 2px rgba(20,32,58,.06), 0 4px 14px rgba(20,32,58,.06);
 }
 
-/* ESCALA REAL DE FONTES NA RAIZ */
 html { font-size: 14px; }
 html.font-lg { font-size: 17px !important; }
 html.font-xl { font-size: 20px !important; }
@@ -253,21 +252,21 @@ tbody tr:hover td{background:var(--surface-2)}
   </main>
 </div>
 
-<div class="a11y-float">
+<div class="a11y-float" id="a11yContainer">
   <button class="a11y-btn" id="btnA11yToggle" title="Acessibilidade"><i class="bi bi-universal-access"></i></button>
   <div class="a11y-box" id="a11yBox" hidden>
     <h4>Acessibilidade</h4>
     <div><strong>Tema Visual</strong></div>
     <div class="a11y-row">
-      <button onclick="setTheme('light')">Claro</button>
-      <button onclick="setTheme('dark')">Escuro</button>
-      <button onclick="setTheme('contrast')">Alto Contraste</button>
+      <button type="button" onclick="setTheme('light')">Claro</button>
+      <button type="button" onclick="setTheme('dark')">Escuro</button>
+      <button type="button" onclick="setTheme('contrast')">Alto Contraste</button>
     </div>
     <div style="margin-top:6px"><strong>Tamanho da Fonte</strong></div>
     <div class="a11y-row">
-      <button onclick="setFont('sm')">Normal</button>
-      <button onclick="setFont('lg')">Grande</button>
-      <button onclick="setFont('xl')">Ex-Grande</button>
+      <button type="button" onclick="setFont('sm')">Normal</button>
+      <button type="button" onclick="setFont('lg')">Grande</button>
+      <button type="button" onclick="setFont('xl')">Ex-Grande</button>
     </div>
   </div>
 </div>
@@ -295,9 +294,19 @@ function setFont(size) {
   setFont(savedFont);
 })();
 
-document.getElementById('btnA11yToggle').addEventListener('click', () => {
-  const box = document.getElementById('a11yBox');
-  box.hidden = !box.hidden;
+// Controla abertura e fechamento automático ao clicar fora
+const btnToggle = document.getElementById('btnA11yToggle');
+const a11yBox = document.getElementById('a11yBox');
+
+btnToggle.addEventListener('click', (e) => {
+  e.stopPropagation();
+  a11yBox.hidden = !a11yBox.hidden;
+});
+
+document.addEventListener('click', (e) => {
+  if (!document.getElementById('a11yContainer').contains(e.target)) {
+    a11yBox.hidden = true;
+  }
 });
 
 (function(){
@@ -313,7 +322,7 @@ if (!token || !payload || (payload.exp && payload.exp * 1000 < Date.now())) {
 }
 
 const ADMIN = payload.perfil === 'admin';
-const OPER = payload.nome || 'Operador';
+const OPER = payload.nome || payload.email || 'Operador';
 $('#userName').textContent = OPER;
 $('#userRole').textContent = ADMIN ? 'Administrador' : 'Operador';
 $('#userAvatar').textContent = OPER.split(' ').filter(Boolean).map(n=>n[0]).join('').substring(0,2).toUpperCase();
@@ -328,7 +337,6 @@ const ETAPAS = {
   finalizado: { nome:'Finalizado', cor:'var(--st-finalizado)' }
 };
 const ORDEM = Object.keys(ETAPAS);
-const NO_PATIO = ['pesagem1','vistoria','nf','saida'];
 
 function etapa(v){
   if (v.status === 'Finalizado') return 'finalizado';
@@ -340,8 +348,6 @@ function etapa(v){
 }
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const kg = n => Number(n) > 0 ? Number(n).toLocaleString('pt-BR') + ' kg' : '—';
-const ton = n => (Number(n)||0).toLocaleString('pt-BR',{maximumFractionDigits:2});
 function fmtData(d){
   if (!d) return '—';
   const dt = new Date(d);
@@ -350,7 +356,7 @@ function fmtData(d){
 const pill = k => `<span class="pill" style="background:${ETAPAS[k].cor}">${ETAPAS[k].nome}</span>`;
 function toast(msg){const t=$('#toast');t.textContent=msg;t.hidden=false;clearTimeout(t.t);t.t=setTimeout(()=>t.hidden=true,3600);}
 
-let V = [], LOG = [], CADASTROS = [], view = 'patio', filtroEtapa = null, selecionado = null;
+let V = [], LOG = [], CADASTROS = [], view = 'patio';
 
 const TITLES = { patio:'Painel do Pátio', agendamento:'Agendamento de Cargas', portaria:'Portaria & Balança', indicadores:'Dashboard Gerencial', relatorios:'Relatórios Operacionais', capacidade:'Gestão de Capacidade', cadastros:'Cadastros Base', auditoria:'Log de Movimentação' };
 
@@ -391,7 +397,7 @@ function render(){
   if ($('#aProd')) $('#aProd').innerHTML = (prods.length ? prods : ['PRODUTO A']).map(x=>`<option>${esc(x)}</option>`).join('');
   if ($('#aTransp')) $('#aTransp').innerHTML = (transps.length ? transps : ['TRANSPORTE A']).map(x=>`<option>${esc(x)}</option>`).join('');
 
-  if(view==='patial' || view==='patio'){
+  if(view==='patio'){
     const base = V;
     $('#yard').innerHTML = ORDEM.map(k=>`<button type="button" class="st" data-etapa="${k}" style="background:${ETAPAS[k].cor}"><h3>${ETAPAS[k].nome}</h3><div class="count"><b>${base.filter(v=>etapa(v)===k).length}</b></div></button>`).join('');
     $('#thead').innerHTML = '<tr><th>ID</th><th>Placa</th><th>Cliente</th><th>Produto</th><th>Status</th></tr>';
@@ -401,17 +407,11 @@ function render(){
     $('#tbodyRelatorio').innerHTML = V.map(v=>`<tr><td>#${v.id}</td><td>${fmtData(v.datahora)}</td><td>${esc(v.placacavalo)}</td><td>${esc(v.cliente)}</td><td>${esc(v.produto)}</td><td>${pill(etapa(v))}</td></tr>`).join('');
   }
   if(view==='auditoria'){
-    $('#logBody').innerHTML = LOG.map(l=>`<tr><td>${fmtData(l.datahora)}</td><td><b>${esc(l.usuario)}</b></td><td>${esc(l.acao)}</td></tr>`).join('') || '<tr><td colspan="3">Sem logs</td></tr>';
+    $('#logBody').innerHTML = LOG.map(l=>`<tr><td>${fmtData(l.datahora)}</td><td><b>${esc(l.usuario || 'Operador')}</b></td><td>${esc(l.acao)}</td></tr>`).join('') || '<tr><td colspan="3">Sem logs</td></tr>';
   }
 }
 
-$('#yard')?.addEventListener('click', e=>{
-  const b = e.target.closest('[data-etapa]'); if(!b) return;
-  filtroEtapa = filtroEtapa===b.dataset.etapa ? null : b.dataset.etapa;
-  render();
-});
-
-$('#agForm').addEventListener('submit', async e=>{
+$('#agForm')?.addEventListener('submit', async e=>{
   e.preventDefault();
   const novo = {
     tipocarga: $('#aTipoCarga').value, datahora: $('#aData').value, cliente: $('#aCli').value,
