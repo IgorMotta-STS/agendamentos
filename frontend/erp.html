@@ -294,17 +294,18 @@ function setFont(size) {
   setFont(savedFont);
 })();
 
-// Controla abertura e fechamento automático ao clicar fora
+// Controla abertura e fechamento com clique global fora
 const btnToggle = document.getElementById('btnA11yToggle');
 const a11yBox = document.getElementById('a11yBox');
+const a11yContainer = document.getElementById('a11yContainer');
 
 btnToggle.addEventListener('click', (e) => {
   e.stopPropagation();
   a11yBox.hidden = !a11yBox.hidden;
 });
 
-document.addEventListener('click', (e) => {
-  if (!document.getElementById('a11yContainer').contains(e.target)) {
+window.addEventListener('click', (e) => {
+  if (a11yContainer && !a11yContainer.contains(e.target)) {
     a11yBox.hidden = true;
   }
 });
