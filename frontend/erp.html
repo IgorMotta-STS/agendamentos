@@ -27,18 +27,12 @@
   --side:#0a0f1a; --side-fg:#9aa6bb; --side-active:#ffffff;
   --ok:#4cc38a; --warn:#e2b44a; --bad:#f07178; --ok-soft:#173527; --bad-soft:#3a1d22; --warn-soft:#352b14;
   --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark }}
-:root[data-theme="dark"]{
-  --bg:#0f1420; --surface:#18202f; --surface-2:#1e2738; --line:#2b3549;
-  --fg:#e6ebf4; --muted:#9aa6bb; --accent:#0d6efd; --accent-fg:#ffffff; --accent-soft:#1a2c4e;
-  --side:#0a0f1a; --side-fg:#9aa6bb; --side-active:#ffffff;
-  --ok:#4cc38a; --warn:#e2b44a; --bad:#f07178; --ok-soft:#173527; --bad-soft:#3a1d22; --warn-soft:#352b14;
-  --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark }
 
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:14px;line-height:1.5;font-weight:400;margin:0}
 h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0;line-height:1.2}
 button,input,select{font:inherit;color:inherit}
-:focus-visible{outline:3px solid #0d6efd;outline-offset:2px;border-radius:4px}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:4px}
 .skip{position:absolute;left:-999px;top:8px;background:var(--accent);color:var(--accent-fg);padding:8px 14px;border-radius:6px;z-index:50}
 .skip:focus{left:8px}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -150,9 +144,6 @@ tbody tr:hover td{background:var(--surface-2)}
 .ticket h3{font-family:var(--font-mono);font-size:13px;text-align:center;border-bottom:1px dashed var(--muted);padding-bottom:6px;margin-bottom:6px}
 .ticket .r{display:flex;justify-content:space-between;gap:10px}
 .notice{border-radius:8px;padding:10px 12px;font-size:13px}
-.notice.bad{background:var(--bad-soft);color:var(--bad)}
-.notice.ok{background:var(--ok-soft);color:var(--ok)}
-.notice.warn{background:var(--warn-soft);color:var(--warn)}
 
 .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
 .kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow)}
@@ -167,12 +158,11 @@ tbody tr:hover td{background:var(--surface-2)}
 .d-none{display:none!important}
 .st[data-etapa]{min-height:104px}
 @media print{body *{visibility:hidden}#relatorioPrint,#relatorioPrint *,#ticket,#ticket *{visibility:visible}#relatorioPrint,#ticket{position:absolute;left:0;top:0;width:100%;border:0}}
-@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
 
-<a class="skip" href="#conteudo">Pular para o conteúdo</a>
+<a class="skip" href="#conteudo">Pular para o conteúdo principal</a>
 <div class="app">
   <aside class="side" aria-label="Menu principal">
     <div class="brand">
@@ -180,17 +170,17 @@ tbody tr:hover td{background:var(--surface-2)}
       <div><b>SE7 Terminais</b><small>ERP Logístico</small></div>
     </div>
     
-    <nav class="nav" id="nav">
+    <nav class="nav" id="nav" aria-label="Navegação do ERP">
       <div class="nav-label">Operações</div>
-      <button data-view="patio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Painel do Pátio</button>
-      <button data-view="agendamento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Agendamento</button>
-      <button data-view="portaria"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18M5 7h14M5 7l-3 7h6zM19 7l-3 7h6zM8 21h8"/></svg>Portaria &amp; Balança</button>
+      <button data-view="patio" accesskey="1" title="Atalho: Alt + 1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Painel do Pátio (Alt+1)</button>
+      <button data-view="agendamento" accesskey="2" title="Atalho: Alt + 2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Agendamento (Alt+2)</button>
+      <button data-view="portaria" accesskey="3" title="Atalho: Alt + 3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v18M5 7h14M5 7l-3 7h6zM19 7l-3 7h6zM8 21h8"/></svg>Portaria &amp; Balança (Alt+3)</button>
       <div class="nav-label">Gestão</div>
-      <button data-view="indicadores"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Indicadores</button>
-      <button data-view="relatorios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Relatórios</button>
-      <button data-view="capacidade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>Capacidade &amp; Janelas</button>
-      <button data-view="cadastros"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Cadastros Base</button>
-      <button data-view="auditoria"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Log de Movimentação</button>
+      <button data-view="indicadores"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Indicadores</button>
+      <button data-view="relatorios" accesskey="4" title="Atalho: Alt + 4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Relatórios (Alt+4)</button>
+      <button data-view="capacidade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>Capacidade &amp; Janelas</button>
+      <button data-view="cadastros"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Cadastros Base</button>
+      <button data-view="auditoria"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Log de Movimentação</button>
     </nav>
 
     <div class="side-foot">
@@ -199,29 +189,29 @@ tbody tr:hover td{background:var(--surface-2)}
         <div style="min-width:0"><div style="color:#fff;font-weight:500;text-overflow:ellipsis;overflow:hidden" id="userName">Usuário</div><div style="font-size:11px;color:var(--side-fg)" id="userRole">Operador</div></div>
       </div>
       <div class="sys-nav">
-        <a href="dashboard.html"><i class="bi bi-arrow-left"></i> Painel</a>
-        <a href="admin.html" id="linkAdmin" class="d-none"><i class="bi bi-shield-lock"></i> Admin</a>
-        <button type="button" id="btnSair" style="margin-left:auto"><i class="bi bi-box-arrow-right"></i> Sair</button>
+        <a href="dashboard.html" aria-label="Voltar ao Painel Geral"><i class="bi bi-arrow-left"></i> Painel</a>
+        <a href="admin.html" id="linkAdmin" class="d-none" aria-label="Painel Administrativo"><i class="bi bi-shield-lock"></i> Admin</a>
+        <button type="button" id="btnSair" aria-label="Encerrar sessão"><i class="bi bi-box-arrow-right"></i> Sair</button>
       </div>
     </div>
   </aside>
 
   <main id="conteudo" tabindex="-1">
-    <div class="page-head"><h1 id="pageTitle">Painel do Pátio</h1><div class="crumb" id="crumb"></div></div>
+    <div class="page-head"><h1 id="pageTitle">Painel do Pátio</h1><div class="crumb" id="crumb" aria-label="Caminho atual"></div></div>
 
     <!-- ============ PAINEL DO PÁTIO ============ -->
     <section data-sec="patio" aria-labelledby="pageTitle">
       <div style="display:flex;flex-direction:column;gap:18px">
-        <form class="panel filters" id="filtros">
+        <form class="panel filters" id="filtros" aria-label="Filtros do pátio">
           <div class="field inline"><label for="fDe">De</label><input class="input" type="date" id="fDe"></div>
           <div class="field inline"><label for="fAte">Até</label><input class="input" type="date" id="fAte"></div>
           <div class="field inline"><label for="fCli">Cliente</label><select class="input" id="fCli"></select></div>
           <div class="field inline"><label for="fProd">Produto</label><select class="input" id="fProd"></select></div>
         </form>
-        <div class="yard" id="yard"></div>
+        <div class="yard" id="yard" aria-label="Resumo operacional do pátio"></div>
         <div class="panel">
           <h2 id="tblTitle">Todas as cargas</h2>
-          <div class="table-wrap"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
+          <div class="table-wrap"><table aria-describedby="tblTitle"><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
         </div>
       </div>
     </section>
@@ -256,7 +246,7 @@ tbody tr:hover td{background:var(--surface-2)}
         <div style="display:flex;flex-direction:column;gap:18px;min-width:0">
           <div class="panel">
             <h2>Agendamentos Recentes</h2>
-            <div class="list" id="agList"></div>
+            <div class="list" id="agList" aria-live="polite"></div>
           </div>
         </div>
       </div>
@@ -281,7 +271,7 @@ tbody tr:hover td{background:var(--surface-2)}
         <div class="panel" style="display:flex;flex-direction:column;gap:14px;min-width:0">
           <h2 style="margin:0">Balança Rodoviária</h2>
           <p class="panel-sub" style="margin:0">Selecione um veículo no pátio para registrar a pesagem.</p>
-          <div class="scale-pick" id="bFila" role="group"></div>
+          <div class="scale-pick" id="bFila" role="group" aria-label="Fila da balança"></div>
           <div id="bDetalhe"></div>
         </div>
       </div>
@@ -298,7 +288,7 @@ tbody tr:hover td{background:var(--surface-2)}
       </div>
     </section>
 
-    <!-- ============ RELATÓRIOS (NOVO) ============ -->
+    <!-- ============ RELATÓRIOS ============ -->
     <section data-sec="relatorios" hidden>
       <div class="panel" id="relatorioPrint">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
@@ -314,17 +304,7 @@ tbody tr:hover td{background:var(--surface-2)}
         <div class="table-wrap">
           <table>
             <thead>
-              <tr>
-                <th>ID</th>
-                <th>Data</th>
-                <th>Placa</th>
-                <th>Cliente</th>
-                <th>Produto</th>
-                <th>Tara (kg)</th>
-                <th>Bruto (kg)</th>
-                <th>Líquido (t)</th>
-                <th>Status</th>
-              </tr>
+              <tr><th>ID</th><th>Data</th><th>Placa</th><th>Cliente</th><th>Produto</th><th>Tara (kg)</th><th>Bruto (kg)</th><th>Líquido (t)</th><th>Status</th></tr>
             </thead>
             <tbody id="tbodyRelatorio"></tbody>
           </table>
@@ -332,40 +312,24 @@ tbody tr:hover td{background:var(--surface-2)}
       </div>
     </section>
 
-    <!-- ============ CAPACIDADE & JANELAS (NOVO) ============ -->
+    <!-- ============ CAPACIDADE & JANELAS ============ -->
     <section data-sec="capacidade" hidden>
       <div class="split">
         <form class="panel" id="formCapacidade">
           <h2>Gestão de Capacidade &amp; Regras</h2>
           <p class="panel-sub">Ajuste os limites de agendamentos por janela e pátio em tempo real.</p>
           <div class="form-grid">
-            <div class="field">
-              <label for="cLimiteJanela">Limite por Janela (Veículos / Hora)</label>
-              <input class="input num" type="number" id="cLimiteJanela" min="1" max="20" required>
-            </div>
-            <div class="field">
-              <label for="cCapacidadePatio">Capacidade Máxima do Pátio (Vagas)</label>
-              <input class="input num" type="number" id="cCapacidadePatio" min="1" max="100" required>
-            </div>
-            <div class="field full">
-              <label class="field inline" style="cursor:pointer">
-                <input type="checkbox" id="cBloqueioEmergencia" style="width:18px;height:18px">
-                <b style="color:var(--bad)">Bloqueio de Emergência / Manutenção (Impedir novos agendamentos)</b>
-              </label>
-            </div>
-            <div class="full" style="text-align:right">
-              <button type="submit" class="btn ok">Salvar Regras de Operação</button>
-            </div>
+            <div class="field"><label for="cLimiteJanela">Limite por Janela (Veículos / Hora)</label><input class="input num" type="number" id="cLimiteJanela" min="1" max="20" required></div>
+            <div class="field"><label for="cCapacidadePatio">Capacidade Máxima do Pátio (Vagas)</label><input class="input num" type="number" id="cCapacidadePatio" min="1" max="100" required></div>
+            <div class="field full"><label class="field inline" style="cursor:pointer"><input type="checkbox" id="cBloqueioEmergencia" style="width:18px;height:18px"><b style="color:var(--bad)">Bloqueio de Emergência / Manutenção (Impedir novos agendamentos)</b></label></div>
+            <div class="full" style="text-align:right"><button type="submit" class="btn ok">Salvar Regras de Operação</button></div>
           </div>
         </form>
-        <div class="panel">
-          <h2>Status Operacional Atual</h2>
-          <div class="list" id="statusCapacidade"></div>
-        </div>
+        <div class="panel"><h2>Status Operacional Atual</h2><div class="list" id="statusCapacidade"></div></div>
       </div>
     </section>
 
-    <!-- ============ CADASTROS BASE (NOVO) ============ -->
+    <!-- ============ CADASTROS BASE ============ -->
     <section data-sec="cadastros" hidden>
       <div class="split">
         <form class="panel" id="formNovoCadastro">
@@ -375,9 +339,7 @@ tbody tr:hover td{background:var(--surface-2)}
             <div class="field"><label for="cadTipo">Tipo de Registro</label><select class="input" id="cadTipo"><option value="cliente">Cliente</option><option value="produto">Produto</option><option value="transportadora">Transportadora</option></select></div>
             <div class="field"><label for="cadNome">Nome / Razão Social</label><input class="input" id="cadNome" required placeholder="Ex.: Fertilizantes do Brasil SA"></div>
             <div class="field full"><label for="cadDoc">Documento (CNPJ / Código)</label><input class="input" id="cadDoc" placeholder="Ex.: 00.000.000/0001-00"></div>
-            <div class="full" style="text-align:right">
-              <button type="submit" class="btn">Cadastrar Item</button>
-            </div>
+            <div class="full" style="text-align:right"><button type="submit" class="btn">Cadastrar Item</button></div>
           </div>
         </form>
         <div class="panel">
