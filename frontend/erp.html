@@ -126,9 +126,10 @@ tbody tr:hover td{background:var(--surface-2)}
 .d-none{display:none!important}
 .toast{position:fixed;right:18px;bottom:18px;background:var(--side);color:#fff;padding:12px 16px;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:40;border-left:4px solid #4cc38a}
 
-/* PAINEL FLUTUANTE DE ACESSIBILIDADE */
+/* WIDGET DE ACESSIBILIDADE NATIVO (DETAILS) */
 .a11y-float { position: fixed; bottom: 20px; right: 20px; z-index: 999; }
-.a11y-btn { width: 48px; height: 48px; border-radius: 50%; background: var(--accent); color: #fff; border: 0; font-size: 22px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: grid; place-items: center; }
+.a11y-float summary::-webkit-details-marker { display: none; }
+.a11y-btn { width: 48px; height: 48px; border-radius: 50%; background: var(--accent); color: #fff; border: 0; font-size: 22px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: grid; place-items: center; list-style: none; }
 .a11y-box { position: absolute; bottom: 60px; right: 0; width: 260px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; }
 .a11y-box h4 { margin: 0; font-size: 1rem; border-bottom: 1px solid var(--line); padding-bottom: 6px; }
 .a11y-row { display: flex; gap: 6px; }
@@ -252,9 +253,10 @@ tbody tr:hover td{background:var(--surface-2)}
   </main>
 </div>
 
-<div class="a11y-float" id="a11yContainer">
-  <button class="a11y-btn" id="btnA11yToggle" title="Acessibilidade"><i class="bi bi-universal-access"></i></button>
-  <div class="a11y-box" id="a11yBox" hidden>
+<!-- WIDGET DE ACESSIBILIDADE NATIVO (DETAILS) -->
+<details class="a11y-float">
+  <summary class="a11y-btn" title="Acessibilidade"><i class="bi bi-universal-access"></i></summary>
+  <div class="a11y-box">
     <h4>Acessibilidade</h4>
     <div><strong>Tema Visual</strong></div>
     <div class="a11y-row">
@@ -269,7 +271,7 @@ tbody tr:hover td{background:var(--surface-2)}
       <button type="button" onclick="setFont('xl')">Ex-Grande</button>
     </div>
   </div>
-</div>
+</details>
 
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
@@ -293,22 +295,6 @@ function setFont(size) {
   setTheme(savedTheme);
   setFont(savedFont);
 })();
-
-// Controla abertura e fechamento com clique global fora
-const btnToggle = document.getElementById('btnA11yToggle');
-const a11yBox = document.getElementById('a11yBox');
-const a11yContainer = document.getElementById('a11yContainer');
-
-btnToggle.addEventListener('click', (e) => {
-  e.stopPropagation();
-  a11yBox.hidden = !a11yBox.hidden;
-});
-
-window.addEventListener('click', (e) => {
-  if (a11yContainer && !a11yContainer.contains(e.target)) {
-    a11yBox.hidden = true;
-  }
-});
 
 (function(){
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
