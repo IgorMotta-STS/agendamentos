@@ -20,31 +20,39 @@
   --font-display:"Lexend", system-ui, sans-serif; --font-body:"Lexend", system-ui, sans-serif;
   --font-mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
   --r:10px; --shadow:0 1px 2px rgba(20,32,58,.06), 0 4px 14px rgba(20,32,58,.06);
-  --base-font-size: 14px;
 }
 
-/* MODO ALTO CONTRASTE EXPLICITO */
-[data-theme="high-contrast"] {
-  --bg: #000000;
-  --surface: #0a0a0a;
-  --surface-2: #161616;
-  --line: #ffffff;
-  --fg: #ffffff;
-  --muted: #ffff80;
-  --accent: #ffff00;
-  --accent-fg: #000000;
-  --accent-soft: #333300;
-  --side: #000000;
-  --side-fg: #ffffff;
-  --side-active: #ffff00;
-  --ok: #00ff00;
-  --warn: #ffff00;
-  --bad: #ff0000;
-  --shadow: 0 0 0 2px #ffffff;
+/* TEMA CLARO FORÇADO */
+html[data-theme="light"] {
+  --bg:#eef1f6; --surface:#ffffff; --surface-2:#f6f8fb; --line:#dfe4ec;
+  --fg:#1d2433; --muted:#5b6578; --accent:#0d6efd; --accent-fg:#ffffff; --accent-soft:#e7f1ff;
+  --side:#14203a; --side-fg:#c9d3e6; --side-active:#ffffff;
+  color-scheme: light;
 }
+
+/* TEMA ESCURO FORÇADO */
+html[data-theme="dark"] {
+  --bg:#0f1420; --surface:#18202f; --surface-2:#1e2738; --line:#2b3549;
+  --fg:#e6ebf4; --muted:#9aa6bb; --accent:#0d6efd; --accent-fg:#ffffff; --accent-soft:#1a2c4e;
+  --side:#0a0f1a; --side-fg:#9aa6bb; --side-active:#ffffff;
+  --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme: dark;
+}
+
+/* TEMA ALTO CONTRASTE (AMARELO E PRETO) */
+html[data-theme="contrast"] {
+  --bg:#000000; --surface:#000000; --surface-2:#111111; --line:#ffff00;
+  --fg:#ffff00; --muted:#ffffff; --accent:#ffff00; --accent-fg:#000000; --accent-soft:#222200;
+  --side:#000000; --side-fg:#ffffff; --side-active:#ffff00;
+  --ok:#00ff00; --warn:#ffff00; --bad:#ff0000;
+  color-scheme: dark;
+}
+
+/* NÍVEIS DE FONTE */
+html.font-lg body { font-size: 16px !important; }
+html.font-xl body { font-size: 18px !important; }
 
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:var(--base-font-size);line-height:1.5;font-weight:400;margin:0}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:14px;line-height:1.5;font-weight:400;margin:0;transition: background 0.2s, color 0.2s;}
 h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0;line-height:1.2}
 button,input,select{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:4px}
@@ -161,24 +169,24 @@ tbody tr:hover td{background:var(--surface-2)}
 .charts{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:18px}
 
 .d-none{display:none!important}
-.st[data-etapa]{min-height:104px}
+.toast{position:fixed;right:18px;bottom:18px;background:var(--side);color:#fff;padding:12px 16px;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:340px;font-size:13.5px;z-index:40;border-left:4px solid #4cc38a}
 
-/* MODAL / PAINEL DE ACESSIBILIDADE */
-.a11y-modal-backdrop{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,.5);z-index:100;display:grid;place-items:center;padding:20px}
-.a11y-card{background:var(--surface);border:2px solid var(--accent);border-radius:12px;width:100%;max-width:440px;padding:22px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:16px}
-.a11y-card h2{font-size:18px;display:flex;align-items:center;gap:8px;margin:0}
-.a11y-opt{display:flex;flex-direction:column;gap:8px;border-bottom:1px solid var(--line);padding-bottom:14px}
-.a11y-opt label{font-weight:600;font-size:13.5px}
-.a11y-btn-group{display:flex;gap:8px}
-.a11y-btn-group button{flex:1;padding:8px;border-radius:6px;border:1px solid var(--line);background:var(--surface-2);cursor:pointer}
-.a11y-btn-group button.active{background:var(--accent);color:var(--accent-fg);border-color:var(--accent);font-weight:600}
+/* PAINEL FLUTUANTE DE ACESSIBILIDADE */
+.a11y-float { position: fixed; bottom: 20px; right: 20px; z-index: 999; }
+.a11y-btn { width: 48px; height: 48px; border-radius: 50%; background: var(--accent); color: #fff; border: 0; font-size: 22px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: grid; place-items: center; }
+.a11y-box { position: absolute; bottom: 60px; right: 0; width: 260px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; }
+.a11y-box h4 { margin: 0; font-size: 14px; border-bottom: 1px solid var(--line); padding-bottom: 6px; }
+.a11y-row { display: flex; gap: 6px; }
+.a11y-row button { flex: 1; padding: 6px; font-size: 12px; border: 1px solid var(--line); background: var(--surface-2); border-radius: 6px; cursor: pointer; }
+.a11y-row button:hover { background: var(--accent-soft); }
 
-@media print{body *{visibility:hidden}#relatorioPrint,#relatorioPrint *{visibility:visible}#relatorioPrint{position:absolute;left:0;top:0;width:100%;border:0}}
+@media print{body *{visibility:hidden}#relatorioPrint,#relatorioPrint *,#ticket,#ticket *{visibility:visible}#relatorioPrint,#ticket{position:absolute;left:0;top:0;width:100%;border:0}}
 </style>
 </head>
 <body>
 
 <a class="skip" href="#conteudo">Pular para o conteúdo principal</a>
+
 <div class="app">
   <aside class="side" aria-label="Menu principal">
     <div class="brand">
@@ -188,22 +196,18 @@ tbody tr:hover td{background:var(--surface-2)}
     
     <nav class="nav" id="nav" aria-label="Navegação do ERP">
       <div class="nav-label">Operações</div>
-      <button data-view="patio" accesskey="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Painel do Pátio</button>
-      <button data-view="agendamento" accesskey="2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Agendamento</button>
-      <button data-view="portaria" accesskey="3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v18M5 7h14M5 7l-3 7h6zM19 7l-3 7h6zM8 21h8"/></svg>Portaria &amp; Balança</button>
+      <button data-view="patio" accesskey="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Painel do Pátio</button>
+      <button data-view="agendamento" accesskey="2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Agendamento</button>
+      <button data-view="portaria" accesskey="3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18M5 7h14M5 7l-3 7h6zM19 7l-3 7h6zM8 21h8"/></svg>Portaria &amp; Balança</button>
       <div class="nav-label">Gestão</div>
-      <button data-view="indicadores"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Indicadores</button>
-      <button data-view="relatorios" accesskey="4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Relatórios</button>
-      <button data-view="capacidade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>Capacidade &amp; Janelas</button>
-      <button data-view="cadastros"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Cadastros Base</button>
-      <button data-view="auditoria"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Log de Movimentação</button>
+      <button data-view="indicadores"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Indicadores</button>
+      <button data-view="relatorios" accesskey="4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Relatórios</button>
+      <button data-view="capacidade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>Capacidade &amp; Janelas</button>
+      <button data-view="cadastros"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Cadastros Base</button>
+      <button data-view="auditoria"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Log de Movimentação</button>
     </nav>
 
     <div class="side-foot">
-      <button type="button" id="btnA11yModal" style="all:unset;cursor:pointer;background:rgba(255,255,255,.1);color:#fff;padding:8px;border-radius:6px;text-align:center;font-weight:500;display:flex;align-items:center;justify-content:center;gap:8px">
-        <i class="bi bi-universal-access" style="font-size:16px"></i> Acessibilidade
-      </button>
-
       <div class="user-box">
         <div class="avatar" id="userAvatar" aria-hidden="true">US</div>
         <div style="min-width:0"><div style="color:#fff;font-weight:500;text-overflow:ellipsis;overflow:hidden" id="userName">Usuário</div><div style="font-size:11px;color:var(--side-fg)" id="userRole">Operador</div></div>
@@ -211,7 +215,7 @@ tbody tr:hover td{background:var(--surface-2)}
       <div class="sys-nav">
         <a href="dashboard.html"><i class="bi bi-arrow-left"></i> Painel</a>
         <a href="admin.html" id="linkAdmin" class="d-none"><i class="bi bi-shield-lock"></i> Admin</a>
-        <button type="button" id="btnSair"><i class="bi bi-box-arrow-right"></i> Sair</button>
+        <button type="button" id="btnSair" style="margin-left:auto"><i class="bi bi-box-arrow-right"></i> Sair</button>
       </div>
     </div>
   </aside>
@@ -220,7 +224,7 @@ tbody tr:hover td{background:var(--surface-2)}
     <div class="page-head"><h1 id="pageTitle">Painel do Pátio</h1><div class="crumb" id="crumb"></div></div>
 
     <!-- ============ PAINEL DO PÁTIO ============ -->
-    <section data-sec="patio">
+    <section data-sec="patio" aria-labelledby="pageTitle">
       <div style="display:flex;flex-direction:column;gap:18px">
         <form class="panel filters" id="filtros">
           <div class="field inline"><label for="fDe">De</label><input class="input" type="date" id="fDe"></div>
@@ -231,7 +235,7 @@ tbody tr:hover td{background:var(--surface-2)}
         <div class="yard" id="yard"></div>
         <div class="panel">
           <h2 id="tblTitle">Todas as cargas</h2>
-          <div class="table-wrap"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
+          <div class="table-wrap"><table aria-describedby="tblTitle"><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
         </div>
       </div>
     </section>
@@ -385,40 +389,22 @@ tbody tr:hover td{background:var(--surface-2)}
   </main>
 </div>
 
-<!-- MODAL DE ACESSIBILIDADE -->
-<div class="a11y-modal-backdrop d-none" id="a11yModal">
-  <div class="a11y-card" role="dialog" aria-labelledby="a11yTitle">
-    <h2 id="a11yTitle"><i class="bi bi-universal-access"></i> Acessibilidade &amp; Visão</h2>
-    
-    <div class="a11y-opt">
-      <label>Modo de Visão / Contraste</label>
-      <div class="a11y-btn-group">
-        <button type="button" id="btnThemeDefault" class="active">Padrão</button>
-        <button type="button" id="btnThemeHighContrast">Alto Contraste</button>
-      </div>
+<!-- WIDGET FLUTUANTE DE ACESSIBILIDADE -->
+<div class="a11y-float">
+  <button class="a11y-btn" id="btnA11yToggle" title="Acessibilidade"><i class="bi bi-universal-access"></i></button>
+  <div class="a11y-box" id="a11yBox" hidden>
+    <h4>Acessibilidade</h4>
+    <div><strong>Tema Visual</strong></div>
+    <div class="a11y-row">
+      <button onclick="setTheme('light')">Claro</button>
+      <button onclick="setTheme('dark')">Escuro</button>
+      <button onclick="setTheme('contrast')">Alto Contraste</button>
     </div>
-
-    <div class="a11y-opt">
-      <label>Tamanho da Fonte</label>
-      <div class="a11y-btn-group">
-        <button type="button" id="btnFontNormal" class="active">Normal</button>
-        <button type="button" id="btnFontLarge">Grande</button>
-        <button type="button" id="btnFontXLarge">Extra Grande</button>
-      </div>
-    </div>
-
-    <div class="a11y-opt">
-      <label>Atalhos de Teclado Rápido</label>
-      <ul style="margin:0;padding-left:18px;font-size:12.5px;color:var(--muted)">
-        <li><b>Alt + 1</b>: Painel do Pátio</li>
-        <li><b>Alt + 2</b>: Agendamentos</li>
-        <li><b>Alt + 3</b>: Portaria &amp; Balança</li>
-        <li><b>Alt + 4</b>: Relatórios</li>
-      </ul>
-    </div>
-
-    <div style="text-align:right">
-      <button type="button" class="btn" id="btnCloseA11y">Fechar</button>
+    <div style="margin-top:6px"><strong>Tamanho da Fonte</strong></div>
+    <div class="a11y-row">
+      <button onclick="setFont('sm')">Normal</button>
+      <button onclick="setFont('lg')">Grande</button>
+      <button onclick="setFont('xl')">Ex-Grande</button>
     </div>
   </div>
 </div>
@@ -428,6 +414,31 @@ tbody tr:hover td{background:var(--surface-2)}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="utils.js"></script>
 <script>
+// CONTROLE DE TEMA E ACESSIBILIDADE GLOBAL
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('theme', theme);
+}
+function setFont(size) {
+  document.documentElement.classList.remove('font-lg', 'font-xl');
+  if (size === 'lg') document.documentElement.classList.add('font-lg');
+  if (size === 'xl') document.documentElement.classList.add('font-xl');
+  localStorage.setItem('fontsize', size);
+}
+
+// Carregar preferências salvas
+(function(){
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  const savedFont = localStorage.getItem('fontsize') || 'sm';
+  setTheme(savedTheme);
+  setFont(savedFont);
+})();
+
+document.getElementById('btnA11yToggle').addEventListener('click', () => {
+  const box = document.getElementById('a11yBox');
+  box.hidden = !box.hidden;
+});
+
 (function(){
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const API = 'https://se7-backend.onrender.com/api';
@@ -680,6 +691,8 @@ function renderBalanca(){
   const v = V.find(x=>x.id==selecionado);
   if (!v) { box.innerHTML=''; return; }
   const k = etapa(v);
+  const previstoKg = (Number(v.quantidade)||0)*1000;
+  const divergencia = v.liquido && previstoKg ? Math.abs(v.liquido - previstoKg)/previstoKg : 0;
 
   let acao = '';
   if (k==='pesagem1' || k==='vistoria') {
@@ -880,41 +893,6 @@ $('#agForm').addEventListener('submit', async e => {
     $('#agForm').reset();
     carregarDadosAPI();
   }
-});
-
-/* LÓGICA DO MODAL DE ACESSIBILIDADE E CONTRASTE */
-const modalA11y = $('#a11yModal');
-$('#btnA11yModal').addEventListener('click', () => modalA11y.classList.remove('d-none'));
-$('#btnCloseA11y').addEventListener('click', () => modalA11y.classList.add('d-none'));
-
-$('#btnThemeDefault').addEventListener('click', function() {
-  document.documentElement.removeAttribute('data-theme');
-  this.classList.add('active');
-  $('#btnThemeHighContrast').classList.remove('active');
-});
-
-$('#btnThemeHighContrast').addEventListener('click', function() {
-  document.documentElement.setAttribute('data-theme', 'high-contrast');
-  this.classList.add('active');
-  $('#btnThemeDefault').classList.remove('active');
-});
-
-$('#btnFontNormal').addEventListener('click', function() {
-  document.documentElement.style.setProperty('--base-font-size', '14px');
-  $$('.a11y-opt button').forEach(b => b.classList.remove('active'));
-  this.classList.add('active');
-});
-
-$('#btnFontLarge').addEventListener('click', function() {
-  document.documentElement.style.setProperty('--base-font-size', '16px');
-  $$('.a11y-opt button').forEach(b => b.classList.remove('active'));
-  this.classList.add('active');
-});
-
-$('#btnFontXLarge').addEventListener('click', function() {
-  document.documentElement.style.setProperty('--base-font-size', '18px');
-  $$('.a11y-opt button').forEach(b => b.classList.remove('active'));
-  this.classList.add('active');
 });
 
 $('#btnSair').addEventListener('click', ()=>{ localStorage.clear(); window.location.href = 'login.html'; });
