@@ -103,17 +103,32 @@ tbody tr:hover td{background:var(--surface-2)}
 .row-card:hover{border-color:var(--accent)}
 .row-card .grow{flex:1;min-width:140px}
 
-/* DASHBOARD GERENCIAL PROFISSIONAL */
+/* DASHBOARD GERENCIAL EXECUTIVO */
 .kpis-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 18px; }
-.kpi-box { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; box-shadow: var(--shadow); }
-.kpi-box span { font-size: 0.85rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
-.kpi-box b { display: block; font-size: 1.8rem; font-weight: 700; color: var(--accent); margin-top: 4px; }
+.kpi-box { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+.kpi-box span { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+.kpi-box b { display: block; font-size: 2rem; font-weight: 700; color: var(--accent); margin-top: 6px; }
+
+/* LAYOUT DE CARDS EM GRID PARA A EFICIÊNCIA */
+.dashboard-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.dash-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 20px; box-shadow: var(--shadow); display: flex; flex-direction: column; justify-content: space-between; }
+.dash-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+.dash-card p { font-size: 0.85rem; color: var(--muted); margin: 0 0 16px 0; }
+
+.progress-track { background: var(--surface-2); border: 1px solid var(--line); height: 16px; border-radius: 20px; overflow: hidden; position: relative; }
+.progress-fill { height: 100%; border-radius: 20px; transition: width 0.6s ease; }
+
+.stat-big { font-size: 2.2rem; font-weight: 700; line-height: 1; margin-bottom: 8px; }
+
+.eta-list { display: flex; flex-direction: column; gap: 10px; }
+.eta-item { display: flex; align-items: center; justify-content: space-between; font-size: 0.88rem; }
+.eta-badge { padding: 3px 8px; border-radius: 6px; color: #fff; font-size: 0.75rem; font-weight: 600; }
 
 .scale-display { background: #000; color: #00ff66; font-family: var(--font-mono); font-size: 2.2rem; font-weight: 700; text-align: right; padding: 14px; border-radius: 8px; margin-bottom: 12px; }
 #ticketPrint { display: none; font-family: var(--font-mono); padding: 20px; border: 1px dashed #000; }
 .toast{position:fixed;right:18px;bottom:18px;background:var(--side);color:#fff;padding:12px 16px;border-radius:8px;z-index:40;border-left:4px solid #4cc38a}
 
-/* WIDGET DE ACESSIBILIDADE NATIVO (DETAILS) */
+/* WIDGET DE ACESSIBILIDADE NATIVO */
 .a11y-float { position: fixed; bottom: 20px; right: 20px; z-index: 999; }
 .a11y-float summary::-webkit-details-marker { display: none; }
 .a11y-btn { width: 48px; height: 48px; border-radius: 50%; background: var(--accent); color: #fff; border: 0; font-size: 22px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: grid; place-items: center; list-style: none; }
@@ -202,7 +217,7 @@ tbody tr:hover td{background:var(--surface-2)}
       </div>
     </section>
 
-    <!-- 4. DASHBOARD GERENCIAL (INDICADORES) -->
+    <!-- 4. DASHBOARD GERENCIAL REFORMULADO E ELEGANTE -->
     <section data-sec="indicadores" hidden>
       <div class="kpis-grid">
         <div class="kpi-box"><span>Total de Cargas</span><b id="kpiTotal">0</b></div>
@@ -210,17 +225,52 @@ tbody tr:hover td{background:var(--surface-2)}
         <div class="kpi-box"><span>Cargas Finalizadas</span><b id="kpiFinalizadas" style="color:var(--ok)">0</b></div>
         <div class="kpi-box"><span>Volume Estimado</span><b id="kpiVolume" style="color:var(--accent)">0 Ton</b></div>
       </div>
-      <div class="panel">
-        <h2>Eficiência Operacional do Terminal Portuário</h2>
-        <p style="color:var(--muted);margin-bottom:14px">Monitorização em tempo real do escoamento de granéis sólidos e carga geral no retroporto.</p>
-        <div style="display:flex;flex-direction:column;gap:12px">
+
+      <div class="dashboard-grid">
+        <!-- Card 1: Taxa de Ocupação -->
+        <div class="dash-card">
           <div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span>Taxa de Ocupação do Pátio</span><b id="lblOcupacao">0%</b></div>
-            <div style="background:var(--line);height:10px;border-radius:5px;overflow:hidden"><div id="barOcupacao" style="background:var(--accent);height:100%;width:0%"></div></div>
+            <h3><i class="bi bi-pie-chart-fill" style="color:var(--accent)"></i> Ocupação do Pátio</h3>
+            <p>Capacidade instalada no retroporto</p>
+            <div class="stat-big" id="lblOcupacao" style="color:var(--accent)">0%</div>
           </div>
           <div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span>Conclusão de Pesagens (Tara vs Bruto)</span><b id="lblConclusao">0%</b></div>
-            <div style="background:var(--line);height:10px;border-radius:5px;overflow:hidden"><div id="barConclusao" style="background:var(--ok);height:100%;width:0%"></div></div>
+            <div class="progress-track">
+              <div class="progress-fill" id="barOcupacao" style="background:var(--accent);width:0%"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:0.8rem;color:var(--muted)">
+              <span>Status: Operação Normal</span>
+              <span>Teto: 50 Veículos</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Conclusão de Pesagens -->
+        <div class="dash-card">
+          <div>
+            <h3><i class="bi bi-speedometer2" style="color:var(--ok)"></i> Conclusão de Pesagens</h3>
+            <p>Fluxo completo (Tara vs. Bruto)</p>
+            <div class="stat-big" id="lblConclusao" style="color:var(--ok)">0%</div>
+          </div>
+          <div>
+            <div class="progress-track">
+              <div class="progress-fill" id="barConclusao" style="background:var(--ok);width:0%"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:0.8rem;color:var(--muted)">
+              <span>Liberação com Ticket</span>
+              <span id="lblFinalizadasCount">0 finalizados</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: Distribuição por Etapas do Pátio -->
+        <div class="dash-card">
+          <div>
+            <h3><i class="bi bi-diagram-3-fill" style="color:#ffc107"></i> Etapas do Retroporto</h3>
+            <p>Distribuição de veículos no fluxo</p>
+          </div>
+          <div class="eta-list" id="etaList">
+            <!-- Gerado dinamicamente no JS -->
           </div>
         </div>
       </div>
@@ -281,7 +331,7 @@ tbody tr:hover td{background:var(--surface-2)}
   </main>
 </div>
 
-<!-- WIDGET DE ACESSIBILIDADE NATIVO (DETAILS) -->
+<!-- WIDGET DE ACESSIBILIDADE NATIVO -->
 <details class="a11y-float">
   <summary class="a11y-btn" title="Acessibilidade"><i class="bi bi-universal-access"></i></summary>
   <div class="a11y-box">
@@ -348,9 +398,9 @@ let V = [], LOGS = [], CADASTROS = [], view = 'patio', veiculoSelecionado = null
 
 const ETAPAS = {
   agendado:   { nome:'Agendado (Portaria)', cor:'var(--st-agendado)' },
-  pesagem1:   { nome:'Aguardando 1ª Pesagem (Tara)', cor:'var(--st-pesagem1)' },
+  pesagem1:   { nome:'Aguardando 1ª Pesagem', cor:'var(--st-pesagem1)' },
   vistoria:   { nome:'Carregando / Pátio', cor:'var(--st-vistoria)' },
-  pesagem2:   { nome:'Aguardando 2ª Pesagem (Bruto)', cor:'var(--st-pesagem2)' },
+  pesagem2:   { nome:'Aguardando 2ª Pesagem', cor:'var(--st-pesagem2)' },
   finalizado: { nome:'Liberado / Finalizado', cor:'var(--st-finalizado)' }
 };
 
@@ -420,12 +470,28 @@ function render(){
     $('#kpiFinalizadas').textContent = finalizadas;
     $('#kpiVolume').textContent = `${total * 32} Ton`;
 
-    const ocupacao = total > 0 ? Math.round((emPatio / 50) * 100) : 0;
+    const ocupacao = total > 0 ? Math.min(Math.round((emPatio / 50) * 100), 100) : 0;
     const conclusao = total > 0 ? Math.round((finalizadas / total) * 100) : 0;
+
     $('#lblOcupacao').textContent = `${ocupacao}%`;
-    $('#barOcupacao.style').width = `${ocupacao}%`;
+    $('#barOcupacao').style.width = `${ocupacao}%`;
+
     $('#lblConclusao').textContent = `${conclusao}%`;
-    $('#barConclusao.style').width = `${conclusao}%`;
+    $('#barConclusao').style.width = `${conclusao}%`;
+    $('#lblFinalizadasCount').textContent = `${finalizadas} de ${total} concluídos`;
+
+    // Renderiza distribuição por etapas
+    if ($('#etaList')) {
+      $('#etaList').innerHTML = Object.keys(ETAPAS).map(k => {
+        const cnt = V.filter(v => etapa(v) === k).length;
+        return `
+          <div class="eta-item">
+            <span>${ETAPAS[k].nome}</span>
+            <span class="eta-badge" style="background:${ETAPAS[k].cor}">${cnt} veíq.</span>
+          </div>
+        `;
+      }).join('');
+    }
   }
 
   if(view==='relatorios'){
