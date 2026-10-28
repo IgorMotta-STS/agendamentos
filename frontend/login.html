@@ -1,103 +1,160 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login - SE7 Terminais</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css" rel="stylesheet">
-  <link href="style.css" rel="stylesheet">
-  
-  
-  <style>
-    .bg-login {
-      background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-                  url('https://www.portodesantos.com.br/wp-content/themes/Tema%20SPA/assets/img/foto_homepage_nova.jpg');
-      background-size: cover;
-      background-position: center;
-    }
-  </style>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</head>
-<body class="d-flex vh-100 bg-light">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login - SE7 Terminais</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --panel-bg:#ffffff; --text-main:#1d2433; --text-muted:#5b6578;
+  --accent:#0d6efd; --accent-hover:#0b5ed7; --line:#dfe4ec;
+  --font-body:"Lexend", system-ui, sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font-body);background:var(--bg);color:var(--text-main);height:100vh;overflow:hidden}
 
-  <div class="col-md-6 d-none d-md-flex justify-content-center align-items-center bg-login text-white">
-    <div class="text-center p-4 bg-dark bg-opacity-50 rounded-3 shadow-lg">
-      <h1 class="display-5 fw-bold mb-0">SE7 TERMINAIS</h1>
-      <p class="fs-4 mt-2 mb-0">Gestão de Agendamentos</p>
+.login-container{display:grid;grid-template-columns:1fr 1fr;height:100vh;width:100vw;transition: all 0.4s ease-in-out;}
+.login-container.erp-mode{grid-template-columns:1fr 1fr;}
+.login-container.erp-mode .side-image{order:2;}
+.login-container.erp-mode .side-form{order:1;}
+
+.side-image{position:relative;background:url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1920&auto=format&fit=crop') center/cover no-repeat;display:flex;flex-direction:column;justify-content:flex-end;padding:60px;color:#fff;}
+.side-image::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0.2) 0%,rgba(0,0,0,0.7) 100%);}
+.side-image-content{position:relative;z-index:2;}
+.side-image h1{font-size:2.5rem;font-weight:700;margin:0 0 10px 0;letter-spacing:-0.02em;}
+.side-image p{font-size:1.1rem;margin:0;opacity:0.9;font-weight:300;}
+
+.side-form{background:var(--panel-bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;position:relative;}
+
+.form-box{width:100%;max-width:380px;display:flex;flex-direction:column;gap:20px;}
+.form-title{font-size:1.75rem;font-weight:600;color:#0d6efd;margin:0;}
+.field{display:flex;flex-direction:column;gap:6px;}
+.field label{font-size:0.85rem;color:var(--text-muted);font-weight:500;}
+.input{border:1px solid var(--line);background:#f8fafc;border-radius:8px;padding:12px 14px;font-size:0.95rem;color:var(--text-main);width:100%;transition:border-color 0.2s;}
+.input:focus{border-color:var(--accent);outline:none;background:#fff;box-shadow:0 0 0 3px rgba(13,110,253,0.15);}
+
+.btn-submit{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:12px;font-size:1rem;font-weight:600;cursor:pointer;width:100%;transition:background 0.2s;}
+.btn-submit:hover{background:var(--accent-hover);}
+
+.form-footer{display:flex;flex-direction:column;gap:12px;font-size:0.85rem;text-align:center;margin-top:10px;}
+.form-footer a{color:var(--accent);text-decoration:none;font-weight:500;}
+.form-footer a:hover{text-decoration:underline;}
+
+/* Botão Flutuante de Alternância */
+.switch-mode-btn{position:absolute;top:24px;right:24px;background:#f1f5f9;border:1px solid var(--line);color:var(--text-main);padding:8px 16px;border-radius:20px;font-size:0.85rem;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.2s;z-index:10;}
+.login-container.erp-mode ~ * .switch-mode-btn, .side-form .switch-mode-btn{right:auto;left:24px;}
+.switch-mode-btn:hover{background:#e2e8f0;}
+
+@media(max-width:900px){
+  .login-container, .login-container.erp-mode{grid-template-columns:1fr;}
+  .side-image{display:none;}
+  .switch-mode-btn{top:16px;left:16px;}
+}
+</style>
+</head>
+<body>
+
+<button type="button" class="switch-mode-btn" id="btnSwitch" onclick="toggleMode()">
+  <i class="bi bi-arrow-repeat"></i> <span id="switchText">Mudar para ERP Logístico</span>
+</button>
+
+<div class="login-container" id="loginContainer">
+  <!-- IMAGEM DE FUNDO -->
+  <div class="side-image">
+    <div class="side-image-content">
+      <h1 id="imgTitle">SE7 Terminais</h1>
+      <p id="imgSubtitle">Gestão de Agendamentos</p>
     </div>
   </div>
 
-  <div class="col-12 col-md-6 d-flex justify-content-center align-items-center">
-    <div class="card shadow-sm border-0 w-100 mx-3" style="max-width: 400px;">
-      <div class="card-body p-5">
-        <h2 class="text-center mb-4 fw-bold text-primary">Acesso ao Sistema</h2>
-
-        <div id="mensagemErro" class="alert alert-danger d-none" role="alert"></div>
-
-        <form id="loginForm">
-          <div class="mb-3">
-            <label for="usuario" class="form-label text-muted fw-semibold">E-mail</label>
-            <input type="text" class="form-control form-control-lg bg-light" id="usuario" placeholder="Digite seu acesso" required>
-          </div>
-          
-          <div class="mb-4">
-            <label for="senha" class="form-label text-muted fw-semibold">Senha</label>
-            <input type="password" class="form-control form-control-lg bg-light" id="senha" placeholder="********" required>
-          </div>
-
-          <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold">Entrar</button>
-          <div class="text-center mt-3 border-top pt-3">
-            <p class="text-muted small mb-1">É motorista ou cliente externo?</p>
-            <a href="rastreio.html" class="btn btn-outline-secondary btn-sm w-100 fw-semibold">
-              <i class="bi bi-geo-alt-fill me-1"></i>Rastrear Carga Sem Login
-            </a>
-          </div>
-        </form>
-
-        <div class="text-center mt-4">
-          <span class="text-muted">Não possui conta?</span> 
-          <a href="cadastro.html" class="text-decoration-none fw-semibold">Cadastrar usuário</a>
+  <!-- FORMULÁRIO DE LOGIN -->
+  <div class="side-form">
+    <div class="form-box">
+      <h2 class="form-title" id="formTitle">Acesso ao Sistema</h2>
+      
+      <form id="loginForm" style="display:flex;flex-direction:column;gap:16px">
+        <div class="field">
+          <label for="email">E-mail</label>
+          <input class="input" type="email" id="email" required placeholder="Digite seu acesso">
         </div>
+        <div class="field">
+          <label for="senha">Senha</label>
+          <input class="input" type="password" id="senha" required placeholder="********">
+        </div>
+        <button type="submit" class="btn-submit" id="btnSubmitText">Entrar</button>
+      </form>
+
+      <div class="form-footer" id="formFooter">
+        <a href="#"><i class="bi bi-geo-alt"></i> Rastrear Carga Sem Login</a>
+        <div>Não possui conta? <a href="#">Cadastrar usuário</a></div>
       </div>
     </div>
   </div>
+</div>
 
-  <script>
-    const API = 'https://se7-backend.onrender.com/api';
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+const API = 'https://se7-backend.onrender.com/api';
+let isErpMode = false;
 
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
+function toggleMode() {
+  isErpMode = !isErpMode;
+  const container = document.getElementById('loginContainer');
+  const title = document.getElementById('formTitle');
+  const imgTitle = document.getElementById('imgTitle');
+  const imgSubtitle = document.getElementById('imgSubtitle');
+  const switchText = document.getElementById('switchText');
+  const formFooter = document.getElementById('formFooter');
+  const emailInput = document.getElementById('email');
 
-      const dados = {
-        usuario: document.getElementById('usuario').value,
-        senha: document.getElementById('senha').value
-      };
+  if (isErpMode) {
+    container.classList.add('erp-mode');
+    title.textContent = 'ERP Logístico';
+    imgTitle.textContent = 'SE7 Terminais';
+    imgSubtitle.textContent = 'ERP Logístico & Balança';
+    switchText.textContent = 'Voltar para Agendamentos';
+    formFooter.style.display = 'none'; // Oculta links de rastreio externo no modo ERP
+    emailInput.value = 'admin@empresa.com'; // Preenche facilidade para teste admin
+  } else {
+    container.classList.remove('erp-mode');
+    title.textContent = 'Acesso ao Sistema';
+    imgTitle.textContent = 'SE7 Terminais';
+    imgSubtitle.textContent = 'Gestão de Agendamentos';
+    switchText.textContent = 'Mudar para ERP Logístico';
+    formFooter.style.display = 'flex';
+    emailInput.value = '';
+  }
+}
 
-      try {
-        const res = await fetch(`${API}/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(dados)
-        });
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('email').value;
+  const senha = document.getElementById('senha').value;
 
-        const resposta = await res.json();
-
-        if (res.ok) {
-          localStorage.setItem('token', resposta.token);
-          localStorage.setItem('usuario', JSON.stringify(resposta.usuario));
-          
-          // Login com sucesso não precisa de alerta, redireciona direto para ficar fluido
-          window.location.href = resposta.usuario.perfil === 'admin' ? 'admin.html' : 'dashboard.html';
-        } else {
-          Swal.fire('Acesso Negado', resposta.erro || 'Login inválido', 'error');
-        }
-      } catch (erro) {
-        Swal.fire('Ops!', 'Erro ao conectar com o servidor.', 'error');
-      }
+  try {
+    const res = await fetch(`${API}/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, senha })
     });
-  </script>
+    const data = await res.json();
+
+    if (res.ok && data.token) {
+      localStorage.setItem('token', data.token);
+      // Se estiver no modo ERP, redireciona para o erp.html, senão para o painel de agendamentos
+      window.location.href = isErpMode ? 'erp.html' : 'dashboard.html';
+    } else {
+      Swal.fire('Atenção', data.erro || 'Credenciais inválidas', 'warning');
+    }
+  } catch (err) {
+    Swal.fire('Erro', 'Não foi possível conectar ao servidor.', 'error');
+  }
+});
+</script>
 </body>
 </html>
