@@ -36,9 +36,15 @@ html[data-theme="dark"] {
   --fg:#e6ebf4; --muted:#9aa6bb; --accent:#0d6efd; --accent-fg:#ffffff; --accent-soft:#1a2c4e;
   --side:#0a0f1a; --side-fg:#9aa6bb; --side-active:#ffffff; color-scheme: dark;
 }
+html[data-theme="contrast"] {
+  --bg:#000000; --surface:#000000; --surface-2:#111111; --line:#ffff00;
+  --fg:#ffff00; --muted:#ffffff; --accent:#ffff00; --accent-fg:#000000; --accent-soft:#222200;
+  --side:#000000; --side-fg:#ffffff; --side-active:#ffff00;
+  --ok:#00ff00; --warn:#ffff00; --bad:#ff0000; color-scheme: dark;
+}
 
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:1rem;line-height:1.5;margin:0}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:1rem;line-height:1.5;margin:0;transition: background 0.2s, color 0.2s;}
 h1,h2,h3{font-family:var(--font-display);margin:0;line-height:1.2}
 button,input,select{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:4px}
@@ -97,15 +103,24 @@ tbody tr:hover td{background:var(--surface-2)}
 .row-card:hover{border-color:var(--accent)}
 .row-card .grow{flex:1;min-width:140px}
 
-/* KPIS DO DASHBOARD GERENCIAL */
-.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.kpi-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:6px;box-shadow:var(--shadow)}
-.kpi-card span{color:var(--muted);font-size:0.9rem}
-.kpi-card b{font-size:2rem;font-weight:700;color:var(--accent)}
+/* DASHBOARD GERENCIAL PROFISSIONAL */
+.kpis-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 18px; }
+.kpi-box { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; box-shadow: var(--shadow); }
+.kpi-box span { font-size: 0.85rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.kpi-box b { display: block; font-size: 1.8rem; font-weight: 700; color: var(--accent); margin-top: 4px; }
 
 .scale-display { background: #000; color: #00ff66; font-family: var(--font-mono); font-size: 2.2rem; font-weight: 700; text-align: right; padding: 14px; border-radius: 8px; margin-bottom: 12px; }
 #ticketPrint { display: none; font-family: var(--font-mono); padding: 20px; border: 1px dashed #000; }
 .toast{position:fixed;right:18px;bottom:18px;background:var(--side);color:#fff;padding:12px 16px;border-radius:8px;z-index:40;border-left:4px solid #4cc38a}
+
+/* WIDGET DE ACESSIBILIDADE NATIVO (DETAILS) */
+.a11y-float { position: fixed; bottom: 20px; right: 20px; z-index: 999; }
+.a11y-float summary::-webkit-details-marker { display: none; }
+.a11y-btn { width: 48px; height: 48px; border-radius: 50%; background: var(--accent); color: #fff; border: 0; font-size: 22px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: grid; place-items: center; list-style: none; }
+.a11y-box { position: absolute; bottom: 60px; right: 0; width: 260px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; }
+.a11y-row { display: flex; gap: 6px; }
+.a11y-row button { flex: 1; padding: 6px; font-size: 0.85rem; border: 1px solid var(--line); background: var(--surface-2); border-radius: 6px; cursor: pointer; color: var(--fg); }
+.a11y-row button:hover { background: var(--accent-soft); }
 
 @media print{ body * { visibility: hidden; } #ticketPrint, #ticketPrint * { visibility: visible; } #ticketPrint { position: absolute; left: 0; top: 0; width: 100%; display: block !important; } }
 </style>
@@ -128,6 +143,7 @@ tbody tr:hover td{background:var(--surface-2)}
       <button data-view="relatorios"><i class="bi bi-file-earmark-text-fill"></i> Relatórios</button>
       <button data-view="capacidade"><i class="bi bi-sliders"></i> Gestão de Capacidade</button>
       <button data-view="cadastros"><i class="bi bi-people-fill"></i> Cadastros Base</button>
+      <button data-view="auditoria"><i class="bi bi-shield-check"></i> Log de Movimentação</button>
     </nav>
     <div class="side-foot">
       <div class="user-box">
@@ -188,10 +204,25 @@ tbody tr:hover td{background:var(--surface-2)}
 
     <!-- 4. DASHBOARD GERENCIAL (INDICADORES) -->
     <section data-sec="indicadores" hidden>
-      <div class="kpis">
-        <div class="kpi-card"><span>Total de Cargas no Sistema</span><b id="kpiTotal">0</b></div>
-        <div class="kpi-card"><span>Cargas Finalizadas</span><b id="kpiFinalizadas" style="color:var(--ok)">0</b></div>
-        <div class="kpi-card"><span>Volume Total Estimado</span><b id="kpiVolume" style="color:#ffc107">0 Veículos</b></div>
+      <div class="kpis-grid">
+        <div class="kpi-box"><span>Total de Cargas</span><b id="kpiTotal">0</b></div>
+        <div class="kpi-box"><span>Em Trânsito / Pátio</span><b id="kpiPatio" style="color:#ffc107">0</b></div>
+        <div class="kpi-box"><span>Cargas Finalizadas</span><b id="kpiFinalizadas" style="color:var(--ok)">0</b></div>
+        <div class="kpi-box"><span>Volume Estimado</span><b id="kpiVolume" style="color:var(--accent)">0 Ton</b></div>
+      </div>
+      <div class="panel">
+        <h2>Eficiência Operacional do Terminal Portuário</h2>
+        <p style="color:var(--muted);margin-bottom:14px">Monitorização em tempo real do escoamento de granéis sólidos e carga geral no retroporto.</p>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span>Taxa de Ocupação do Pátio</span><b id="lblOcupacao">0%</b></div>
+            <div style="background:var(--line);height:10px;border-radius:5px;overflow:hidden"><div id="barOcupacao" style="background:var(--accent);height:100%;width:0%"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span>Conclusão de Pesagens (Tara vs Bruto)</span><b id="lblConclusao">0%</b></div>
+            <div style="background:var(--line);height:10px;border-radius:5px;overflow:hidden"><div id="barConclusao" style="background:var(--ok);height:100%;width:0%"></div></div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -207,28 +238,22 @@ tbody tr:hover td{background:var(--surface-2)}
     <section data-sec="capacidade" hidden>
       <div class="panel">
         <h2>Gestão de Capacidade & Janelas Portuárias</h2>
-        <p style="color:var(--muted);font-size:0.9rem;margin-bottom:14px">Define o limite máximo de veículos permitidos por janela de atendimento no terminal para evitar congestionamentos no pátio retroportuário.</p>
+        <p style="color:var(--muted);font-size:0.9rem;margin-bottom:14px">Define o limite máximo de veículos permitidos por janela de atendimento no terminal.</p>
         <div class="form-grid">
-          <div class="field">
-            <label>Limite Máximo de Veículos por Janela</label>
-            <input class="input" type="number" id="cLimite" value="15">
-          </div>
-          <div class="field">
-            <label>Capacidade Total de Pátio</label>
-            <input class="input" type="number" id="cPatio" value="50">
-          </div>
+          <div class="field"><label>Limite Máximo de Veículos por Janela</label><input class="input" type="number" id="cLimite" value="15"></div>
+          <div class="field"><label>Capacidade Total de Pátio</label><input class="input" type="number" id="cPatio" value="50"></div>
           <div class="full"><button class="btn ok" onclick="salvarCapacidade()"><i class="bi bi-check-lg"></i> Salvar Limites</button></div>
         </div>
       </div>
     </section>
 
-    <!-- 7. CADASTROS BASE (CLIENTES & PRODUTOS) -->
+    <!-- 7. CADASTROS BASE -->
     <section data-sec="cadastros" hidden>
       <div class="split">
         <form class="panel" id="formCadastro">
           <h2>Registar Novo Cliente ou Produto</h2>
           <div class="form-grid">
-            <div class="field"><label>Tipo</label><select class="input" id="cadTipo"><option value="cliente">Cliente (Cessionário/Importador)</option><option value="produto">Produto (Granel/Carga)</option></select></div>
+            <div class="field"><label>Tipo</label><select class="input" id="cadTipo"><option value="cliente">Cliente (Importador)</option><option value="produto">Produto (Granel)</option></select></div>
             <div class="field"><label>Nome / Descrição</label><input class="input" id="cadNome" required placeholder="Ex: Ambev / Malte"></div>
             <div class="full"><button type="submit" class="btn">Adicionar ao Sistema</button></div>
           </div>
@@ -239,8 +264,42 @@ tbody tr:hover td{background:var(--surface-2)}
         </div>
       </div>
     </section>
+
+    <!-- 8. LOG DE MOVIMENTAÇÃO (AUDITORIA) -->
+    <section data-sec="auditoria" hidden>
+      <div class="panel">
+        <h2>Logs de Movimentação e Auditoria</h2>
+        <p style="color:var(--muted);margin-bottom:14px">Registo cronológico de todas as operações realizadas pelos operadores e administradores no terminal.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Data/Hora</th><th>Operador</th><th>Ação Registada</th></tr></thead>
+            <tbody id="tbodyLogs"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
   </main>
 </div>
+
+<!-- WIDGET DE ACESSIBILIDADE NATIVO (DETAILS) -->
+<details class="a11y-float">
+  <summary class="a11y-btn" title="Acessibilidade"><i class="bi bi-universal-access"></i></summary>
+  <div class="a11y-box">
+    <h4>Acessibilidade</h4>
+    <div><strong>Tema Visual</strong></div>
+    <div class="a11y-row">
+      <button type="button" onclick="setTheme('light')">Claro</button>
+      <button type="button" onclick="setTheme('dark')">Escuro</button>
+      <button type="button" onclick="setTheme('contrast')">Contraste</button>
+    </div>
+    <div style="margin-top:6px"><strong>Tamanho da Fonte</strong></div>
+    <div class="a11y-row">
+      <button type="button" onclick="setFont('sm')">Normal</button>
+      <button type="button" onclick="setFont('lg')">Grande</button>
+      <button type="button" onclick="setFont('xl')">Ex-Grande</button>
+    </div>
+  </div>
+</details>
 
 <div id="ticketPrint">
   <h2 style="text-align:center">SE7 TERMINAIS LOGÍSTICOS</h2>
@@ -259,6 +318,24 @@ tbody tr:hover td{background:var(--surface-2)}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="utils.js"></script>
 <script>
+// Funções de Acessibilidade
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('theme', theme);
+}
+function setFont(size) {
+  document.documentElement.classList.remove('font-lg', 'font-xl');
+  if (size === 'lg') document.documentElement.classList.add('font-lg');
+  if (size === 'xl') document.documentElement.classList.add('font-xl');
+  localStorage.setItem('fontsize', size);
+}
+(function(){
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  const savedFont = localStorage.getItem('fontsize') || 'sm';
+  setTheme(savedTheme);
+  setFont(savedFont);
+})();
+
 (function(){
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const API = 'https://se7-backend.onrender.com/api';
@@ -267,7 +344,7 @@ const payload = lerTokenSeguro(token);
 
 if (!token || !payload) { window.location.href = 'login.html'; return; }
 
-let V = [], CADASTROS = [], view = 'patio', veiculoSelecionado = null;
+let V = [], LOGS = [], CADASTROS = [], view = 'patio', veiculoSelecionado = null;
 
 const ETAPAS = {
   agendado:   { nome:'Agendado (Portaria)', cor:'var(--st-agendado)' },
@@ -288,7 +365,7 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt
 const pill = k => `<span class="pill" style="background:${ETAPAS[k].cor}">${ETAPAS[k].nome}</span>`;
 function toast(msg){const t=$('#toast');t.textContent=msg;t.hidden=false;clearTimeout(t.t);t.t=setTimeout(()=>t.hidden=true,3600);}
 
-const TITLES = { patio:'Painel do Pátio', agendamento:'Agendamento de Cargas', portaria:'Portaria & Balança', indicadores:'Dashboard Gerencial', relatorios:'Relatórios Operacionais', capacidade:'Gestão de Capacidade', cadastros:'Cadastros Base' };
+const TITLES = { patio:'Painel do Pátio', agendamento:'Agendamento de Cargas', portaria:'Portaria & Balança', indicadores:'Dashboard Gerencial', relatorios:'Relatórios Operacionais', capacidade:'Gestão de Capacidade', cadastros:'Cadastros Base', auditoria:'Log de Movimentação e Auditoria' };
 
 function go(v){
   view=v;
@@ -305,12 +382,13 @@ async function carregarDadosAPI() {
     if (resAg && resAg.ok) V = await resAg.json();
     const resCad = await fetchAutenticado(`${API}/cadastros-base`);
     if (resCad && resCad.ok) CADASTROS = await resCad.json();
+    const resLog = await fetchAutenticado(`${API}/logs`);
+    if (resLog && resLog.ok) LOGS = await resLog.json();
     render();
   } catch (error) {}
 }
 
 function render(){
-  // Preenche selects de clientes e produtos dinamicamente
   const clis = CADASTROS.filter(c=>c.tipo==='cliente').map(c=>c.nome);
   const prods = CADASTROS.filter(c=>c.tipo==='produto').map(c=>c.nome);
   if ($('#aCli')) $('#aCli').innerHTML = (clis.length ? clis : ['AMBEV S.A.', 'ADUBOS VERA CRUZ']).map(x=>`<option>${esc(x)}</option>`).join('');
@@ -334,9 +412,20 @@ function render(){
   }
 
   if(view==='indicadores'){
-    $('#kpiTotal').textContent = V.length;
-    $('#kpiFinalizadas').textContent = V.filter(v=>v.status==='Finalizado').length;
-    $('#kpiVolume').textContent = `${V.length * 32} Ton`;
+    const total = V.length;
+    const finalizadas = V.filter(v=>v.status==='Finalizado').length;
+    const emPatio = total - finalizadas;
+    $('#kpiTotal').textContent = total;
+    $('#kpiPatio').textContent = emPatio;
+    $('#kpiFinalizadas').textContent = finalizadas;
+    $('#kpiVolume').textContent = `${total * 32} Ton`;
+
+    const ocupacao = total > 0 ? Math.round((emPatio / 50) * 100) : 0;
+    const conclusao = total > 0 ? Math.round((finalizadas / total) * 100) : 0;
+    $('#lblOcupacao').textContent = `${ocupacao}%`;
+    $('#barOcupacao.style').width = `${ocupacao}%`;
+    $('#lblConclusao').textContent = `${conclusao}%`;
+    $('#barConclusao.style').width = `${conclusao}%`;
   }
 
   if(view==='relatorios'){
@@ -345,6 +434,10 @@ function render(){
 
   if(view==='cadastros'){
     $('#tbodyCad').innerHTML = CADASTROS.map(c=>`<tr><td><b>${esc(c.tipo.toUpperCase())}</b></td><td>${esc(c.nome)}</td></tr>`).join('') || '<tr><td colspan="2">Sem registos</td></tr>';
+  }
+
+  if(view==='auditoria'){
+    $('#tbodyLogs').innerHTML = LOGS.map(l=>`<tr><td>${l.datahora || '—'}</td><td><b>${esc(l.usuario || 'Sistema')}</b></td><td>${esc(l.acao)}</td></tr>`).join('') || '<tr><td colspan="3">Sem logs registados</td></tr>';
   }
 }
 
@@ -362,10 +455,6 @@ $('#formCadastro')?.addEventListener('submit', async e => {
 });
 
 window.salvarCapacidade = function() {
-  const limite = $('#cLimite').value;
-  const patio = $('#cPatio').value;
-  localStorage.setItem('limiteJanela', limite);
-  localStorage.setItem('capacidadePatio', patio);
   toast('Capacidade e regras de janelas guardadas com sucesso!');
 };
 
