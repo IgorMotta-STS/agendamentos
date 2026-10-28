@@ -376,6 +376,18 @@ async function chamar(url, metodo, corpo){
   return res.json();
 }
 
+// Função de normalização e busca robusta de placas para a Portaria
+function filtrarAgendamentosPorPlaca(termoBusca, listaAgendamentos) {
+  if (!termoBusca) return listaAgendamentos;
+  const termoLimpo = termoBusca.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+  return listaAgendamentos.filter(item => {
+    const placaCavalo = (item.placacavalo || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const placaCarreta = (item.placacarreta1 || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    return placaCavalo.includes(termoLimpo) || placaCarreta.includes(termoLimpo);
+  });
+}
+
 function render(){
   const clis = CADASTROS.filter(c=>c.tipo==='cliente').map(c=>c.nome);
   const prods = CADASTROS.filter(c=>c.tipo==='produto').map(c=>c.nome);
@@ -390,6 +402,12 @@ function render(){
     $('#thead').innerHTML = '<tr><th>ID</th><th>Placa</th><th>Cliente</th><th>Produto</th><th>Status</th></tr>';
     $('#tbody').innerHTML = base.map(v=>`<tr><td>#${v.id}</td><td>${esc(v.placacavalo)}</td><td>${esc(v.cliente)}</td><td>${esc(v.produto)}</td><td>${pill(etapa(v))}</td></tr>`).join('') || '<tr><td colspan="5">Sem registos</td></tr>';
   }
+  if(view==='portaria'){
+    const termo = $('#pBusca')?.value || '';
+    const filtrados = filtrarAgendamentosPorPlaca(termo, V);
+    const htmlPortaria = filtrados.map(v => `<div class="row-card"><div class="grow"><b>#${v.id} - ${esc(v.placacavalo)}</b><br><small>${esc(v.cliente)} (${esc(v.produto)})</small></div>${pill(etapa(v))}</div>`).join('') || '<div class="empty">Nenhum veículo encontrado</div>';
+    if ($('#pEntrada')) $('#pEntrada').innerHTML = htmlPortaria;
+  }
   if(view==='relatorios'){
     $('#tbodyRelatorio').innerHTML = V.map(v=>`<tr><td>#${v.id}</td><td>${fmtData(v.datahora)}</td><td>${esc(v.placacavalo)}</td><td>${esc(v.cliente)}</td><td>${esc(v.produto)}</td><td>${pill(etapa(v))}</td></tr>`).join('');
   }
@@ -397,6 +415,11 @@ function render(){
     $('#logBody').innerHTML = LOG.map(l=>`<tr><td>${fmtData(l.datahora)}</td><td><b>${esc(l.usuario || 'Operador')}</b></td><td>${esc(l.acao)}</td></tr>`).join('') || '<tr><td colspan="3">Sem logs</td></tr>';
   }
 }
+
+// Event listener para re-renderizar a portaria ao digitar no campo de busca de placas
+$('#pBusca')?.addEventListener('input', () => {
+  if (view === 'portaria') render();
+});
 
 $('#agForm')?.addEventListener('submit', async e=>{
   e.preventDefault();
