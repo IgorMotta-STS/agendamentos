@@ -18,20 +18,54 @@
 *{box-sizing:border-box}
 body{margin:0;font-family:var(--font-body);background:var(--bg);color:var(--text-main);height:100vh;overflow:hidden}
 
-.login-container{display:grid;grid-template-columns:1fr 1fr;height:100vh;width:100vw;transition: all 0.4s ease-in-out;}
-.login-container.erp-mode{grid-template-columns:1fr 1fr;}
-.login-container.erp-mode .side-image{order:2;}
-.login-container.erp-mode .side-form{order:1;}
+.login-container{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+}
 
-.side-image{position:relative;background-image: url('https://images.unsplash.com/photo-1578575437130-527eed3abbec?q=80&w=1920&auto=format&fit=crop'); background-position: center; background-size: cover; display:flex;flex-direction:column;justify-content:flex-end;padding:60px;color:#fff;transition: background-image 0.4s ease-in-out;}
+/* Painel de Imagem com efeito de transição suave (Fade & Slide) */
+.side-image{
+  position: relative;
+  background-position: center;
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 60px;
+  color: #fff;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease-in-out;
+  grid-column: 1; /* Padrão: Esquerda */
+}
 .side-image::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0.2) 0%,rgba(0,0,0,0.7) 100%);}
-.side-image-content{position:relative;z-index:2;}
+.side-image-content{position:relative;z-index:2; transition: opacity 0.3s ease;}
 .side-image h1{font-size:2.5rem;font-weight:700;margin:0 0 10px 0;letter-spacing:-0.02em;}
 .side-image p{font-size:1.1rem;margin:0;opacity:0.9;font-weight:300;}
 
-.side-form{background:var(--panel-bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;position:relative;}
+/* Painel do Formulário */
+.side-form{
+  background: var(--panel-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  position: relative;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  grid-column: 2; /* Padrão: Direita */
+}
 
-.form-box{width:100%;max-width:380px;display:flex;flex-direction:column;gap:20px;}
+/* Modo ERP Ativo: Inverte as colunas visualmente com animação */
+.login-container.erp-mode .side-image{
+  grid-column: 2; /* Move para a Direita */
+}
+.login-container.erp-mode .side-form{
+  grid-column: 1; /* Move para a Esquerda */
+}
+
+.form-box{width:100%;max-width:380px;display:flex;flex-direction:column;gap:20px; transition: opacity 0.3s ease;}
 .form-title{font-size:1.75rem;font-weight:600;color:#0d6efd;margin:0;}
 .field{display:flex;flex-direction:column;gap:6px;}
 .field label{font-size:0.85rem;color:var(--text-muted);font-weight:500;}
@@ -47,13 +81,12 @@ body{margin:0;font-family:var(--font-body);background:var(--bg);color:var(--text
 
 /* Botão Flutuante de Alternância */
 .switch-mode-btn{position:absolute;top:24px;right:24px;background:#f1f5f9;border:1px solid var(--line);color:var(--text-main);padding:8px 16px;border-radius:20px;font-size:0.85rem;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.2s;z-index:10;}
-.login-container.erp-mode ~ * .switch-mode-btn, .side-form .switch-mode-btn{right:auto;left:24px;}
+.login-container.erp-mode ~ .switch-mode-btn, body .switch-mode-btn{transition: all 0.4s ease;}
 .switch-mode-btn:hover{background:#e2e8f0;}
 
 @media(max-width:900px){
   .login-container, .login-container.erp-mode{grid-template-columns:1fr;}
   .side-image{display:none;}
-  .switch-mode-btn{top:16px;left:16px;}
 }
 </style>
 </head>
@@ -65,16 +98,16 @@ body{margin:0;font-family:var(--font-body);background:var(--bg);color:var(--text
 
 <div class="login-container" id="loginContainer">
   <!-- IMAGEM DE FUNDO -->
-  <div class="side-image" id="sideImageBg">
-    <div class="side-image-content">
+  <div class="side-image" id="sideImageBg" style="background-image: url('https://images.unsplash.com/photo-1578575437130-527eed3abbec?q=80&w=1920&auto=format&fit=crop');">
+    <div class="side-image-content" id="imageContent">
       <h1 id="imgTitle">SE7 Terminais</h1>
       <p id="imgSubtitle">Gestão de Agendamentos</p>
     </div>
   </div>
 
   <!-- FORMULÁRIO DE LOGIN -->
-  <div class="side-form">
-    <div class="form-box">
+  <div class="side-form" id="sideForm">
+    <div class="form-box" id="formBox">
       <h2 class="form-title" id="formTitle">Acesso ao Sistema</h2>
       
       <form id="loginForm" style="display:flex;flex-direction:column;gap:16px">
@@ -102,9 +135,8 @@ body{margin:0;font-family:var(--font-body);background:var(--bg);color:var(--text
 const API = 'https://se7-backend.onrender.com/api';
 let isErpMode = false;
 
-// URLs das imagens para cada modo
-const IMG_AGENDAMENTO = 'https://images.unsplash.com/photo-1578575437130-527eed3abbec?q=80&w=1920&auto=format&fit=crop'; // A original panorâmica do porto/cidade
-const IMG_ERP = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1920&auto=format&fit=crop'; // Nova temática de terminal de cargas/armazém
+const IMG_AGENDAMENTO = 'https://images.unsplash.com/photo-1578575437130-527eed3abbec?q=80&w=1920&auto=format&fit=crop';
+const IMG_ERP = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1920&auto=format&fit=crop';
 
 function toggleMode() {
   isErpMode = !isErpMode;
@@ -116,26 +148,38 @@ function toggleMode() {
   const formFooter = document.getElementById('formFooter');
   const emailInput = document.getElementById('email');
   const sideImageBg = document.getElementById('sideImageBg');
+  const imageContent = document.getElementById('imageContent');
+  const formBox = document.getElementById('formBox');
 
-  if (isErpMode) {
-    container.classList.add('erp-mode');
-    title.textContent = 'ERP Logístico';
-    imgTitle.textContent = 'SE7 Terminais';
-    imgSubtitle.textContent = 'ERP Logístico & Balança';
-    switchText.textContent = 'Voltar para Agendamentos';
-    sideImageBg.style.backgroundImage = `url('${IMG_ERP}')`;
-    formFooter.style.display = 'none';
-    emailInput.value = 'admin@empresa.com';
-  } else {
-    container.classList.remove('erp-mode');
-    title.textContent = 'Acesso ao Sistema';
-    imgTitle.textContent = 'SE7 Terminais';
-    imgSubtitle.textContent = 'Gestão de Agendamentos';
-    switchText.textContent = 'Mudar para ERP Logístico';
-    sideImageBg.style.backgroundImage = `url('${IMG_AGENDAMENTO}')`;
-    formFooter.style.display = 'flex';
-    emailInput.value = '';
-  }
+  // Efeito fade out rápido antes de trocar o conteúdo e a imagem
+  imageContent.style.opacity = 0;
+  formBox.style.opacity = 0;
+
+  setTimeout(() => {
+    if (isErpMode) {
+      container.classList.add('erp-mode');
+      title.textContent = 'ERP Logístico';
+      imgTitle.textContent = 'SE7 Terminais';
+      imgSubtitle.textContent = 'ERP Logístico & Balança';
+      switchText.textContent = 'Voltar para Agendamentos';
+      sideImageBg.style.backgroundImage = `url('${IMG_ERP}')`;
+      formFooter.style.display = 'none';
+      emailInput.value = 'admin@empresa.com';
+    } else {
+      container.classList.remove('erp-mode');
+      title.textContent = 'Acesso ao Sistema';
+      imgTitle.textContent = 'SE7 Terminais';
+      imgSubtitle.textContent = 'Gestão de Agendamentos';
+      switchText.textContent = 'Mudar para ERP Logístico';
+      sideImageBg.style.backgroundImage = `url('${IMG_AGENDAMENTO}')`;
+      formFooter.style.display = 'flex';
+      emailInput.value = '';
+    }
+
+    // Fade in do novo conteúdo
+    imageContent.style.opacity = 1;
+    formBox.style.opacity = 1;
+  }, 300);
 }
 
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
