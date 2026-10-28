@@ -82,6 +82,7 @@ main{padding-block:22px 40px;padding-inline:24px;min-width:0;display:flex;flex-d
 .btn{border:0;border-radius:8px;padding:8px 14px;min-height:36px;cursor:pointer;font-weight:500;background:var(--accent);color:var(--accent-fg);display:inline-flex;align-items:center;gap:6px;justify-content:center;font-size:0.95rem}
 .btn:hover{filter:brightness(1.08)}
 .btn.ok{background:var(--ok);color:#fff}
+.btn.ghost{background:transparent;color:var(--fg);border:1px solid var(--line)}
 
 .yard{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) minmax(0,.75fr) minmax(0,.75fr);gap:14px}
 .st{all:unset;box-sizing:border-box;cursor:pointer;position:relative;overflow:hidden;color:#fff;border-radius:var(--r);padding:16px 14px 12px;min-height:112px;display:flex;flex-direction:column;justify-content:space-between}
@@ -136,7 +137,43 @@ tbody tr:hover td{background:var(--surface-2)}
 .a11y-row button { flex: 1; padding: 6px; font-size: 0.85rem; border: 1px solid var(--line); background: var(--surface-2); border-radius: 6px; cursor: pointer; color: var(--fg); }
 .a11y-row button:hover { background: var(--accent-soft); }
 
-@media print{ body * { visibility: hidden; } #ticketPrint, #ticketPrint * { visibility: visible; } #ticketPrint { position: absolute; left: 0; top: 0; width: 100%; display: block !important; } }
+/* REGRAS CORRIGIDAS PARA IMPRESSÃO EM PDF */
+@media print {
+  body * { visibility: hidden !important; }
+  
+  /* Quando imprimindo do Relatório */
+  body.printing-report #secaoRelatorio, 
+  body.printing-report #secaoRelatorio * { 
+    visibility: visible !important; 
+  }
+  body.printing-report #secaoRelatorio { 
+    position: absolute !important; 
+    left: 0 !important; 
+    top: 0 !important; 
+    width: 100% !important; 
+    background: #ffffff !important; 
+    color: #000000 !important; 
+    box-shadow: none !important; 
+    border: none !important; 
+  }
+  body.printing-report #secaoRelatorio button { display: none !important; }
+  body.printing-report table { width: 100% !important; border-collapse: collapse !important; }
+  body.printing-report th, body.printing-report td { border: 1px solid #ccc !important; padding: 8px !important; color: #000 !important; text-align: center !important; }
+  body.printing-report th { background: #f0f0f0 !important; font-weight: bold !important; }
+
+  /* Quando imprimindo o Ticket da Balança */
+  body.printing-ticket #ticketPrint, 
+  body.printing-ticket #ticketPrint * { 
+    visibility: visible !important; 
+  }
+  body.printing-ticket #ticketPrint { 
+    position: absolute !important; 
+    left: 0 !important; 
+    top: 0 !important; 
+    width: 100% !important; 
+    display: block !important; 
+  }
+}
 </style>
 </head>
 <body>
@@ -212,7 +249,7 @@ tbody tr:hover td{background:var(--surface-2)}
       </form>
     </section>
 
-    <!-- 3. PORTARIA & BALANÇA COM RELATÓRIO INTEGRADO -->
+    <!-- 3. PORTARIA & BALANÇA -->
     <section data-sec="portaria" hidden>
       <div class="split">
         <div class="panel">
@@ -284,11 +321,29 @@ tbody tr:hover td{background:var(--surface-2)}
       </div>
     </section>
 
-    <!-- 5. RELATÓRIOS -->
+    <!-- 5. RELATÓRIOS (CONTAINER COM ID CORRIGIDO PARA IMPRESSÃO) -->
     <section data-sec="relatorios" hidden>
-      <div class="panel" id="relatorioPrint">
-        <div style="display:flex;justify-content:space-between"><h2>Relatório Operacional Portuário</h2><button class="btn" onclick="window.print()"><i class="bi bi-printer"></i> Imprimir</button></div>
-        <table style="margin-top:14px"><thead><tr><th>ID</th><th>Data/Hora</th><th>Placa</th><th>Cliente</th><th>Tara</th><th>Bruto</th><th>Status</th></tr></thead><tbody id="tbodyRelatorio"></tbody></table>
+      <div class="panel" id="secaoRelatorio">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <h2>Relatório Operacional Portuário</h2>
+          <button class="btn" onclick="imprimirRelatorio()"><i class="bi bi-printer"></i> Imprimir Relatório PDF</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Data/Hora</th>
+                <th>Placa</th>
+                <th>Cliente</th>
+                <th>Tara</th>
+                <th>Bruto</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyRelatorio"></tbody>
+          </table>
+        </div>
       </div>
     </section>
 
@@ -621,7 +676,11 @@ window.avancarCarregamento = async function() {
   if (res.ok) { toast('Carregamento confirmado! Pronto para 2ª pesagem.'); carregarDadosAPI(); selecionarVeiculo(veiculoSelecionado.id); }
 };
 
+/* FUNÇÕES DE IMPRESSÃO ISOLADAS E CONTROLADAS */
 window.imprimirTicket = function() {
+  document.body.classList.remove('printing-report');
+  document.body.classList.add('printing-ticket');
+  
   $('#tkId').textContent = veiculoSelecionado.id;
   $('#tkData').textContent = new Date().toLocaleString('pt-BR');
   $('#tkPlaca').textContent = veiculoSelecionado.placacavalo;
@@ -631,6 +690,13 @@ window.imprimirTicket = function() {
   $('#tkTara').textContent = veiculoSelecionado.tara;
   $('#tkBruto').textContent = veiculoSelecionado.bruto;
   $('#tkLiq').textContent = veiculoSelecionado.bruto - veiculoSelecionado.tara;
+  
+  window.print();
+};
+
+window.imprimirRelatorio = function() {
+  document.body.classList.remove('printing-ticket');
+  document.body.classList.add('printing-report');
   window.print();
 };
 
