@@ -109,7 +109,6 @@ tbody tr:hover td{background:var(--surface-2)}
 .kpi-box span { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
 .kpi-box b { display: block; font-size: 2rem; font-weight: 700; color: var(--accent); margin-top: 6px; }
 
-/* LAYOUT DE CARDS EM GRID PARA A EFICIÊNCIA */
 .dashboard-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
 .dash-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 20px; box-shadow: var(--shadow); display: flex; flex-direction: column; justify-content: space-between; }
 .dash-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
@@ -186,7 +185,7 @@ tbody tr:hover td{background:var(--surface-2)}
       </div>
     </section>
 
-    <!-- 2. AGENDAMENTO -->
+    <!-- 2. AGENDAMENTO COM INPUTS LIVRES E DATALIST -->
     <section data-sec="agendamento" hidden>
       <form class="panel" id="agForm">
         <h2>Novo agendamento de carga</h2>
@@ -195,8 +194,21 @@ tbody tr:hover td{background:var(--surface-2)}
           <div class="field"><label>Motorista</label><input class="input" id="aMot" required placeholder="Nome completo"></div>
           <div class="field"><label>Placa do Cavalo</label><input class="input" id="aPlaca" required placeholder="ABC-1234"></div>
           <div class="field"><label>Data / Hora da Janela</label><input class="input" type="datetime-local" id="aData" required></div>
-          <div class="field"><label>Cliente (Cadastrado)</label><select class="input" id="aCli" required></select></div>
-          <div class="field"><label>Produto (Cadastrado)</label><select class="input" id="aProd" required></select></div>
+          
+          <!-- Cliente com input livre e datalist para sugestões -->
+          <div class="field">
+            <label>Cliente</label>
+            <input class="input" id="aCli" list="dlClientes" required placeholder="Digite ou selecione o cliente...">
+            <datalist id="dlClientes"></datalist>
+          </div>
+          
+          <!-- Produto com input livre e datalist para sugestões -->
+          <div class="field">
+            <label>Produto</label>
+            <input class="input" id="aProd" list="dlProdutos" required placeholder="Digite ou selecione o produto...">
+            <datalist id="dlProdutos"></datalist>
+          </div>
+
           <div class="full" style="text-align:right"><button type="submit" class="btn">Salvar Agendamento</button></div>
         </div>
       </form>
@@ -217,7 +229,7 @@ tbody tr:hover td{background:var(--surface-2)}
       </div>
     </section>
 
-    <!-- 4. DASHBOARD GERENCIAL REFORMULADO E ELEGANTE -->
+    <!-- 4. DASHBOARD GERENCIAL -->
     <section data-sec="indicadores" hidden>
       <div class="kpis-grid">
         <div class="kpi-box"><span>Total de Cargas</span><b id="kpiTotal">0</b></div>
@@ -227,7 +239,6 @@ tbody tr:hover td{background:var(--surface-2)}
       </div>
 
       <div class="dashboard-grid">
-        <!-- Card 1: Taxa de Ocupação -->
         <div class="dash-card">
           <div>
             <h3><i class="bi bi-pie-chart-fill" style="color:var(--accent)"></i> Ocupação do Pátio</h3>
@@ -245,7 +256,6 @@ tbody tr:hover td{background:var(--surface-2)}
           </div>
         </div>
 
-        <!-- Card 2: Conclusão de Pesagens -->
         <div class="dash-card">
           <div>
             <h3><i class="bi bi-speedometer2" style="color:var(--ok)"></i> Conclusão de Pesagens</h3>
@@ -263,15 +273,12 @@ tbody tr:hover td{background:var(--surface-2)}
           </div>
         </div>
 
-        <!-- Card 3: Distribuição por Etapas do Pátio -->
         <div class="dash-card">
           <div>
             <h3><i class="bi bi-diagram-3-fill" style="color:#ffc107"></i> Etapas do Retroporto</h3>
             <p>Distribuição de veículos no fluxo</p>
           </div>
-          <div class="eta-list" id="etaList">
-            <!-- Gerado dinamicamente no JS -->
-          </div>
+          <div class="eta-list" id="etaList"></div>
         </div>
       </div>
     </section>
@@ -368,7 +375,6 @@ tbody tr:hover td{background:var(--surface-2)}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="utils.js"></script>
 <script>
-// Funções de Acessibilidade
 function setTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
   localStorage.setItem('theme', theme);
@@ -439,10 +445,12 @@ async function carregarDadosAPI() {
 }
 
 function render(){
+  // Popula os datalists com sugestões dos cadastros base
   const clis = CADASTROS.filter(c=>c.tipo==='cliente').map(c=>c.nome);
   const prods = CADASTROS.filter(c=>c.tipo==='produto').map(c=>c.nome);
-  if ($('#aCli')) $('#aCli').innerHTML = (clis.length ? clis : ['AMBEV S.A.', 'ADUBOS VERA CRUZ']).map(x=>`<option>${esc(x)}</option>`).join('');
-  if ($('#aProd')) $('#aProd').innerHTML = (prods.length ? prods : ['Malte Cervejeiro', 'MAP', 'Cloreto de Potássio']).map(x=>`<option>${esc(x)}</option>`).join('');
+  
+  if ($('#dlClientes')) $('#dlClientes').innerHTML = (clis.length ? clis : ['AMBEV S.A.', 'ADUBOS VERA CRUZ LTDA', 'BUNGE ALIMENTOS']).map(x=>`<option value="${esc(x)}">`).join('');
+  if ($('#dlProdutos')) $('#dlProdutos').innerHTML = (prods.length ? prods : ['Malte Cervejeiro', 'MAP', 'Cloreto de Potássio', 'Soja em Grãos']).map(x=>`<option value="${esc(x)}">`).join('');
 
   if(view==='patio'){
     $('#yard').innerHTML = Object.keys(ETAPAS).map(k=>`<div class="st" style="background:${ETAPAS[k].cor}"><h3>${ETAPAS[k].nome}</h3><div class="count"><b>${V.filter(v=>etapa(v)===k).length}</b></div></div>`).join('');
@@ -473,14 +481,13 @@ function render(){
     const ocupacao = total > 0 ? Math.min(Math.round((emPatio / 50) * 100), 100) : 0;
     const conclusao = total > 0 ? Math.round((finalizadas / total) * 100) : 0;
 
-    $('#lblOcupacao').textContent = `${ocupacao}%`;
-    $('#barOcupacao').style.width = `${ocupacao}%`;
+    if($('#lblOcupacao')) $('#lblOcupacao').textContent = `${ocupacao}%`;
+    if($('#barOcupacao')) $('#barOcupacao').style.width = `${ocupacao}%`;
 
-    $('#lblConclusao').textContent = `${conclusao}%`;
-    $('#barConclusao').style.width = `${conclusao}%`;
-    $('#lblFinalizadasCount').textContent = `${finalizadas} de ${total} concluídos`;
+    if($('#lblConclusao')) $('#lblConclusao').textContent = `${conclusao}%`;
+    if($('#barConclusao')) $('#barConclusao').style.width = `${conclusao}%`;
+    if($('#lblFinalizadasCount')) $('#lblFinalizadasCount').textContent = `${finalizadas} de ${total} concluídos`;
 
-    // Renderiza distribuição por etapas
     if ($('#etaList')) {
       $('#etaList').innerHTML = Object.keys(ETAPAS).map(k => {
         const cnt = V.filter(v => etapa(v) === k).length;
@@ -506,6 +513,32 @@ function render(){
     $('#tbodyLogs').innerHTML = LOGS.map(l=>`<tr><td>${l.datahora || '—'}</td><td><b>${esc(l.usuario || 'Sistema')}</b></td><td>${esc(l.acao)}</td></tr>`).join('') || '<tr><td colspan="3">Sem logs registados</td></tr>';
   }
 }
+
+// Handler de Agendamento (Lê os inputs de texto livre)
+$('#agForm')?.addEventListener('submit', async e=>{
+  e.preventDefault();
+  const novo = {
+    transportadora: $('#aTransp').value,
+    motorista: $('#aMot').value,
+    placacavalo: $('#aPlaca').value.toUpperCase(),
+    datahora: $('#aData').value,
+    cliente: $('#aCli').value,
+    produto: $('#aProd').value,
+    status: 'Agendado'
+  };
+
+  const res = await fetchAutenticado(`${API}/agendamentos`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(novo)
+  });
+
+  if (res && res.ok) {
+    toast('Agendamento salvo com sucesso!');
+    $('#agForm').reset();
+    carregarDadosAPI();
+  } else {
+    Swal.fire('Erro', 'Não foi possível salvar o agendamento', 'error');
+  }
+});
 
 $('#formCadastro')?.addEventListener('submit', async e => {
   e.preventDefault();
