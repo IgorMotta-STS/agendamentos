@@ -142,7 +142,7 @@ body{margin:0;font-family:var(--font-body);background:var(--bg);color:var(--text
     <div class="pane">
       <div class="side-form">
         <div class="form-box">
-          <h2 class="form-title">ERP Logístico</h2>
+          <h2 class="form-title">Acesso ao ERP Logístico</h2>
           <form id="loginFormErp" onsubmit="realizarLogin(event, true)" style="display:flex;flex-direction:column;gap:16px">
             <div class="field">
               <label>E-mail de Operador / Admin</label>
@@ -186,6 +186,20 @@ function toggleMode() {
   }
 }
 
+// Função auxiliar para ler o payload do JWT no frontend com segurança
+function lerTokenSeguro(token) {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    return null;
+  }
+}
+
 async function realizarLogin(e, isErp) {
   e.preventDefault();
   const email = document.getElementById(isErp ? 'emailErp' : 'emailAgendamento').value;
@@ -200,6 +214,15 @@ async function realizarLogin(e, isErp) {
     const data = await res.json();
 
     if (res.ok && data.token) {
+      const payload = lerTokenSeguro(data.token);
+      const perfil = payload?.perfil || 'usuario';
+
+      // Validação restrita: ERP apenas para Admin/Operador
+      if (isErp && perfil !== 'admin') {
+        Swal.fire('Acesso Restrito', 'Esta conta não possui permissão de Administrador para aceder ao ERP.', 'warning');
+        return;
+      }
+
       localStorage.setItem('token', data.token);
       window.location.href = isErp ? 'erp.html' : 'dashboard.html';
     } else {
