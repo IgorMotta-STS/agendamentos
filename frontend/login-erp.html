@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login - ERP Logístico | SE7 Terminais</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f1420; --surface:#18202f; --line:#2b3549;
+  --fg:#e6ebf4; --muted:#9aa6bb; --accent:#0d6efd; --accent-fg:#ffffff;
+  --font-display:"Lexend", system-ui, sans-serif; --font-body:"Lexend", system-ui, sans-serif;
+  --r:12px; --shadow:0 8px 24px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);min-height:100vh;display:grid;place-items:center;margin:0;padding:20px}
+.login-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:32px;width:100%;max-width:400px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:20px}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:4px}
+.brand-mark{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,#0d6efd,#0b5ed7);display:grid;place-items:center;font-weight:700;font-size:18px;color:#fff}
+.brand h2{font-size:1.25rem;font-weight:600;margin:0}
+.brand small{display:block;color:var(--muted);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.badge-erp{display:inline-flex;align-items:center;gap:6px;background:rgba(13,110,253,.15);color:var(--accent);padding:4px 10px;border-radius:6px;font-size:0.8rem;font-weight:600;width:fit-content}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:0.9rem;color:var(--muted);font-weight:500}
+.input{border:1px solid var(--line);background:#1e2738;border-radius:8px;padding:10px 14px;color:var(--fg);font-size:0.95rem;width:100%}
+.input:focus{border-color:var(--accent);outline:2px solid rgba(13,110,253,.25)}
+.btn{border:0;border-radius:8px;padding:11px 16px;cursor:pointer;font-weight:600;background:var(--accent);color:var(--accent-fg);display:flex;align-items:center;justify-content:center;gap:8px;font-size:1rem;margin-top:6px}
+.btn:hover{filter:brightness(1.1)}
+.back-link{text-align:center;font-size:0.85rem;margin-top:4px}
+.back-link a{color:var(--muted);text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.back-link a:hover{color:var(--fg)}
+</style>
+</head>
+<body>
+
+<div class="login-card">
+  <div class="brand">
+    <div class="brand-mark">S7</div>
+    <div>
+      <h2>SE7 Terminais</h2>
+      <small>Sistema Logístico</small>
+    </div>
+  </div>
+
+  <div class="badge-erp">
+    <i class="bi bi-shield-lock-fill"></i> Acesso Restrito ao ERP &amp; Balança
+  </div>
+
+  <form id="loginForm" style="display:flex;flex-direction:column;gap:16px">
+    <div class="field">
+      <label for="email">E-mail de Operador / Admin</label>
+      <input class="input" type="email" id="email" value="admin@empresa.com" required placeholder="admin@empresa.com">
+    </div>
+    <div class="field">
+      <label for="senha">Palavra-passe (Senha)</label>
+      <input class="input" type="password" id="senha" value="123456" required placeholder="••••••••">
+    </div>
+    <button type="submit" class="btn">Entrar no ERP <i class="bi bi-arrow-right"></i></button>
+  </form>
+
+  <div class="back-link">
+    <a href="dashboard.html"><i class="bi bi-arrow-left"></i> Voltar para o Painel Geral / Agendamento</a>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+const API = 'https://se7-backend.onrender.com/api';
+
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('email').value;
+  const senha = document.getElementById('senha').value;
+
+  try {
+    const res = await fetch(`${API}/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, senha })
+    });
+    const data = await res.json();
+
+    if (res.ok && data.token) {
+      localStorage.setItem('token', data.token);
+      window.location.href = 'erp.html';
+    } else {
+      Swal.fire('Atenção', data.erro || 'Credenciais inválidas', 'warning');
+    }
+  } catch (err) {
+    Swal.fire('Erro', 'Não foi possível conectar ao servidor de autenticação.', 'error');
+  }
+});
+</script>
+</body>
+</html>
