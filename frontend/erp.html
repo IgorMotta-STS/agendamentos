@@ -212,11 +212,14 @@ tbody tr:hover td{background:var(--surface-2)}
       </form>
     </section>
 
-    <!-- 3. PORTARIA & BALANÇA -->
+    <!-- 3. PORTARIA & BALANÇA COM RELATÓRIO INTEGRADO -->
     <section data-sec="portaria" hidden>
       <div class="split">
         <div class="panel">
-          <h2>Fila de Veículos</h2>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <h2 style="margin:0">Fila de Veículos</h2>
+            <button class="btn ghost sm" onclick="go('relatorios')"><i class="bi bi-file-earmark-bar-graph"></i> Ver Relatório Consolidado</button>
+          </div>
           <input class="input" id="pBusca" placeholder="Buscar placa..." style="margin-bottom:12px">
           <div class="list" id="pEntrada"></div>
         </div>
@@ -411,7 +414,6 @@ const ETAPAS = {
 function etapa(v){
   if (v.status === 'Finalizado') return 'finalizado';
   if (!v.tara || Number(v.tara) === 0) return 'pesagem1';
-  // Se tem tara mas o bruto ainda não foi preenchido/finalizado, verifica se está em vistoria ou pronto para 2ª pesagem
   if (!v.bruto || Number(v.bruto) === 0) {
     return (v.status === 'Em andamento') ? 'pesagem2' : 'vistoria';
   }
@@ -431,6 +433,7 @@ function go(v){
   $('#pageTitle').textContent=TITLES[v];
   carregarDadosAPI();
 }
+window.go = go;
 $('#nav').addEventListener('click',e=>{const b=e.target.closest('button[data-view]');if(b)go(b.dataset.view);});
 
 async function carregarDadosAPI() {
@@ -582,7 +585,12 @@ window.selecionarVeiculo = function(id) {
   }
 
   if (tara > 0 && bruto > 0) {
-    html += `<button class="btn ghost" onclick="imprimirTicket()" style="margin-top:8px">Imprimir Ticket</button>`;
+    html += `
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn ghost" onclick="imprimirTicket()"><i class="bi bi-printer"></i> Imprimir Ticket</button>
+        <button class="btn ghost" onclick="go('relatorios')"><i class="bi bi-file-earmark-text"></i> Ver no Relatório</button>
+      </div>
+    `;
   }
   
   $('#bDetalhe').innerHTML = html;
@@ -606,7 +614,6 @@ window.gravarPesagem = async function(tipo) {
 
 window.avancarCarregamento = async function() {
   if (!veiculoSelecionado) return;
-  // Atualiza o status para forçar a transição para a 2ª pesagem (Bruto)
   const up = { ...veiculoSelecionado, status: 'Em andamento' };
   const res = await fetchAutenticado(`${API}/agendamentos/${veiculoSelecionado.id}`, {
     method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(up)
